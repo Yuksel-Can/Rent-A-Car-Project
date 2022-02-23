@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACarProject.business.abstracts.CarService;
-import com.turkcell.rentACarProject.business.dtos.CarDto;
+import com.turkcell.rentACarProject.business.dtos.GetCarDto;
 import com.turkcell.rentACarProject.business.dtos.CarListDto;
 import com.turkcell.rentACarProject.business.requests.CreateCarRequest;
 import com.turkcell.rentACarProject.business.requests.UpdateCarRequest;
@@ -48,15 +48,20 @@ public class CarManager implements CarService{
 
 	@Override
 	public void update(UpdateCarRequest updateCarRequest) {
-
-		Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
-		this.carDao.save(car);
+		try {
+			isExistsCarId(updateCarRequest.getCarId());
+			
+			Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
+			this.carDao.save(car);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	@Override
 	public void delete(int id) {
 		try {
-			isCarExists(id);
+			isExistsCarId(id);
 			this.carDao.deleteById(id);
 			
 		} catch (Exception e) {
@@ -66,16 +71,25 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public CarDto getById(int id) {
-		Car car = this.carDao.getById(id);
-		CarDto carDto = this.modelMapperService.forDto().map(car, CarDto.class);
-		return carDto;
+	public GetCarDto getById(int id) {
+		try {
+			isExistsCarId(id);
+			
+			Car car = this.carDao.getById(id);
+			GetCarDto carDto = this.modelMapperService.forDto().map(car, GetCarDto.class);
+			return carDto;
+		} catch (BusinessException e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
 	}
 	
-	boolean isCarExists(int id) throws BusinessException {
+	/**/
+	
+	boolean isExistsCarId(int id) throws BusinessException {
 		if(this.carDao.existsById(id)) {
 			return true;
 		}
-		throw new BusinessException("Lütfen geçerli bir id giriniz");
+		throw new BusinessException("Car id not exists");
 	}
 }

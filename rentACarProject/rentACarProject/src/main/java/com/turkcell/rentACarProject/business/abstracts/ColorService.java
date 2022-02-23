@@ -3,14 +3,19 @@ package com.turkcell.rentACarProject.business.abstracts;
 import java.util.List;
 
 import com.turkcell.rentACarProject.business.dtos.ColorListDto;
+import com.turkcell.rentACarProject.business.dtos.GetColorDto;
 import com.turkcell.rentACarProject.business.requests.CreateColorRequest;
-import com.turkcell.rentACarProject.entities.concretes.Color;
+import com.turkcell.rentACarProject.business.requests.UpdateColorRequest;
+import com.turkcell.rentACarProject.core.utilities.result.DataResult;
+import com.turkcell.rentACarProject.core.utilities.result.Result;
 
 public interface ColorService {
 	
-	List<ColorListDto> getAll();
+	DataResult<List<ColorListDto>> getAll();
 	
-	void add(CreateColorRequest cleareColorRequest);
+	Result add(CreateColorRequest createColorRequest);
+	Result update(UpdateColorRequest updateColorRequest);
+	Result delete(int id);
 	
-	Color getById(int id);
+	DataResult<GetColorDto> getById(int id);
 }

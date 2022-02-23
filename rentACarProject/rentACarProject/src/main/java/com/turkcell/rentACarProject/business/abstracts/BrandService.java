@@ -5,14 +5,19 @@ import java.util.List;
 import com.turkcell.rentACarProject.business.dtos.BrandListDto;
 import com.turkcell.rentACarProject.business.dtos.GetBrandDto;
 import com.turkcell.rentACarProject.business.requests.CreateBrandRequest;
+import com.turkcell.rentACarProject.business.requests.UpdateBrandRequest;
+import com.turkcell.rentACarProject.core.utilities.result.DataResult;
+import com.turkcell.rentACarProject.core.utilities.result.Result;
 
 public interface BrandService {
 	
-	List<BrandListDto> getAll();
+	DataResult<List<BrandListDto>> getAll();
 	
-	void add(CreateBrandRequest createBrandRequest);
+	Result add(CreateBrandRequest createBrandRequest);
+	Result update(UpdateBrandRequest updateBrandRequest);
+	Result delete(int id);
 	
-	GetBrandDto getById(int id);
+	DataResult<GetBrandDto> getById(int id);
 	
 
 }

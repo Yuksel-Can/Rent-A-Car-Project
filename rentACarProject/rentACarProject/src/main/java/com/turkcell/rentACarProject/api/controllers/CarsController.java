@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkcell.rentACarProject.business.abstracts.CarService;
 import com.turkcell.rentACarProject.business.dtos.CarListDto;
+import com.turkcell.rentACarProject.business.dtos.GetCarDto;
 import com.turkcell.rentACarProject.business.requests.CreateCarRequest;
 import com.turkcell.rentACarProject.business.requests.UpdateCarRequest;
 
@@ -51,6 +52,9 @@ public class CarsController {
 		this.carService.add(createCarRequest);
 	}
 	
-
+	@GetMapping("/getById")
+	public GetCarDto getById(@RequestParam int id) {
+		return this.carService.getById(id);
+	}
 	
 }

@@ -3,13 +3,22 @@ package com.turkcell.rentACarProject.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.turkcell.rentACarProject.business.abstracts.BrandService;
 import com.turkcell.rentACarProject.business.dtos.BrandListDto;
 import com.turkcell.rentACarProject.business.dtos.GetBrandDto;
 import com.turkcell.rentACarProject.business.requests.CreateBrandRequest;
+import com.turkcell.rentACarProject.business.requests.UpdateBrandRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
+import com.turkcell.rentACarProject.core.utilities.result.DataResult;
+import com.turkcell.rentACarProject.core.utilities.result.ErrorDataResult;
+import com.turkcell.rentACarProject.core.utilities.result.ErrorResult;
+import com.turkcell.rentACarProject.core.utilities.result.Result;
+import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
+import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.BrandDao;
 import com.turkcell.rentACarProject.entities.concretes.Brand;
 
@@ -19,46 +28,100 @@ public class BrandManager implements BrandService {
 	private BrandDao brandDao;
 	private ModelMapperService modelMapperService;
 
+	@Autowired
 	public BrandManager(BrandDao brandDao, ModelMapperService modelMapperService) {
 		this.brandDao = brandDao;
 		this.modelMapperService = modelMapperService;
 	}
 
 	@Override
-	public List<BrandListDto> getAll() {
+	public DataResult<List<BrandListDto>> getAll() {
 		List<Brand> brands = this.brandDao.findAll();
 
 		List<BrandListDto> result = brands.stream()
 				.map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
 				.collect(Collectors.toList());
 
-		return result;
+		return new SuccessDataResult<List<BrandListDto>>(result, "Brand listed");
 	}
 
 	@Override
-	public void add(CreateBrandRequest createBrandRequest) {
+	public Result add(CreateBrandRequest createBrandRequest) {
 
 		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 
 		if (!isExistByName(brand.getBrandName())) {
 			this.brandDao.save(brand);
+			
+			return new SuccessResult("Brand added");
 		}
+		return new ErrorResult("Brand not added");
 
+	}
+
+	@Override
+	public Result update(UpdateBrandRequest updateBrandRequest) {
+		
+		try {
+			isExistsByBrandId(updateBrandRequest.getBrandId());
+			
+			Brand brand = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
+			if (!isExistByName(brand.getBrandName())) {
+				this.brandDao.save(brand);
+				return new SuccessResult("Brand updated");
+			}		
+			return new ErrorResult("Brand not updated ");
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return new ErrorResult("Brand not updated");
+		}
+		
+	}
+
+	@Override
+	public Result delete(int id) {
+		try {
+			isExistsByBrandId(id);
+			this.brandDao.deleteById(id);
+			
+			return new SuccessResult("Brand deleted");
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return new ErrorResult("Brand not deleted");
+		}
+		
+	}
+
+	@Override
+	public DataResult<GetBrandDto> getById(int id) {
+		try {
+			isExistsByBrandId(id);
+			
+			Brand brand = this.brandDao.getById(id);
+			GetBrandDto getBrandDto = this.modelMapperService.forDto().map(brand, GetBrandDto.class);
+			
+			return new SuccessDataResult<GetBrandDto>(getBrandDto, "Brand listed");
+			
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return new ErrorDataResult<>("Brand dont list");
+		}
+		
+	}
+	
+	/**/
+	
+	private boolean isExistsByBrandId(int id) throws BusinessException {
+		if(this.brandDao.existsByBrandId(id)) {
+			return true;
+		}
+		throw new BusinessException("Color id not exists");
 	}
 
 	public boolean isExistByName(String name) {
 		return this.brandDao.existsByBrandName(name);
-	}
-
-	@Override
-	public GetBrandDto getById(int id) {
-		
-		Brand brand = this.brandDao.getById(id);
-		
-		GetBrandDto getBrandDto = this.modelMapperService.forDto().map(brand, GetBrandDto.class);
-		
-		return getBrandDto;
-		
 	}
 
 }
