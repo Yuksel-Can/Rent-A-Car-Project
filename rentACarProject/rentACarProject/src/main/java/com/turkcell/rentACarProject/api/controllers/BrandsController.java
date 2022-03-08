@@ -2,6 +2,8 @@ package com.turkcell.rentACarProject.api.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.turkcell.rentACarProject.business.abstracts.BrandService;
 import com.turkcell.rentACarProject.business.dtos.BrandListDto;
 import com.turkcell.rentACarProject.business.dtos.GetBrandDto;
-import com.turkcell.rentACarProject.business.requests.CreateBrandRequest;
-import com.turkcell.rentACarProject.business.requests.UpdateBrandRequest;
+import com.turkcell.rentACarProject.business.requests.create.CreateBrandRequest;
+import com.turkcell.rentACarProject.business.requests.update.UpdateBrandRequest;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
@@ -35,12 +37,12 @@ public class BrandsController {
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody CreateBrandRequest createBrandRequest) {
+	public Result add(@RequestBody @Valid CreateBrandRequest createBrandRequest) {
 		return this.brandService.add(createBrandRequest);
 	}
 	
 	@PutMapping("/update")
-	public Result update(UpdateBrandRequest updateBrandRequest) {
+	public Result update(@RequestBody @Valid UpdateBrandRequest updateBrandRequest) {
 		return this.brandService.update(updateBrandRequest);
 	}
 	
