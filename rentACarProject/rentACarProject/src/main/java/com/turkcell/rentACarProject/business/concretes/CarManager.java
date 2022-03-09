@@ -16,6 +16,7 @@ import com.turkcell.rentACarProject.business.dtos.CarListDto;
 import com.turkcell.rentACarProject.business.dtos.CarPagedDto;
 import com.turkcell.rentACarProject.business.dtos.CarSortedDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateCarRequest;
+import com.turkcell.rentACarProject.business.requests.delete.DeleteCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
@@ -71,21 +72,19 @@ public class CarManager implements CarService{
 			return new SuccessResult("Car updated");
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			return new ErrorResult("Car not updated");
 		}
 	}
 
 	@Override
-	public Result delete(int id) {
+	public Result delete(DeleteCarRequest deleteCarRequest) {
 		try {
-			isExistsCarId(id);
-			this.carDao.deleteById(id);
+			isExistsCarId(deleteCarRequest.getCarId());
+			this.carDao.deleteById(deleteCarRequest.getCarId());
 			
 			return new SuccessResult("Car deleted");
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			return new ErrorResult("Car not deleted");
 		}
 		
@@ -102,7 +101,6 @@ public class CarManager implements CarService{
 			return new SuccessDataResult<GetCarDto>(carDto, "Car listed");
 			
 		} catch (BusinessException e) {
-			System.out.println(e.getMessage());
 			
 			return new ErrorDataResult<GetCarDto>("Car not listed");
 		}

@@ -10,6 +10,7 @@ import com.turkcell.rentACarProject.business.abstracts.BrandService;
 import com.turkcell.rentACarProject.business.dtos.BrandListDto;
 import com.turkcell.rentACarProject.business.dtos.GetBrandDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateBrandRequest;
+import com.turkcell.rentACarProject.business.requests.delete.DeleteBrandRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateBrandRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
@@ -73,22 +74,20 @@ public class BrandManager implements BrandService {
 			return new ErrorResult("Brand not updated ");
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			return new ErrorResult("Brand not updated");
 		}
 		
 	}
 
 	@Override
-	public Result delete(int id) {
+	public Result delete(DeleteBrandRequest deleteBrandRequest) {
 		try {
-			isExistsByBrandId(id);
-			this.brandDao.deleteById(id);
+			isExistsByBrandId(deleteBrandRequest.getBrandId());
+			this.brandDao.deleteById(deleteBrandRequest.getBrandId());
 			
 			return new SuccessResult("Brand deleted");
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			return new ErrorResult("Brand not deleted");
 		}
 		
@@ -105,7 +104,6 @@ public class BrandManager implements BrandService {
 			return new SuccessDataResult<GetBrandDto>(getBrandDto, "Brand listed");
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			return new ErrorDataResult<>("Brand dont list");
 		}
 		
@@ -117,7 +115,7 @@ public class BrandManager implements BrandService {
 		if(this.brandDao.existsByBrandId(id)) {
 			return true;
 		}
-		throw new BusinessException("Color id not exists");
+		throw new BusinessException("Brand id not exists");
 	}
 
 	public boolean isExistByName(String name) {

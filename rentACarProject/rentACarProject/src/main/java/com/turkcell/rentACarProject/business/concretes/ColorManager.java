@@ -10,6 +10,7 @@ import com.turkcell.rentACarProject.business.abstracts.ColorService;
 import com.turkcell.rentACarProject.business.dtos.ColorListDto;
 import com.turkcell.rentACarProject.business.dtos.GetColorDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateColorRequest;
+import com.turkcell.rentACarProject.business.requests.delete.DeleteColorRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateColorRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
@@ -74,7 +75,6 @@ public class ColorManager implements ColorService{
 			return new ErrorResult("Color not updated");
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			
 			return new ErrorResult("Color not updated");
 		}
@@ -82,16 +82,14 @@ public class ColorManager implements ColorService{
 	}
 
 	@Override
-	public Result delete(int id) {
+	public Result delete(DeleteColorRequest deleteColorRequest) {
 		try {
-			isExistsByColorId(id);
-			this.colorDao.deleteById(id);
+			isExistsByColorId(deleteColorRequest.getColorId());
+			this.colorDao.deleteById(deleteColorRequest.getColorId());
 			
 			return new SuccessResult("Color deleted");
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			
 			return new ErrorResult("Color not deleted");
 		}
 		
@@ -107,7 +105,6 @@ public class ColorManager implements ColorService{
 			return new SuccessDataResult<GetColorDto>(getColorDto, "Color listed");
 			
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
 			return new ErrorDataResult<GetColorDto>("Color not listed");
 		}
 		

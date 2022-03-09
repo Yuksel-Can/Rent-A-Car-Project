@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import com.turkcell.rentACarProject.business.abstracts.BrandService;
 import com.turkcell.rentACarProject.business.dtos.BrandListDto;
 import com.turkcell.rentACarProject.business.dtos.GetBrandDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateBrandRequest;
+import com.turkcell.rentACarProject.business.requests.delete.DeleteBrandRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateBrandRequest;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -27,9 +29,11 @@ public class BrandsController {
 	
 	private BrandService brandService; 
 	
+	@Autowired
 	public BrandsController(BrandService brandService) {
 		this.brandService = brandService;
 	}
+	
 	
 	@GetMapping("/getAll")
 	public DataResult<List<BrandListDto>> getAll(){
@@ -46,13 +50,15 @@ public class BrandsController {
 		return this.brandService.update(updateBrandRequest);
 	}
 	
-	@DeleteMapping("delete")
-	public Result delete(@RequestParam int id) {
-		return this.brandService.delete(id);
+	@DeleteMapping("/delete")
+	public Result delete(@RequestBody @Valid DeleteBrandRequest deleteBrandRequest) {
+		return this.brandService.delete(deleteBrandRequest);
 	}
 	
 	@GetMapping("/getById")
-	public DataResult<GetBrandDto> getById(@RequestParam int id){
-		return this.brandService.getById(id);
+	public DataResult<GetBrandDto> getById(@RequestParam int brandId){
+		return this.brandService.getById(brandId);
 	}
+	
+	
 }
