@@ -1,7 +1,6 @@
 package com.turkcell.rentACarProject;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.modelmapper.ModelMapper;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.ErrorDataResult;
 
 @SpringBootApplication
@@ -43,5 +43,13 @@ public class RentACarProjectApplication {
 		return result;
 		
 	}
-
+	
+	@ExceptionHandler
+	@ResponseStatus(code = HttpStatus.BAD_REQUEST)
+	public ErrorDataResult<Object> handleBusinessException(BusinessException businessException){
+		
+		String businessExceptionMessage = businessException.getMessage();
+		ErrorDataResult<Object> result = new ErrorDataResult<Object>(businessExceptionMessage, "Business.Error");
+		return result;
+	}
 }

@@ -7,7 +7,10 @@ import com.turkcell.rentACarProject.entities.concretes.Car;
 
 public interface CarDao extends JpaRepository<Car, Integer>{
 	
-	boolean existsById(int carId); 
+	boolean existsByCarId(int carId); 
+	boolean existsByBrand_BrandId(int brandId);
+	boolean existsByColor_ColorId(int colorId);
 	
 	List<Car> findByDailyPriceLessThanEqual(double dailyPrice);	//gunluk fiyata göre kucuk esit
+	
 }

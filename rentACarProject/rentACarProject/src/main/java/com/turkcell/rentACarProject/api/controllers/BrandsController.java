@@ -20,6 +20,7 @@ import com.turkcell.rentACarProject.business.dtos.GetBrandDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateBrandRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteBrandRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateBrandRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
@@ -41,22 +42,22 @@ public class BrandsController {
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody @Valid CreateBrandRequest createBrandRequest) {
+	public Result add(@RequestBody @Valid CreateBrandRequest createBrandRequest) throws BusinessException {
 		return this.brandService.add(createBrandRequest);
 	}
 	
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateBrandRequest updateBrandRequest) {
+	public Result update(@RequestBody @Valid UpdateBrandRequest updateBrandRequest) throws BusinessException {
 		return this.brandService.update(updateBrandRequest);
 	}
 	
 	@DeleteMapping("/delete")
-	public Result delete(@RequestBody @Valid DeleteBrandRequest deleteBrandRequest) {
+	public Result delete(@RequestBody @Valid DeleteBrandRequest deleteBrandRequest) throws BusinessException {
 		return this.brandService.delete(deleteBrandRequest);
 	}
 	
 	@GetMapping("/getById")
-	public DataResult<GetBrandDto> getById(@RequestParam int brandId){
+	public DataResult<GetBrandDto> getById(@RequestParam int brandId) throws BusinessException{
 		return this.brandService.getById(brandId);
 	}
 	

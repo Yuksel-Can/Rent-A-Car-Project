@@ -19,6 +19,7 @@ import com.turkcell.rentACarProject.business.dtos.GetColorDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateColorRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteColorRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateColorRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
@@ -40,22 +41,22 @@ public class ColorsController {
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody @Valid CreateColorRequest createColorRequest) {
+	public Result add(@RequestBody @Valid CreateColorRequest createColorRequest) throws BusinessException {
 		return this.colorService.add(createColorRequest);
 	}
 	
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateColorRequest updateColorRequest) {
+	public Result update(@RequestBody @Valid UpdateColorRequest updateColorRequest) throws BusinessException {
 		return this.colorService.update(updateColorRequest);
 	}
 	
 	@DeleteMapping("/delete")
-	public Result delete(@RequestBody @Valid DeleteColorRequest deleteColorRequest) {
+	public Result delete(@RequestBody @Valid DeleteColorRequest deleteColorRequest) throws BusinessException {
 		return this.colorService.delete(deleteColorRequest);
 	}
 	
 	@GetMapping("/getById")
-	public DataResult<GetColorDto> getById(@RequestParam int colorId) {
+	public DataResult<GetColorDto> getById(@RequestParam int colorId) throws BusinessException {
 		return this.colorService.getById(colorId);
 	}
 	
