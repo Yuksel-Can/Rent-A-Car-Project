@@ -49,7 +49,7 @@ public class ColorManager implements ColorService{
 	@Override
 	public Result add(CreateColorRequest createColorRequest) throws BusinessException {
 		
-		isNotExistsByColorName(createColorRequest.getColorName());
+		checkIsNotExistsByColorName(createColorRequest.getColorName());
 		
 		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
 		this.colorDao.save(color);
@@ -60,8 +60,8 @@ public class ColorManager implements ColorService{
 	@Override
 	public Result update(UpdateColorRequest updateColorRequest) throws BusinessException {
 
-		isExistsByColorId(updateColorRequest.getColorId());
-		isNotExistsByColorName(updateColorRequest.getColorName());
+		checkIsExistsByColorId(updateColorRequest.getColorId());
+		checkIsNotExistsByColorName(updateColorRequest.getColorName());
 		
 		Color color = this.modelMapperService.forRequest().map(updateColorRequest, Color.class);
 		this.colorDao.save(color);
@@ -72,8 +72,8 @@ public class ColorManager implements ColorService{
 	@Override
 	public Result delete(DeleteColorRequest deleteColorRequest) throws BusinessException {
 
-		isExistsByColorId(deleteColorRequest.getColorId());
-		this.carService.isNotExistsByCar_ColorId(deleteColorRequest.getColorId());
+		checkIsExistsByColorId(deleteColorRequest.getColorId());
+		this.carService.checkIsNotExistsByCar_ColorId(deleteColorRequest.getColorId());
 		
 		this.colorDao.deleteById(deleteColorRequest.getColorId());			
 		return new SuccessResult("Color deleted");
@@ -83,7 +83,7 @@ public class ColorManager implements ColorService{
 	@Override
 	public DataResult<GetColorDto> getById(int id) throws BusinessException {
 
-		isExistsByColorId(id);
+		checkIsExistsByColorId(id);
 		
 		Color color = this.colorDao.getById(id);
 		GetColorDto getColorDto = this.modelMapperService.forDto().map(color, GetColorDto.class);
@@ -93,13 +93,13 @@ public class ColorManager implements ColorService{
 	
 	/**/
 	
-	public void isExistsByColorId(int brandId) throws BusinessException {
+	public void checkIsExistsByColorId(int brandId) throws BusinessException {
 		if(!this.colorDao.existsByColorId(brandId)) {
 			throw new BusinessException("Color id not exists");
 		}
 	}
 	
-	public void isNotExistsByColorName(String brandName) throws BusinessException {
+	public void checkIsNotExistsByColorName(String brandName) throws BusinessException {
 		if(this.colorDao.existsByColorName(brandName)) {
 			throw new BusinessException("Color name already exists");
 		}

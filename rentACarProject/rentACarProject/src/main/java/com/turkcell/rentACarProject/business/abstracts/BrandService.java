@@ -21,7 +21,7 @@ public interface BrandService {
 	
 	DataResult<GetBrandDto> getById(int id) throws BusinessException;
 	
-	public void isExistsByBrandId(int brandId) throws BusinessException;
-	public void isNotExistByBrandName(String brandName) throws BusinessException;
+	void checkIsExistsByBrandId(int brandId) throws BusinessException;
+	void checkIsNotExistByBrandName(String brandName) throws BusinessException;
 
 }

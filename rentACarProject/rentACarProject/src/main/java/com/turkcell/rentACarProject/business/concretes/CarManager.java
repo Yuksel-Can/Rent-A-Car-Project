@@ -59,8 +59,8 @@ public class CarManager implements CarService{
 	@Override
 	public Result add(CreateCarRequest createCarRequest)  throws BusinessException {
 		
-		this.brandService.isExistsByBrandId(createCarRequest.getBrandId());
-		this.colorService.isExistsByColorId(createCarRequest.getColorId());
+		this.brandService.checkIsExistsByBrandId(createCarRequest.getBrandId());
+		this.colorService.checkIsExistsByColorId(createCarRequest.getColorId());
 		
 		Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
 		this.carDao.save(car);
@@ -71,9 +71,9 @@ public class CarManager implements CarService{
 	@Override
 	public Result update(UpdateCarRequest updateCarRequest) throws BusinessException {
 
-		isExistsByCarId(updateCarRequest.getCarId());
-		this.brandService.isExistsByBrandId(updateCarRequest.getBrandId());
-		this.colorService.isExistsByColorId(updateCarRequest.getColorId());
+		checkIsExistsByCarId(updateCarRequest.getCarId());
+		this.brandService.checkIsExistsByBrandId(updateCarRequest.getBrandId());
+		this.colorService.checkIsExistsByColorId(updateCarRequest.getColorId());
 		
 		Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
 		this.carDao.save(car);
@@ -84,7 +84,7 @@ public class CarManager implements CarService{
 	@Override
 	public Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException {
 		
-		isExistsByCarId(deleteCarRequest.getCarId());
+		checkIsExistsByCarId(deleteCarRequest.getCarId());
 		
 		this.carDao.deleteById(deleteCarRequest.getCarId());			
 		return new SuccessResult("Car deleted");
@@ -94,7 +94,7 @@ public class CarManager implements CarService{
 	@Override
 	public DataResult<GetCarDto> getById(int id) throws BusinessException {
 
-		isExistsByCarId(id);
+		checkIsExistsByCarId(id);
 		
 		Car car = this.carDao.getById(id);
 		GetCarDto carDto = this.modelMapperService.forDto().map(car, GetCarDto.class);
@@ -138,22 +138,22 @@ public class CarManager implements CarService{
 	}
 	
 	/**/
-	
-	public void isExistsByCarId(int carId) throws BusinessException {
+	@Override
+	public void checkIsExistsByCarId(int carId) throws BusinessException {
 		if(!this.carDao.existsByCarId(carId)) {
 			throw new BusinessException("Car id not exists");
 		}
 	}
 	
 	@Override
-	public void isNotExistsByCar_BrandId(int brandId) throws BusinessException {
+	public void checkIsNotExistsByCar_BrandId(int brandId) throws BusinessException {
 		if(this.carDao.existsByBrand_BrandId(brandId)) {
 			throw new BusinessException("Brand id used by a car");
 		}
 	}
 	
 	@Override
-	public void isNotExistsByCar_ColorId(int colorId) throws BusinessException {
+	public void checkIsNotExistsByCar_ColorId(int colorId) throws BusinessException {
 		if(this.carDao.existsByColor_ColorId(colorId)) {
 			throw new BusinessException("Color id used by a car");
 		}

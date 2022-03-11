@@ -51,5 +51,6 @@ public class RentACarProjectApplication {
 		String businessExceptionMessage = businessException.getMessage();
 		ErrorDataResult<Object> result = new ErrorDataResult<Object>(businessExceptionMessage, "Business.Error");
 		return result;
+
 	}
 }

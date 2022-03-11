@@ -21,12 +21,13 @@ public interface CarService {
 	Result add(CreateCarRequest createCarRequest) throws BusinessException;
 	Result update(UpdateCarRequest updateCarRequest) throws BusinessException;
 	Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException;
-	
-	DataResult<GetCarDto> getById(int id) throws BusinessException;
-	public void isNotExistsByCar_BrandId(int brandId) throws BusinessException;
-	public void isNotExistsByCar_ColorId(int colorId) throws BusinessException;
-	
+
 	DataResult<List<CarListByDailyPrice>> findByDailyPriceLessThenEqual(double dailyPrice);
 	DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize);
 	DataResult<List<CarSortedDto>> getAllSortedCar(int sort);
+	DataResult<GetCarDto> getById(int id) throws BusinessException;
+
+	void checkIsExistsByCarId(int carId) throws  BusinessException;
+	void checkIsNotExistsByCar_BrandId(int brandId) throws BusinessException;
+	void checkIsNotExistsByCar_ColorId(int colorId) throws BusinessException;
 }

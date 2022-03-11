@@ -20,6 +20,7 @@ public interface ColorService {
 	Result delete(DeleteColorRequest deleteColorRequest) throws BusinessException;
 	
 	DataResult<GetColorDto> getById(int id) throws BusinessException;
-	public void isExistsByColorId(int colorId) throws BusinessException;
-	public void isNotExistsByColorName(String colorName) throws BusinessException;
+
+	void checkIsExistsByColorId(int colorId) throws BusinessException;
+	void checkIsNotExistsByColorName(String colorName) throws BusinessException;
 }

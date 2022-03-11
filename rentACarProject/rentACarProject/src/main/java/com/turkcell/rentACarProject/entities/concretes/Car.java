@@ -1,17 +1,12 @@
 package com.turkcell.rentACarProject.entities.concretes;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -42,5 +37,8 @@ public class Car {
 	@ManyToOne()
 	@JoinColumn(name="color_id")
 	private Color color;
+
+	@OneToMany(mappedBy = "car_id")
+	private List<CarMaintenance> carMaintenances;
 	
 }

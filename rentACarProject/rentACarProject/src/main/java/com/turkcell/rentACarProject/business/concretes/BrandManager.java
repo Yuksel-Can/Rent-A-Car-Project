@@ -49,7 +49,7 @@ public class BrandManager implements BrandService {
 	@Override
 	public Result add(CreateBrandRequest createBrandRequest) throws BusinessException {
 
-		isNotExistByBrandName(createBrandRequest.getBrandName());
+		checkIsNotExistByBrandName(createBrandRequest.getBrandName());
 		
 		Brand brand = this.modelMapperService.forRequest().map(createBrandRequest, Brand.class);
 		this.brandDao.save(brand);
@@ -60,8 +60,8 @@ public class BrandManager implements BrandService {
 	@Override
 	public Result update(UpdateBrandRequest updateBrandRequest) throws BusinessException {
 				
-		isExistsByBrandId(updateBrandRequest.getBrandId());
-		isNotExistByBrandName(updateBrandRequest.getBrandName());
+		checkIsExistsByBrandId(updateBrandRequest.getBrandId());
+		checkIsNotExistByBrandName(updateBrandRequest.getBrandName());
 		
 		Brand brand = this.modelMapperService.forRequest().map(updateBrandRequest, Brand.class);
 		this.brandDao.save(brand);
@@ -72,8 +72,8 @@ public class BrandManager implements BrandService {
 	@Override
 	public Result delete(DeleteBrandRequest deleteBrandRequest) throws BusinessException {
 		
-		isExistsByBrandId(deleteBrandRequest.getBrandId());
-		this.carService.isNotExistsByCar_BrandId(deleteBrandRequest.getBrandId());
+		checkIsExistsByBrandId(deleteBrandRequest.getBrandId());
+		this.carService.checkIsNotExistsByCar_BrandId(deleteBrandRequest.getBrandId());
 		
 		this.brandDao.deleteById(deleteBrandRequest.getBrandId());
 		return new SuccessResult("Brand deleted");
@@ -83,7 +83,7 @@ public class BrandManager implements BrandService {
 	@Override
 	public DataResult<GetBrandDto> getById(int id) throws BusinessException {
 
-		isExistsByBrandId(id);
+		checkIsExistsByBrandId(id);
 			
 		Brand brand = this.brandDao.getById(id);
 		GetBrandDto getBrandDto = this.modelMapperService.forDto().map(brand, GetBrandDto.class);
@@ -93,14 +93,14 @@ public class BrandManager implements BrandService {
 	
 	/**/
 	
-	public void isExistsByBrandId(int id) throws BusinessException {
+	public void checkIsExistsByBrandId(int id) throws BusinessException {
 		if(!this.brandDao.existsByBrandId(id)) {
 			throw new BusinessException("Brand id not exists");
 		}
 		
 	}
 
-	public void isNotExistByBrandName(String name) throws BusinessException {
+	public void checkIsNotExistByBrandName(String name) throws BusinessException {
 		if(this.brandDao.existsByBrandName(name)) {
 			throw new BusinessException("Brand name already exists");
 		}
