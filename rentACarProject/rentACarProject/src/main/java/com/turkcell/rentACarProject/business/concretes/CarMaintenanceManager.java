@@ -50,35 +50,83 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     @Override
     public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
 
+        checkNotReturnDateBeforeToday(createCarMaintenanceRequest.getReturnDate());
         this.carService.checkIsExistsByCarId(createCarMaintenanceRequest.getCarId());
-        checkIfReturnDateBeforeToday(createCarMaintenanceRequest.getReturnDate());
 
         CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest, CarMaintenance.class);
         this.carMaintenanceDao.save(carMaintenance);
-        return new SuccessResult("CarMaintenance Added");
+        return new SuccessResult("CarMaintenance added");
 
     }
 
     @Override
-    public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) {
-        return null;
+    public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws BusinessException {
+
+        checkIsExistsByCarMaintenanceId(updateCarMaintenanceRequest.getMaintenanceId());
+        checkNotReturnDateBeforeToday(updateCarMaintenanceRequest.getReturnDate());
+        this.carService.checkIsExistsByCarId(updateCarMaintenanceRequest.getCarId());
+
+        CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest, CarMaintenance.class);
+        this.carMaintenanceDao.save(carMaintenance);
+        return new SuccessResult("CarMaintenance updated");
+
     }
 
     @Override
-    public Result delete(DeleteCarMaintenanceRequest carMaintenanceRequest) {
-        return null;
+    public Result delete(DeleteCarMaintenanceRequest carMaintenanceRequest) throws BusinessException {
+
+        checkIsExistsByCarMaintenanceId(carMaintenanceRequest.getMaintenanceId());
+
+        this.carMaintenanceDao.deleteById(carMaintenanceRequest.getMaintenanceId());
+        return new SuccessResult("CarMaintenance deleted");
+
     }
 
     @Override
-    public DataResult<GetCarMaintenanceDto> getById(int carMaintenanceId) {
-        return null;
+    public DataResult<GetCarMaintenanceDto> getByCarMaintenanceId(int carMaintenanceId) throws BusinessException {
+
+        checkIsExistsByCarMaintenanceId(carMaintenanceId);
+
+        CarMaintenance carMaintenance = this.carMaintenanceDao.getById(carMaintenanceId);
+        GetCarMaintenanceDto result = this.modelMapperService.forDto().map(carMaintenance, GetCarMaintenanceDto.class);
+        return new SuccessDataResult<>(result, "Car Maintenence getted by id: " + carMaintenanceId);
+
     }
 
     @Override
-    public void checkIfReturnDateBeforeToday(LocalDate returnDate) throws BusinessException {
+    public DataResult<List<CarMaintenanceListDto>> getAllByCarMaintenance_CarId(int carId) throws BusinessException {
 
-        if(returnDate.isBefore(LocalDate.now())){
-            throw new BusinessException("return date cannot be a past date");
+        checkIsExistsByCarMaintenance_CarId(carId);
+        this.carService.checkIsExistsByCarId(carId);    //*
+
+        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findByCar_CarId(carId);
+        List<CarMaintenanceListDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
+                .collect(Collectors.toList());
+        return new SuccessDataResult<>(result, "Car maintenances are brought by car id: " + carId);
+    }
+
+    public void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws BusinessException {
+
+        if(!this.carMaintenanceDao.existsByMaintenanceId(carMaintenanceId)){
+            throw new BusinessException("Car Maintenance id not exists");
         }
     }
+
+    public void checkIsExistsByCarMaintenance_CarId(int carId) throws BusinessException {
+
+        if(!this.carMaintenanceDao.existsByCar_CarId(carId)){
+            throw new BusinessException("Car id not found in car maintenance");
+        }
+    }
+
+    @Override
+    public void checkNotReturnDateBeforeToday(LocalDate returnDate) throws BusinessException {
+        if(returnDate != null){
+            if(returnDate.isBefore(LocalDate.now())){
+                throw new BusinessException("return date cannot be a past date");
+            }
+        }
+
+    }
+
 }

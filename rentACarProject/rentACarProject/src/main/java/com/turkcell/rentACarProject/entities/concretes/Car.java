@@ -38,7 +38,7 @@ public class Car {
 	@JoinColumn(name="color_id")
 	private Color color;
 
-	@OneToMany(mappedBy = "car_id")
+	@OneToMany(mappedBy = "car")
 	private List<CarMaintenance> carMaintenances;
 	
 }
