@@ -26,5 +26,7 @@ public interface CarMaintenanceService {
 
 	void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws BusinessException;
 	void checkIsExistsByCarMaintenance_CarId(int carId) throws BusinessException;
-	void checkNotReturnDateBeforeToday(LocalDate returnDate) throws BusinessException;
+	void checkIfNotReturnDateBeforeToday(LocalDate returnDate) throws BusinessException;
+	void checkIfNotCarAlreadyInMaintenance(int carId) throws BusinessException;
+
 }

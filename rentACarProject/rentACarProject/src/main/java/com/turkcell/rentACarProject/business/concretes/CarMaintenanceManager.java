@@ -41,8 +41,10 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     public DataResult<List<CarMaintenanceListDto>> getAll() {
 
         List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findAll();
+
         List<CarMaintenanceListDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
                 .collect(Collectors.toList());
+
         return new SuccessDataResult<>(result, "CarMaintenance listed");
 
     }
@@ -50,11 +52,15 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     @Override
     public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
 
-        checkNotReturnDateBeforeToday(createCarMaintenanceRequest.getReturnDate());
+        checkIfNotReturnDateBeforeToday(createCarMaintenanceRequest.getReturnDate());
         this.carService.checkIsExistsByCarId(createCarMaintenanceRequest.getCarId());
+        checkIfNotCarAlreadyInMaintenance(createCarMaintenanceRequest.getCarId());
+
 
         CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest, CarMaintenance.class);
+
         this.carMaintenanceDao.save(carMaintenance);
+
         return new SuccessResult("CarMaintenance added");
 
     }
@@ -63,11 +69,13 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws BusinessException {
 
         checkIsExistsByCarMaintenanceId(updateCarMaintenanceRequest.getMaintenanceId());
-        checkNotReturnDateBeforeToday(updateCarMaintenanceRequest.getReturnDate());
+        checkIfNotReturnDateBeforeToday(updateCarMaintenanceRequest.getReturnDate());
         this.carService.checkIsExistsByCarId(updateCarMaintenanceRequest.getCarId());
 
         CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest, CarMaintenance.class);
+
         this.carMaintenanceDao.save(carMaintenance);
+
         return new SuccessResult("CarMaintenance updated");
 
     }
@@ -78,6 +86,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         checkIsExistsByCarMaintenanceId(carMaintenanceRequest.getMaintenanceId());
 
         this.carMaintenanceDao.deleteById(carMaintenanceRequest.getMaintenanceId());
+
         return new SuccessResult("CarMaintenance deleted");
 
     }
@@ -89,6 +98,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
         CarMaintenance carMaintenance = this.carMaintenanceDao.getById(carMaintenanceId);
         GetCarMaintenanceDto result = this.modelMapperService.forDto().map(carMaintenance, GetCarMaintenanceDto.class);
+
         return new SuccessDataResult<>(result, "Car Maintenence getted by id: " + carMaintenanceId);
 
     }
@@ -100,9 +110,12 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         this.carService.checkIsExistsByCarId(carId);    //*
 
         List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findByCar_CarId(carId);
+
         List<CarMaintenanceListDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
                 .collect(Collectors.toList());
+
         return new SuccessDataResult<>(result, "Car maintenances are brought by car id: " + carId);
+
     }
 
     public void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws BusinessException {
@@ -120,13 +133,27 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public void checkNotReturnDateBeforeToday(LocalDate returnDate) throws BusinessException {
+    public void checkIfNotReturnDateBeforeToday(LocalDate returnDate) throws BusinessException {
+
         if(returnDate != null){
             if(returnDate.isBefore(LocalDate.now())){
                 throw new BusinessException("return date cannot be a past date");
             }
         }
-
     }
+
+    @Override
+    public void checkIfNotCarAlreadyInMaintenance(int carId) throws BusinessException{
+
+        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findByCar_CarId(carId);
+
+        for(CarMaintenance carMaintenance : carMaintenances){
+            if((carMaintenance.getReturnDate()==null ) || (carMaintenance.getReturnDate().isAfter(LocalDate.now()))){
+                throw new BusinessException("Car already in maintenance, id: " + carId);
+            }
+        }
+    }
+
+
 
 }
