@@ -2,6 +2,7 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACarProject.business.abstracts.CarService;
+import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.CarMaintenanceListDto;
 import com.turkcell.rentACarProject.business.dtos.GetCarMaintenanceDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateCarMaintenanceRequest;
@@ -26,14 +27,16 @@ import java.util.stream.Collectors;
 public class CarMaintenanceManager implements CarMaintenanceService {
 
     private CarMaintenanceDao carMaintenanceDao;
-    private ModelMapperService modelMapperService;
     private CarService carService;
+    private RentalCarService rentalCarService;
+    private ModelMapperService modelMapperService;
 
     @Autowired
-    public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService, CarService carService){
+    public CarMaintenanceManager(CarMaintenanceDao carMaintenanceDao, ModelMapperService modelMapperService, CarService carService, RentalCarService rentalCarService){
         this.carMaintenanceDao = carMaintenanceDao;
-        this.modelMapperService = modelMapperService;
         this.carService = carService;
+        this.rentalCarService = rentalCarService;
+        this.modelMapperService = modelMapperService;
     }
 
 
@@ -52,10 +55,14 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     @Override
     public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
 
-//        checkIfNotReturnDateBeforeToday(createCarMaintenanceRequest.getReturnDate());
+        checkIfNotReturnDateBeforeToday(createCarMaintenanceRequest.getReturnDate());
         this.carService.checkIsExistsByCarId(createCarMaintenanceRequest.getCarId());
-        checkIfNotCarAlreadyInMaintenance(createCarMaintenanceRequest.getCarId());
+        checkIfNotCarAlreadyInMaintenanceOnTheToday(createCarMaintenanceRequest.getCarId());
 
+        checkIfNotCarAlreadyRentedEnteredDate(createCarMaintenanceRequest.getCarId(),LocalDate.now());
+        checkIfNotCarAlreadyRentedEnteredDate(createCarMaintenanceRequest.getCarId(),createCarMaintenanceRequest.getReturnDate());
+        this.rentalCarService.checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(createCarMaintenanceRequest.getCarId(),
+                LocalDate.now(), createCarMaintenanceRequest.getReturnDate());
 
         CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest, CarMaintenance.class);
 
@@ -71,6 +78,12 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         checkIsExistsByCarMaintenanceId(updateCarMaintenanceRequest.getMaintenanceId());
         checkIfNotReturnDateBeforeToday(updateCarMaintenanceRequest.getReturnDate());
         this.carService.checkIsExistsByCarId(updateCarMaintenanceRequest.getCarId());
+        checkIfNotCarAlreadyInMaintenanceOnTheToday(updateCarMaintenanceRequest.getCarId());
+
+        checkIfNotCarAlreadyRentedEnteredDate(updateCarMaintenanceRequest.getCarId(),LocalDate.now());
+        checkIfNotCarAlreadyRentedEnteredDate(updateCarMaintenanceRequest.getCarId(),updateCarMaintenanceRequest.getReturnDate());
+        this.rentalCarService.checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(updateCarMaintenanceRequest.getCarId(),
+                LocalDate.now(), updateCarMaintenanceRequest.getReturnDate());
 
         CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest, CarMaintenance.class);
 
@@ -114,7 +127,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         List<CarMaintenanceListDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Car maintenances are brought by car id: " + carId);
+        return new SuccessDataResult<>(result, "Car maintenances are listed by car id: " + carId);
 
     }
 
@@ -143,17 +156,42 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public void checkIfNotCarAlreadyInMaintenance(int carId) throws BusinessException{
+    public void checkIfNotCarAlreadyInMaintenanceOnTheToday(int carId) throws BusinessException{
 
         List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findByCar_CarId(carId);
 
-        for(CarMaintenance carMaintenance : carMaintenances){
-            if((carMaintenance.getReturnDate()==null ) || (carMaintenance.getReturnDate().isAfter(LocalDate.now()))){
-                throw new BusinessException("Car already in maintenance, id: " + carId);
+        if(carMaintenances != null){
+            for(CarMaintenance carMaintenance : carMaintenances){
+                if((carMaintenance.getReturnDate()==null ) || (carMaintenance.getReturnDate().isAfter(LocalDate.now()))){
+                    throw new BusinessException("Car already in maintenance, id: " + carId);
+                }
             }
         }
     }
 
+    @Override
+    public void checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
+
+        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findByCar_CarId(carId);
+
+        if(carMaintenances != null){
+            for (CarMaintenance carMaintenance : carMaintenances){
+                if (carMaintenance.getReturnDate()==null){
+                    if(carMaintenance.getReturnDate().now().plusDays(14).isAfter(enteredDate)){
+                        throw new BusinessException("The car is in maintenance on the entered date");
+                    }
+                }else if(carMaintenance.getReturnDate().isAfter(enteredDate)){
+                    throw new BusinessException("The car is in maintenance on the entered date");
+                }
+            }
+        }
+    }
+
+    public void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
+        if(enteredDate != null){
+            this.rentalCarService.checkIfNotCarAlreadyRentedEnteredDate(carId,enteredDate);
+        }
+    }
 
 
 }

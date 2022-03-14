@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class RentalCarListDto {
 
+    private int rentalCarId;
     private LocalDate startDate;
     private LocalDate finishDate;
     private int carId;
