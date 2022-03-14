@@ -56,9 +56,9 @@ public class RentalCarManager implements RentalCarService {
     @Override
     public Result add(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
         this.carService.checkIsExistsByCarId(createRentalCarRequest.getCarId());
-        //checkIfStartDateAfterToday(createRentalCarRequest.getStartDate());
+        checkIfStartDateAfterToday(createRentalCarRequest.getStartDate());
         checkIfStartDateBeforeFinishDate(createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate());
-        checkIfCarAlreadyRented(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate());
+        checkIfCarAlreadyRentedForCreate(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate());
         this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate());
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarRequest, RentalCar.class);
@@ -74,9 +74,9 @@ public class RentalCarManager implements RentalCarService {
 
         checkIsExistsByRentalCarId(updateRentalCarRequest.getRentalCarId());
         this.carService.checkIsExistsByCarId(updateRentalCarRequest.getCarId());
-      //  checkIfStartDateAfterToday(updateRentalCarRequest.getStartDate());
+        checkIfStartDateAfterToday(updateRentalCarRequest.getStartDate());
         checkIfStartDateBeforeFinishDate(updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate());
-        checkIfCarAlreadyRented(updateRentalCarRequest.getRentalCarId(), updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate());
+        checkIfCarAlreadyRentedForUpdate(updateRentalCarRequest.getRentalCarId(), updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate());
         this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate());
 
 
@@ -100,7 +100,7 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    public DataResult<GetRentalCarDto> getById(int rentalCarId) throws BusinessException {
+    public DataResult<GetRentalCarDto> getByRentalCarId(int rentalCarId) throws BusinessException {
 
         checkIsExistsByRentalCarId(rentalCarId);
 
@@ -128,28 +128,9 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    public void checkIfCarAlreadyRented(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
-
-        List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
-        if(rentalCars != null) {
-            for(RentalCar rentalCar : rentalCars){
-                checkIfCarAlreadyRentedOnTheStartDate(rentalCar, startDate);
-                checkIfCarAlreadyRentedOnTheFinishDate(rentalCar, finishDate);
-                checkIfCarAlreadyRentedBetweenStartAndFinishDates(rentalCar, startDate, finishDate);
-            }
-        }
-    }
-
-    public void checkIfCarAlreadyRented(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
-
-        List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
-        if(rentalCars != null) {
-            for(RentalCar rentalCar : rentalCars){
-                if(rentalCar.getRentalCarId() == rentalCarId) continue;
-                checkIfCarAlreadyRentedOnTheStartDate(rentalCar, startDate);
-                checkIfCarAlreadyRentedOnTheFinishDate(rentalCar, finishDate);
-                checkIfCarAlreadyRentedBetweenStartAndFinishDates(rentalCar, startDate, finishDate);
-            }
+    public void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException {
+        if(startDate.isBefore(LocalDate.now())){
+            throw new BusinessException("Start date cannot be earlier than today");
         }
     }
 
@@ -161,24 +142,37 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    public void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException {
-        if(startDate.isBefore(LocalDate.now())){
-            throw new BusinessException("Start date cannot be earlier than today");
+    public void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
+
+        List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
+
+        if(rentalCars != null) {
+            for(RentalCar rentalCar : rentalCars){
+                checkIfCarAlreadyRentedOnTheEnteredDate(rentalCar,startDate);
+                checkIfCarAlreadyRentedOnTheEnteredDate(rentalCar,finishDate);
+                checkIfCarAlreadyRentedBetweenStartAndFinishDates(rentalCar, startDate, finishDate);
+            }
         }
     }
 
     @Override
-    public void checkIfCarAlreadyRentedOnTheStartDate(RentalCar rentalCar, LocalDate startDate) throws BusinessException {
-        if(rentalCar.getStartDate().isBefore(startDate) && (rentalCar.getFinishDate().isAfter(startDate))){
-            throw new BusinessException("The car is already rented on the start date");
+    public void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
+
+        List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
+        if(rentalCars != null) {
+            for(RentalCar rentalCar : rentalCars){
+                if(rentalCar.getRentalCarId() == rentalCarId) continue;
+                checkIfCarAlreadyRentedOnTheEnteredDate(rentalCar,startDate);
+                checkIfCarAlreadyRentedOnTheEnteredDate(rentalCar,finishDate);
+                checkIfCarAlreadyRentedBetweenStartAndFinishDates(rentalCar, startDate, finishDate);
+            }
         }
     }
 
-    @Override
-    public void checkIfCarAlreadyRentedOnTheFinishDate(RentalCar rentalCar, LocalDate finishDate) throws BusinessException {
 
-        if(rentalCar.getStartDate().isBefore(finishDate) && (rentalCar.getFinishDate().isAfter(finishDate))){
-            throw new BusinessException("The car is already rented on the finish date");
+    public void checkIfCarAlreadyRentedOnTheEnteredDate(RentalCar rentalCar, LocalDate enteredDate) throws BusinessException {
+        if(rentalCar.getStartDate().isBefore(enteredDate) && (rentalCar.getFinishDate().isAfter(enteredDate))){
+            throw new BusinessException("The car rented between entered dates");
         }
     }
 
@@ -192,20 +186,8 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
+    //for maintenance(*)
     @Override
-    public void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
-        List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
-
-        if(rentalCars != null){
-            for(RentalCar rentalCar : rentalCars){
-                if(rentalCar.getStartDate().isBefore(enteredDate) && rentalCar.getFinishDate().isAfter(enteredDate)){
-                    throw new BusinessException("The car is rented between these dates, cannot be maintenance or rented");
-
-                }
-            }
-        }
-    }
-
     public void checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
 
@@ -217,6 +199,21 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
+    //for maintenance(*)
+    @Override
+    public void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
+        List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
+
+        if(rentalCars != null && enteredDate != null){
+            for(RentalCar rentalCar : rentalCars){
+                if(rentalCar.getStartDate().isBefore(enteredDate) && rentalCar.getFinishDate().isAfter(enteredDate)){
+                    throw new BusinessException("The car is rented between these dates, cannot be maintenance or rented");
+
+                }
+            }
+        }
+    }
+
 
     @Override
     public void checkIsExistsByRentalCarId(int rentalCarId) throws BusinessException {

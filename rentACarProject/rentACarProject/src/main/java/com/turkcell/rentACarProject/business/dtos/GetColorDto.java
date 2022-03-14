@@ -11,4 +11,5 @@ public class GetColorDto {
 	
 	private int colorId;
 	private String colorName;
+
 }

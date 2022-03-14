@@ -1,7 +1,6 @@
 package com.turkcell.rentACarProject.entities.concretes;
 
 import java.time.LocalDate;
-
 import javax.persistence.*;
 
 import lombok.AllArgsConstructor;

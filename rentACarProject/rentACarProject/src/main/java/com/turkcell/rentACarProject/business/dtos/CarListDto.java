@@ -17,5 +17,4 @@ public class CarListDto {
 	private int brandId;
 	private String brandName;
 
-	
 }

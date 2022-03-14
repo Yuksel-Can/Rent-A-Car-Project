@@ -48,7 +48,7 @@ public class RentalCarsController {
 
     @GetMapping("/getById")
     public DataResult<GetRentalCarDto> getById(@RequestParam int rentalCarId) throws BusinessException {
-        return this.rentalCarService.getById(rentalCarId);
+        return this.rentalCarService.getByRentalCarId(rentalCarId);
     }
 
     @GetMapping("/getByCarCarId")

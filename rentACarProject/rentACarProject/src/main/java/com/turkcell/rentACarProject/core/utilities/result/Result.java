@@ -10,7 +10,7 @@ public class Result {
 	}
 	
 	public Result(boolean success, String message) {
-		this(success);									//buradaki diger constructor'i calistirir
+		this(success);
 		this.message = message;
 	}
 	

@@ -21,18 +21,20 @@ public interface RentalCarService {
     Result update(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
 
-    DataResult<GetRentalCarDto> getById(int rentalCarId) throws BusinessException;
+    DataResult<GetRentalCarDto> getByRentalCarId(int rentalCarId) throws BusinessException;
     DataResult<List<RentalCarListDto>> getAllByRentalCar_CarId(int carId) throws BusinessException;
 
-    void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException;
     void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException;
-    void checkIfCarAlreadyRented(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
-    void checkIfCarAlreadyRentedOnTheStartDate(RentalCar rentalCar, LocalDate startDate) throws BusinessException;                                                           //4
-    void checkIfCarAlreadyRentedOnTheFinishDate(RentalCar rentalCar, LocalDate finishDate) throws BusinessException;                                                        //3
+    void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException;
+
+    void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
+    void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
+    void checkIfCarAlreadyRentedOnTheEnteredDate(RentalCar rentalCar, LocalDate enteredDate) throws BusinessException;                                           //4
     void checkIfCarAlreadyRentedBetweenStartAndFinishDates(RentalCar rentalCar, LocalDate startDate, LocalDate finishDate) throws BusinessException;             //5
 
-    void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException;
+    //for maintenance
     void checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
+    void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException;
 
     void checkIsExistsByRentalCarId(int rentalCarId) throws BusinessException;
     void checkIsExistsByRentalCar_CarId(int carId) throws BusinessException;

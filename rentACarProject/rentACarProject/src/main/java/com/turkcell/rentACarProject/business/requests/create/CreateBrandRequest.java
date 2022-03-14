@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateBrandRequest {
 	
-	@NotNull					//  hiç atanmama durumu
-	@NotBlank					//  	 "" olma durumu //int icin kullanilamaz
+	@NotNull
+	@NotBlank
 	@Size(min = 3, max = 30)
 	private String brandName;
 

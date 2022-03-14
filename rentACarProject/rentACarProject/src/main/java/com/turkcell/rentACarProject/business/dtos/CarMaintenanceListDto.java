@@ -17,4 +17,5 @@ public class CarMaintenanceListDto {
     private double dailyPrice;
     private String brandName;
     private String colorName;
+
 }

@@ -1,6 +1,5 @@
 package com.turkcell.rentACarProject.business.dtos;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ColorListDto {
 	
-    private int id;
-	
+    private int colorId;
 	private String colorName;
 }

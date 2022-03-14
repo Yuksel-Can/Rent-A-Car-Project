@@ -19,7 +19,7 @@ public interface BrandService {
 	Result update(UpdateBrandRequest updateBrandRequest) throws BusinessException;
 	Result delete(DeleteBrandRequest deleteBrandRequest) throws BusinessException;
 	
-	DataResult<GetBrandDto> getById(int id) throws BusinessException;
+	DataResult<GetBrandDto> getById(int colorId) throws BusinessException;
 	
 	void checkIsExistsByBrandId(int brandId) throws BusinessException;
 	void checkIsNotExistByBrandName(String brandName) throws BusinessException;

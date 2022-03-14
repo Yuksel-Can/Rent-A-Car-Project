@@ -25,7 +25,6 @@ public class UpdateCarMaintenanceRequest {
     @Size(min = 3, max = 300)
     private String description;
 
-  //  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate returnDate;
 
     @NotNull

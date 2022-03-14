@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 public class ModelMapperManager implements ModelMapperService {
 
 	private ModelMapper modelMapper;
-	
-	
+
 	public ModelMapperManager(ModelMapper modelMapper) {
 		super();
 		this.modelMapper = modelMapper;
 	}
+
 
 	public ModelMapper forDto() {
 	 this.modelMapper.getConfiguration().setAmbiguityIgnored(true).setMatchingStrategy(MatchingStrategies.LOOSE);

@@ -10,8 +10,9 @@ import java.util.List;
 @Repository
 public interface CarMaintenanceDao extends JpaRepository<CarMaintenance, Integer>{
 
-    List<CarMaintenance> findByCar_CarId(int carId);
-
     boolean existsByMaintenanceId(int carManintenanceId);
     boolean existsByCar_CarId(int carId);
+
+    List<CarMaintenance> findAllByCar_CarId(int carId);
+
 }

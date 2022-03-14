@@ -59,8 +59,8 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         this.carService.checkIsExistsByCarId(createCarMaintenanceRequest.getCarId());
         checkIfNotCarAlreadyInMaintenanceOnTheToday(createCarMaintenanceRequest.getCarId());
 
-        checkIfNotCarAlreadyRentedEnteredDate(createCarMaintenanceRequest.getCarId(),LocalDate.now());
-        checkIfNotCarAlreadyRentedEnteredDate(createCarMaintenanceRequest.getCarId(),createCarMaintenanceRequest.getReturnDate());
+        this.rentalCarService.checkIfNotCarAlreadyRentedEnteredDate(createCarMaintenanceRequest.getCarId(),LocalDate.now());
+        this.rentalCarService.checkIfNotCarAlreadyRentedEnteredDate(createCarMaintenanceRequest.getCarId(),createCarMaintenanceRequest.getReturnDate());
         this.rentalCarService.checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(createCarMaintenanceRequest.getCarId(),
                 LocalDate.now(), createCarMaintenanceRequest.getReturnDate());
 
@@ -80,8 +80,8 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         this.carService.checkIsExistsByCarId(updateCarMaintenanceRequest.getCarId());
         checkIfNotCarAlreadyInMaintenanceOnTheToday(updateCarMaintenanceRequest.getCarId());
 
-        checkIfNotCarAlreadyRentedEnteredDate(updateCarMaintenanceRequest.getCarId(),LocalDate.now());
-        checkIfNotCarAlreadyRentedEnteredDate(updateCarMaintenanceRequest.getCarId(),updateCarMaintenanceRequest.getReturnDate());
+        this.rentalCarService.checkIfNotCarAlreadyRentedEnteredDate(updateCarMaintenanceRequest.getCarId(),LocalDate.now());
+        this.rentalCarService.checkIfNotCarAlreadyRentedEnteredDate(updateCarMaintenanceRequest.getCarId(),updateCarMaintenanceRequest.getReturnDate());
         this.rentalCarService.checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(updateCarMaintenanceRequest.getCarId(),
                 LocalDate.now(), updateCarMaintenanceRequest.getReturnDate());
 
@@ -122,27 +122,13 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         checkIsExistsByCarMaintenance_CarId(carId);
         this.carService.checkIsExistsByCarId(carId);    //*
 
-        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findByCar_CarId(carId);
+        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findAllByCar_CarId(carId);
 
         List<CarMaintenanceListDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Car maintenances are listed by car id: " + carId);
 
-    }
-
-    public void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws BusinessException {
-
-        if(!this.carMaintenanceDao.existsByMaintenanceId(carMaintenanceId)){
-            throw new BusinessException("Car Maintenance id not exists");
-        }
-    }
-
-    public void checkIsExistsByCarMaintenance_CarId(int carId) throws BusinessException {
-
-        if(!this.carMaintenanceDao.existsByCar_CarId(carId)){
-            throw new BusinessException("Car id not found in car maintenance");
-        }
     }
 
     @Override
@@ -158,7 +144,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     @Override
     public void checkIfNotCarAlreadyInMaintenanceOnTheToday(int carId) throws BusinessException{
 
-        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findByCar_CarId(carId);
+        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findAllByCar_CarId(carId);
 
         if(carMaintenances != null){
             for(CarMaintenance carMaintenance : carMaintenances){
@@ -172,7 +158,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     @Override
     public void checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
 
-        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findByCar_CarId(carId);
+        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findAllByCar_CarId(carId);
 
         if(carMaintenances != null){
             for (CarMaintenance carMaintenance : carMaintenances){
@@ -187,9 +173,19 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         }
     }
 
-    public void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
-        if(enteredDate != null){
-            this.rentalCarService.checkIfNotCarAlreadyRentedEnteredDate(carId,enteredDate);
+    @Override
+    public void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws BusinessException {
+
+        if(!this.carMaintenanceDao.existsByMaintenanceId(carMaintenanceId)){
+            throw new BusinessException("Car Maintenance id not exists");
+        }
+    }
+
+    @Override
+    public void checkIsExistsByCarMaintenance_CarId(int carId) throws BusinessException {
+
+        if(!this.carMaintenanceDao.existsByCar_CarId(carId)){
+            throw new BusinessException("Car id not found in car maintenance");
         }
     }
 

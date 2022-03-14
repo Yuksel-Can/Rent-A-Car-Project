@@ -14,12 +14,10 @@ import java.time.LocalDate;
 public class CreateRentalCarRequest {
 
     @NotNull
-    //@NotBlank
     private LocalDate startDate;
 
 
     @NotNull
-    //@NotBlank
     private LocalDate finishDate;
 
     @NotNull
