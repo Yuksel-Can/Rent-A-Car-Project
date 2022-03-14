@@ -52,7 +52,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     @Override
     public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
 
-        checkIfNotReturnDateBeforeToday(createCarMaintenanceRequest.getReturnDate());
+//        checkIfNotReturnDateBeforeToday(createCarMaintenanceRequest.getReturnDate());
         this.carService.checkIsExistsByCarId(createCarMaintenanceRequest.getCarId());
         checkIfNotCarAlreadyInMaintenance(createCarMaintenanceRequest.getCarId());
 

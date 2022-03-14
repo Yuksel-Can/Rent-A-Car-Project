@@ -40,8 +40,10 @@ public class ColorManager implements ColorService{
 	public DataResult<List<ColorListDto>> getAll() {
 		
 		List<Color> colors = this.colorDao.findAll();
+
 		List<ColorListDto> result = colors.stream().map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))
 				.collect(Collectors.toList());
+
 		return new SuccessDataResult<List<ColorListDto>>(result, "Color listed");
 		
 	}
@@ -52,7 +54,9 @@ public class ColorManager implements ColorService{
 		checkIsNotExistsByColorName(createColorRequest.getColorName());
 		
 		Color color = this.modelMapperService.forRequest().map(createColorRequest, Color.class);
+
 		this.colorDao.save(color);
+
 		return new SuccessResult("Color added");
 		
 	}
@@ -64,7 +68,9 @@ public class ColorManager implements ColorService{
 		checkIsNotExistsByColorName(updateColorRequest.getColorName());
 		
 		Color color = this.modelMapperService.forRequest().map(updateColorRequest, Color.class);
+
 		this.colorDao.save(color);
+
 		return new SuccessResult("Color updated");
 
 	}
@@ -75,7 +81,8 @@ public class ColorManager implements ColorService{
 		checkIsExistsByColorId(deleteColorRequest.getColorId());
 		this.carService.checkIsNotExistsByCar_ColorId(deleteColorRequest.getColorId());
 		
-		this.colorDao.deleteById(deleteColorRequest.getColorId());			
+		this.colorDao.deleteById(deleteColorRequest.getColorId());
+
 		return new SuccessResult("Color deleted");
 			
 	}
@@ -86,7 +93,9 @@ public class ColorManager implements ColorService{
 		checkIsExistsByColorId(id);
 		
 		Color color = this.colorDao.getById(id);
+
 		GetColorDto getColorDto = this.modelMapperService.forDto().map(color, GetColorDto.class);
+
 		return new SuccessDataResult<GetColorDto>(getColorDto, "Color listed");
 		
 	}
@@ -94,6 +103,7 @@ public class ColorManager implements ColorService{
 	/**/
 	
 	public void checkIsExistsByColorId(int brandId) throws BusinessException {
+
 		if(!this.colorDao.existsByColorId(brandId)) {
 			throw new BusinessException("Color id not exists");
 		}

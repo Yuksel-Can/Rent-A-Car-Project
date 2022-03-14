@@ -50,9 +50,11 @@ public class CarManager implements CarService{
 	public DataResult<List<CarListDto>> getAll() {
 		
 		List<Car> cars = this.carDao.findAll();
+
 		List<CarListDto> carsDto = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class))
 				.collect(Collectors.toList());
-		return new SuccessDataResult<List<CarListDto>>(carsDto, "Cars listed");
+
+		return new SuccessDataResult<>(carsDto, "Cars listed");
 		
 	}
 
@@ -63,7 +65,9 @@ public class CarManager implements CarService{
 		this.colorService.checkIsExistsByColorId(createCarRequest.getColorId());
 		
 		Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
+
 		this.carDao.save(car);
+
 		return new SuccessResult("Car added");
 		
 	}
@@ -76,8 +80,10 @@ public class CarManager implements CarService{
 		this.colorService.checkIsExistsByColorId(updateCarRequest.getColorId());
 		
 		Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
+
 		this.carDao.save(car);
-		return new SuccessResult("Car updated");
+
+		return new SuccessResult("Car updated, id: " + updateCarRequest.getCarId());
 		
 	}
 
@@ -86,7 +92,8 @@ public class CarManager implements CarService{
 		
 		checkIsExistsByCarId(deleteCarRequest.getCarId());
 		
-		this.carDao.deleteById(deleteCarRequest.getCarId());			
+		this.carDao.deleteById(deleteCarRequest.getCarId());
+
 		return new SuccessResult("Car deleted");
 		
 	}
@@ -97,8 +104,11 @@ public class CarManager implements CarService{
 		checkIsExistsByCarId(id);
 		
 		Car car = this.carDao.getById(id);
+
 		GetCarDto carDto = this.modelMapperService.forDto().map(car, GetCarDto.class);
+
 		return new SuccessDataResult<GetCarDto>(carDto, "Car listed");
+
 	}
 	
 	@Override
@@ -107,6 +117,7 @@ public class CarManager implements CarService{
 		List<Car> cars = this.carDao.findByDailyPriceLessThanEqual(dailyPrice);
 		List<CarListByDailyPrice> response = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByDailyPrice.class))
 					.collect(Collectors.toList());
+
 		return new SuccessDataResult<List<CarListByDailyPrice>>(response, "Less than Car listed");
 		
 	}
@@ -122,45 +133,52 @@ public class CarManager implements CarService{
 		
 		List<CarPagedDto> carPagedDtos = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarPagedDto.class))
 				.collect(Collectors.toList());
+
 		return new SuccessDataResult<List<CarPagedDto>>(carPagedDtos, "All cars paged");
+
 	}
-	
+
 	@Override
 	public DataResult<List<CarSortedDto>> getAllSortedCar(int sort) {
-		
+
 		Sort sortList=selectSortedType(sort);
-		
+
 		List<Car> cars = this.carDao.findAll(sortList);
-		
+
 		List<CarSortedDto> carSortedDtos = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarSortedDto.class))
 				.collect(Collectors.toList());
+
 		return new SuccessDataResult<List<CarSortedDto>>(carSortedDtos, "All cars sorted");
+
 	}
-	
+
 	/**/
 	@Override
 	public void checkIsExistsByCarId(int carId) throws BusinessException {
+
 		if(!this.carDao.existsByCarId(carId)) {
 			throw new BusinessException("Car id not exists");
 		}
 	}
-	
+
 	@Override
 	public void checkIsNotExistsByCar_BrandId(int brandId) throws BusinessException {
+
 		if(this.carDao.existsByBrand_BrandId(brandId)) {
 			throw new BusinessException("Brand id used by a car");
 		}
 	}
-	
+
 	@Override
 	public void checkIsNotExistsByCar_ColorId(int colorId) throws BusinessException {
+
 		if(this.carDao.existsByColor_ColorId(colorId)) {
 			throw new BusinessException("Color id used by a car");
 		}
 	}
-	
+
 	Sort selectSortedType(int sort) {
-		
+
 		if(sort==1) {
 			return Sort.by(Sort.Direction.ASC, "dailyPrice");
 		}else if(sort==0) {
