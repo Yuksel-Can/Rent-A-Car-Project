@@ -52,8 +52,18 @@ public class RentalCarsController {
         return this.rentalCarService.getByRentalCarId(rentalCarId);
     }
 
-    @GetMapping("/getByCar_CarId")
+    @GetMapping("/getByRentalCar_CarId")
     public DataResult<List<RentalCarListDto>> getAllByRentalCar_CarId(@RequestParam int carId) throws BusinessException {
         return this.rentalCarService.getAllByRentalCar_CarId(carId);
+    }
+
+    @GetMapping("/getByRentedCity_CityId")
+    public DataResult<List<RentalCarListDto>> getAllByRentedCity_CityId(@RequestParam int rentedCityId) throws BusinessException {
+        return this.rentalCarService.getAllByRentedCity_CityId(rentedCityId);
+    }
+
+    @GetMapping("/getByDeliveredCity_CityId")
+    public DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(@RequestParam int deliveredCityId) throws BusinessException {
+        return this.rentalCarService.getAllByDeliveredCity_CityId(deliveredCityId);
     }
 }

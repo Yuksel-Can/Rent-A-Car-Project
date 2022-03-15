@@ -134,6 +134,33 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
+    public DataResult<List<RentalCarListDto>> getAllByRentedCity_CityId(int rentedCity) throws BusinessException {
+
+        this.cityService.checkIfExistsByCityId(rentedCity);
+        checkIsExistsByRentedCity_CityId(rentedCity);
+
+        List<RentalCar> rentalCars = this.rentalCarDao.getAllByRentedCity_CityId(rentedCity);
+        List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+                .collect(Collectors.toList());
+
+        return new SuccessDataResult<>(result, "Rentals of the car listed by rentedCityId: " + rentedCity);
+
+    }
+
+    @Override
+    public DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(int deliveredCity) throws BusinessException {
+
+        this.cityService.checkIfExistsByCityId(deliveredCity);
+        checkIsExistsByDeliveredCity_CityId(deliveredCity);
+
+        List<RentalCar> rentalCars = this.rentalCarDao.getAllByDeliveredCity_CityId(deliveredCity);
+        List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+                .collect(Collectors.toList());
+
+        return new SuccessDataResult<>(result, "Rentals of the car listed by deliveredCity: " + deliveredCity);
+    }
+
+    @Override
     public void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException {
         if(startDate.isBefore(LocalDate.now())){
             throw new BusinessException("Start date cannot be earlier than today");
@@ -236,5 +263,18 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
+    @Override
+    public void checkIsExistsByRentedCity_CityId(int rentedCityId) throws BusinessException {
+        if(!this.rentalCarDao.existsByRentedCity_CityId(rentedCityId)){
+            throw new BusinessException("City id not found in rental car list, rentedCityId: " + rentedCityId);
+        }
+    }
+
+    @Override
+    public void checkIsExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException {
+        if(!this.rentalCarDao.existsByDeliveredCity_CityId(deliveredCityId)){
+            throw new BusinessException("City id not found in rental car list, deliveredCityId: " + deliveredCityId);
+        }
+    }
 
 }

@@ -12,6 +12,7 @@ import com.turkcell.rentACarProject.core.utilities.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -32,23 +33,32 @@ public class OrderedAdditionalsController {
     }
 
     @PostMapping("/add")
-    public Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
+    public Result add(@RequestBody @Valid CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
         return this.orderedAdditionalService.add(createOrderedAdditionalRequest);
     }
 
     @PutMapping("/update")
-    public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest)throws BusinessException {
+    public Result update(@RequestBody @Valid UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest)throws BusinessException {
         return this.orderedAdditionalService.update(updateOrderedAdditionalRequest);
     }
 
     @DeleteMapping("/delete")
-    public Result delete(DeleteOrderedAdditionalRequest deleteOrderedAdditionalRequest) throws  BusinessException {
+    public Result delete(@RequestBody @Valid DeleteOrderedAdditionalRequest deleteOrderedAdditionalRequest) throws  BusinessException {
         return this.orderedAdditionalService.delete(deleteOrderedAdditionalRequest);
     }
 
     @GetMapping("getByOrderedAdditionalId")
-    public DataResult<GetOrderedAdditionalDto> getByOrderedAdditionalId(int orderedAdditionalId) throws BusinessException {
+    public DataResult<GetOrderedAdditionalDto> getByOrderedAdditionalId(@RequestParam int orderedAdditionalId) throws BusinessException {
         return this.orderedAdditionalService.getByOrderedAdditionalId(orderedAdditionalId);
     }
 
+    @GetMapping("/getByOrderedAdditional_RentalCarId")
+    public DataResult<List<OrderedAdditionalListDto>> getByOrderedAdditional_RentalCarId(@RequestParam int rentalCarId) throws BusinessException {
+        return this.orderedAdditionalService.getByOrderedAdditional_RentalCarId(rentalCarId);
+    }
+
+    @GetMapping("/getByOrderedAdditional_AdditionalId")
+    public DataResult<List<OrderedAdditionalListDto>> getByOrderedAdditional_AdditionalId(@RequestParam int additionalId) throws BusinessException {
+        return this.orderedAdditionalService.getByOrderedAdditional_AdditionalId(additionalId);
+    }
 }

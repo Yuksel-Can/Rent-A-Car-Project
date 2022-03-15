@@ -23,6 +23,8 @@ public interface RentalCarService {
 
     DataResult<GetRentalCarDto> getByRentalCarId(int rentalCarId) throws BusinessException;
     DataResult<List<RentalCarListDto>> getAllByRentalCar_CarId(int carId) throws BusinessException;
+    DataResult<List<RentalCarListDto>> getAllByRentedCity_CityId(int rentedCity) throws BusinessException;
+    DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(int deliveredCity) throws BusinessException;
 
     void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException;
     void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException;
@@ -38,4 +40,6 @@ public interface RentalCarService {
 
     void checkIsExistsByRentalCarId(int rentalCarId) throws BusinessException;
     void checkIsExistsByRentalCar_CarId(int carId) throws BusinessException;
+    void checkIsExistsByRentedCity_CityId(int rentedCityId) throws BusinessException;
+    void checkIsExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
 }
