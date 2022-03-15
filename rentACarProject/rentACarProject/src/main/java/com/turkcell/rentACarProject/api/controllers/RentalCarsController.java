@@ -26,6 +26,7 @@ public class RentalCarsController {
         this.rentalCarService = rentalCarService;
     }
 
+
     @GetMapping("/getAll")
     public DataResult<List<RentalCarListDto>> getAll(){
         return this.rentalCarService.getAll();

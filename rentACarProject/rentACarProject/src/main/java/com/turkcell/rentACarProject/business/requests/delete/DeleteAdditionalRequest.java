@@ -10,10 +10,10 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteCarMaintenanceRequest {
+public class DeleteAdditionalRequest {
 
     @NotNull
     @Min(1)
-    private int maintenanceId;
+    private int additionalId;
 
 }

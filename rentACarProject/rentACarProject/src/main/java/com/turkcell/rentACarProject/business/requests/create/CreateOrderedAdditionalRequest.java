@@ -6,24 +6,22 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateRentalCarRequest {
-
-    @NotNull
-    private LocalDate startDate;
-
-
-    @NotNull
-    private LocalDate finishDate;
-
-    private double rentalCarTotalPrice;
+public class CreateOrderedAdditionalRequest {
 
     @NotNull
     @Min(1)
-    private int carId;
+    private short orderedAdditionalQuantity;
+
+    @NotNull
+    @Min(1)
+    private int additionalId;
+
+    @NotNull
+    @Min(1)
+    private int rentalCarId;
 
 }

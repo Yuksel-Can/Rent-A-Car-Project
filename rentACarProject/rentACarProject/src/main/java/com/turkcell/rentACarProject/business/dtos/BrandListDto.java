@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class BrandListDto {
 	
 	private int brandId;
-	
 	private String brandName;
+
 }

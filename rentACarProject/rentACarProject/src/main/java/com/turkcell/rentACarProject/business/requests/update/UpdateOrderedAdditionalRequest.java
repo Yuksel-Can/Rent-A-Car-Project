@@ -5,29 +5,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateRentalCarRequest {
+public class UpdateOrderedAdditionalRequest {
+
+    @NotNull
+    @Min(1)
+    private int orderedAdditionalId;
+
+    @NotNull
+    @Min(1)
+    private short orderedAdditionalQuantity;
+
+    @NotNull
+    @Min(1)
+    private int additionalId;
 
     @NotNull
     @Min(1)
     private int rentalCarId;
-
-    @NotNull
-    private LocalDate startDate;
-
-    @NotNull
-    private LocalDate finishDate;
-
-    private double rentalCarTotalPrice;
-
-    @NotNull
-    @Min(1)
-    private int carId;
 
 }

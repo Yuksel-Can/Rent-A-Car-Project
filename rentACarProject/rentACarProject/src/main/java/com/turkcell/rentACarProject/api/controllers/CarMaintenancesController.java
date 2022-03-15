@@ -26,6 +26,7 @@ public class CarMaintenancesController {
         this.carMaintenanceService = carMaintenanceService;
     }
 
+
     @GetMapping("/getAll")
     public DataResult<List<CarMaintenanceListDto>> getall() {
         return this.carMaintenanceService.getAll();

@@ -94,7 +94,7 @@ public class CarManager implements CarService{
 		
 		this.carDao.deleteById(deleteCarRequest.getCarId());
 
-		return new SuccessResult("Car deleted");
+		return new SuccessResult("Car deleted, carId: " + deleteCarRequest.getCarId());
 		
 	}
 

@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetBrandDto {
-	
-	private int brandId;
-	private String brandName;
+public class GetOrderedAdditionalDto {
+
+    private int orderedAdditionalId;
+    private short orderedAdditionalQuantity;
+    private int additionalId;
+    private int rentalCarId;
 
 }

@@ -16,10 +16,10 @@ import lombok.AllArgsConstructor;
 
 import lombok.Data;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(name = "colors")
 public class Color {
 	
@@ -33,4 +33,5 @@ public class Color {
 	
 	@OneToMany(mappedBy = "color")
 	private List<Car> cars;
+
 }
