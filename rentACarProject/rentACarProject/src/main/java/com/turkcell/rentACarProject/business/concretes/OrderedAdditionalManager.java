@@ -47,6 +47,10 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         List<OrderedAdditionalListDto> result = orderedAdditionals.stream().map(orderedAdditional -> this.modelMapperService.forDto()
                 .map(orderedAdditional, OrderedAdditionalListDto.class)).collect(Collectors.toList());
 
+        for(int i = 0; i < result.size(); i++){
+            result.get(i).setRentalCarId(orderedAdditionals.get(i).getRentalCar().getRentalCarId());
+        }
+
         return new SuccessDataResult<>(result,"Ordered Additional Service listed");
 
     }
@@ -56,28 +60,31 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         this.additionalService.checkIfExistsByAdditionalId(createOrderedAdditionalRequest.getAdditionalId());
         this.rentalCarService.checkIsExistsByRentalCarId(createOrderedAdditionalRequest.getRentalCarId());
+        checkIfTheAdditionalQuantityOrderedIsValid(createOrderedAdditionalRequest);
 
         OrderedAdditional orderedAdditional = this.modelMapperService.forRequest().map(createOrderedAdditionalRequest, OrderedAdditional.class);
+        orderedAdditional.setOrderedAdditionalId(0);
 
         this.orderedAdditionalDao.save(orderedAdditional);
 
         return new SuccessResult("Ordered Additional Service added");
 
     }
-
     @Override
     public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
 
         checkIfExistsByOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
+        this.additionalService.checkIfExistsByAdditionalId(updateOrderedAdditionalRequest.getAdditionalId());
+        this.rentalCarService.checkIsExistsByRentalCarId(updateOrderedAdditionalRequest.getRentalCarId());
 
         OrderedAdditional orderedAdditional = this.modelMapperService.forRequest().map(updateOrderedAdditionalRequest, OrderedAdditional.class);
+        orderedAdditional.setOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
 
         this.orderedAdditionalDao.save(orderedAdditional);
 
         return new SuccessResult("Ordered Additional Service updated");
 
     }
-
     @Override
     public Result delete(DeleteOrderedAdditionalRequest deleteOrderedAdditionalRequest) throws BusinessException {
 
@@ -98,13 +105,22 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         GetOrderedAdditionalDto result = this.modelMapperService.forDto().map(orderedAdditional, GetOrderedAdditionalDto.class);
 
+        result.setRentalCarId(orderedAdditional.getRentalCar().getRentalCarId());   // (*)
+
         return new SuccessDataResult<>(result, "Ordered Additional Service listed by orderedAdditionalId: " + orderedAdditionalId);
 
     }
 
     private void checkIfExistsByOrderedAdditionalId(int orderedAdditionalId) throws BusinessException {
-        if(this.orderedAdditionalDao.existsByOrderedAdditionalId(orderedAdditionalId)){
+        if(!this.orderedAdditionalDao.existsByOrderedAdditionalId(orderedAdditionalId)){
             throw new BusinessException("Ordered Additional id not exists");
+        }
+    }
+
+    private void checkIfTheAdditionalQuantityOrderedIsValid(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
+        int maxUnitsPerRental = this.additionalService.getByAdditionalId(createOrderedAdditionalRequest.getAdditionalId()).getData().getMaxUnitsPerRental();
+        if(createOrderedAdditionalRequest.getOrderedAdditionalQuantity() > maxUnitsPerRental){
+            throw new BusinessException("Maximum quantity for this additional service can be : " + maxUnitsPerRental);
         }
     }
 

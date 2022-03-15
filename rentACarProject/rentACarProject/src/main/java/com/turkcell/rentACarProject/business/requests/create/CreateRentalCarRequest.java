@@ -16,14 +16,19 @@ public class CreateRentalCarRequest {
     @NotNull
     private LocalDate startDate;
 
-
     @NotNull
     private LocalDate finishDate;
-
-    private double rentalCarTotalPrice;
 
     @NotNull
     @Min(1)
     private int carId;
+
+    @NotNull
+    @Min(1)
+    private int rentedCityId;
+
+    @NotNull
+    @Min(1)
+    private int deliveredCityId;
 
 }

@@ -95,7 +95,7 @@ public class CityManager implements CityService {
 
     }
 
-    private void checkIfExistsByCityId(int cityId) throws BusinessException {
+    public void checkIfExistsByCityId(int cityId) throws BusinessException {
         if(!this.cityDao.existsByCityId(cityId)){
             throw new BusinessException("City id not exists");
         }

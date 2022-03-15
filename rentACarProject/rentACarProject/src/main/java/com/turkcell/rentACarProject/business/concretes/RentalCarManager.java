@@ -2,6 +2,7 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACarProject.business.abstracts.CarService;
+import com.turkcell.rentACarProject.business.abstracts.CityService;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
@@ -30,13 +31,15 @@ public class RentalCarManager implements RentalCarService {
     private RentalCarDao rentalCarDao;
     private CarService carService;
     private CarMaintenanceService carMaintenanceService;
+    private CityService cityService;
     private ModelMapperService modelMapperService;
 
     @Autowired
-    public RentalCarManager(RentalCarDao rentalCarDao, ModelMapperService modelMapperService, CarService carService,@Lazy CarMaintenanceService carMaintenanceService) {
+    public RentalCarManager(RentalCarDao rentalCarDao, ModelMapperService modelMapperService, CarService carService,@Lazy CarMaintenanceService carMaintenanceService, CityService cityService) {
         this.rentalCarDao = rentalCarDao;
         this.carService = carService;
         this.carMaintenanceService = carMaintenanceService;
+        this.cityService = cityService;
         this.modelMapperService = modelMapperService;
     }
 
@@ -60,6 +63,8 @@ public class RentalCarManager implements RentalCarService {
         checkIfStartDateBeforeFinishDate(createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate());
         checkIfCarAlreadyRentedForCreate(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate());
         this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate());
+        this.cityService.checkIfExistsByCityId(createRentalCarRequest.getRentedCityId());
+        this.cityService.checkIfExistsByCityId(createRentalCarRequest.getDeliveredCityId());
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarRequest, RentalCar.class);
 
@@ -78,7 +83,8 @@ public class RentalCarManager implements RentalCarService {
         checkIfStartDateBeforeFinishDate(updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate());
         checkIfCarAlreadyRentedForUpdate(updateRentalCarRequest.getRentalCarId(), updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate());
         this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate());
-
+        this.cityService.checkIfExistsByCityId(updateRentalCarRequest.getRentedCityId());
+        this.cityService.checkIfExistsByCityId(updateRentalCarRequest.getDeliveredCityId());
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(updateRentalCarRequest, RentalCar.class);
 

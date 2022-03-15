@@ -12,6 +12,7 @@ public class GetOrderedAdditionalDto {
     private int orderedAdditionalId;
     private short orderedAdditionalQuantity;
     private int additionalId;
+    private String additionalName;
     private int rentalCarId;
 
 }

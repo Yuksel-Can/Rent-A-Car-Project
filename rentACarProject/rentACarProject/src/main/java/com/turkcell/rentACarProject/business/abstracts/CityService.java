@@ -21,4 +21,6 @@ public interface CityService {
 
     DataResult<GetCityDto> getByCityId(int cityId) throws BusinessException;
 
+    void checkIfExistsByCityId(int cityId) throws BusinessException;
+
 }

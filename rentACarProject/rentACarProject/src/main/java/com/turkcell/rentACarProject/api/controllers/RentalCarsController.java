@@ -52,7 +52,7 @@ public class RentalCarsController {
         return this.rentalCarService.getByRentalCarId(rentalCarId);
     }
 
-    @GetMapping("/getByCarCarId")
+    @GetMapping("/getByCar_CarId")
     public DataResult<List<RentalCarListDto>> getAllByRentalCar_CarId(@RequestParam int carId) throws BusinessException {
         return this.rentalCarService.getAllByRentalCar_CarId(carId);
     }

@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
@@ -24,10 +23,16 @@ public class UpdateRentalCarRequest {
     @NotNull
     private LocalDate finishDate;
 
-    private double rentalCarTotalPrice;
-
     @NotNull
     @Min(1)
     private int carId;
+
+    @NotNull
+    @Min(1)
+    private int rentedCityId;
+
+    @NotNull
+    @Min(1)
+    private int deliveredCityId;
 
 }
