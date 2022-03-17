@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.AdditionalService;
+import com.turkcell.rentACarProject.business.abstracts.OrderedAdditionalService;
 import com.turkcell.rentACarProject.business.dtos.AdditionalListDto;
 import com.turkcell.rentACarProject.business.dtos.GetAdditionalDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateAdditionalRequest;
@@ -15,6 +16,7 @@ import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.AdditionalDao;
 import com.turkcell.rentACarProject.entities.concretes.Additional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,11 +26,13 @@ import java.util.stream.Collectors;
 public class AdditionalManager implements AdditionalService {
 
     private AdditionalDao additionalDao;
+    private OrderedAdditionalService orderedAdditionalService;
     private ModelMapperService modelMapperService;
 
     @Autowired
-    public AdditionalManager(AdditionalDao additionalDao, ModelMapperService modelMapperService) {
+    public AdditionalManager(AdditionalDao additionalDao, ModelMapperService modelMapperService, @Lazy OrderedAdditionalService orderedAdditionalService) {
         this.additionalDao = additionalDao;
+        this.orderedAdditionalService = orderedAdditionalService;
         this.modelMapperService = modelMapperService;
     }
 
@@ -76,6 +80,7 @@ public class AdditionalManager implements AdditionalService {
     public Result delete(DeleteAdditionalRequest deleteAdditionalRequest) throws BusinessException {
 
         checkIfExistsByAdditionalId(deleteAdditionalRequest.getAdditionalId());
+        this.orderedAdditionalService.checkIsNotExistsByOrderedAdditional_AdditionalId(deleteAdditionalRequest.getAdditionalId());
 
         this.additionalDao.deleteById(deleteAdditionalRequest.getAdditionalId());
 

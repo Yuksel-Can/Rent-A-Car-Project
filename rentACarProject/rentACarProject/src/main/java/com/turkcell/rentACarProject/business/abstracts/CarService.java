@@ -26,8 +26,12 @@ public interface CarService {
 	DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize);
 	DataResult<List<CarSortedDto>> getAllSortedCar(int sort);
 	DataResult<GetCarDto> getById(int id) throws BusinessException;
+	DataResult<List<CarListDto>> getAllByCar_BrandId(int brandId) throws BusinessException;
+	DataResult<List<CarListDto>> getAllByCar_ColorId(int colorId) throws BusinessException;
 
 	void checkIsExistsByCarId(int carId) throws  BusinessException;
 	void checkIsNotExistsByCar_BrandId(int brandId) throws BusinessException;
 	void checkIsNotExistsByCar_ColorId(int colorId) throws BusinessException;
+
+	double getDailyPriceByCarId(int carId);
 }

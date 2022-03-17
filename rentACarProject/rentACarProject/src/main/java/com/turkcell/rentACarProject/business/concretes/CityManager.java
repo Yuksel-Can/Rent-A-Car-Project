@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CityService;
+import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.CityListDto;
 import com.turkcell.rentACarProject.business.dtos.GetCityDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateCityRequest;
@@ -15,6 +16,7 @@ import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.CityDao;
 import com.turkcell.rentACarProject.entities.concretes.City;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,11 +26,13 @@ import java.util.stream.Collectors;
 public class CityManager implements CityService {
 
     private CityDao cityDao;
+    private RentalCarService rentalCarService;
     private ModelMapperService modelMapperService;
 
     @Autowired
-    public CityManager(CityDao cityDao, ModelMapperService modelMapperService) {
+    public CityManager(CityDao cityDao, ModelMapperService modelMapperService, @Lazy RentalCarService rentalCarService) {
         this.cityDao = cityDao;
+        this.rentalCarService = rentalCarService;
         this.modelMapperService = modelMapperService;
     }
 
@@ -75,7 +79,8 @@ public class CityManager implements CityService {
     public Result delete(DeleteCityRequest deleteCityRequest) throws BusinessException {
 
         checkIfExistsByCityId(deleteCityRequest.getCityId());
-
+        this.rentalCarService.checkIsNotExistsByRentedCity_CityId(deleteCityRequest.getCityId());
+        this.rentalCarService.checkIsNotExistsByDeliveredCity_CityId(deleteCityRequest.getCityId());
 //        this.cityDao.deleteById(deleteCityRequest.getCityId());
 
         return new SuccessResult("City deleted, cityId: " + deleteCityRequest.getCityId());

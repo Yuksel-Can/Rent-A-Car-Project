@@ -3,6 +3,8 @@ package com.turkcell.rentACarProject.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
+import com.turkcell.rentACarProject.business.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
@@ -13,11 +15,6 @@ import org.springframework.stereotype.Service;
 import com.turkcell.rentACarProject.business.abstracts.BrandService;
 import com.turkcell.rentACarProject.business.abstracts.CarService;
 import com.turkcell.rentACarProject.business.abstracts.ColorService;
-import com.turkcell.rentACarProject.business.dtos.GetCarDto;
-import com.turkcell.rentACarProject.business.dtos.CarListByDailyPrice;
-import com.turkcell.rentACarProject.business.dtos.CarListDto;
-import com.turkcell.rentACarProject.business.dtos.CarPagedDto;
-import com.turkcell.rentACarProject.business.dtos.CarSortedDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateCarRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateCarRequest;
@@ -38,12 +35,14 @@ public class CarManager implements CarService{
 	private ModelMapperService modelMapperService;
 	private BrandService brandService;
 	private ColorService colorService;
+	private RentalCarService rentalCarService;
 	
 	@Autowired
-	public  CarManager(CarDao carDao,ModelMapperService modelMapperService, @Lazy BrandService brandService, @Lazy ColorService colorService ) {
+	public  CarManager(CarDao carDao,ModelMapperService modelMapperService, @Lazy BrandService brandService, @Lazy ColorService colorService, @Lazy RentalCarService rentalCarService) {
 		this.carDao = carDao;
 		this.brandService = brandService;
 		this.colorService = colorService;
+		this.rentalCarService = rentalCarService;
 		this.modelMapperService = modelMapperService;
 	}
 	@Override
@@ -91,7 +90,8 @@ public class CarManager implements CarService{
 	public Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException {
 		
 		checkIsExistsByCarId(deleteCarRequest.getCarId());
-		
+		this.rentalCarService.checkIsNotExistsByRentalCar_CarId(deleteCarRequest.getCarId());
+
 		this.carDao.deleteById(deleteCarRequest.getCarId());
 
 		return new SuccessResult("Car deleted, carId: " + deleteCarRequest.getCarId());
@@ -110,7 +110,36 @@ public class CarManager implements CarService{
 		return new SuccessDataResult<GetCarDto>(carDto, "Car listed");
 
 	}
-	
+
+	@Override
+	public DataResult<List<CarListDto>> getAllByCar_BrandId(int brandId) throws BusinessException {
+
+		this.brandService.checkIsExistsByBrandId(brandId);
+		checkIsExistsByCar_BrandId(brandId);
+
+		List<Car> cars = this.carDao.getAllByBrand_BrandId(brandId);
+
+		List<CarListDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<>(result, "Cars listed by brandId: " + brandId);
+
+	}
+
+	@Override
+	public DataResult<List<CarListDto>> getAllByCar_ColorId(int colorId) throws BusinessException {
+
+		this.colorService.checkIsExistsByColorId(colorId);
+		checkIsExistsByCar_ColorId(colorId);
+
+		List<Car> cars = this.carDao.getAllByColor_ColorId(colorId);
+
+		List<CarListDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class))
+				.collect(Collectors.toList());
+
+		return new SuccessDataResult<>(result, "Cars listed by colorId: " + colorId);
+	}
+
 	@Override
 	public DataResult<List<CarListByDailyPrice>> findByDailyPriceLessThenEqual(double dailyPrice) {
 		
@@ -161,6 +190,20 @@ public class CarManager implements CarService{
 		}
 	}
 
+	public void checkIsExistsByCar_BrandId(int brandId) throws BusinessException {
+
+		if(!this.carDao.existsByBrand_BrandId(brandId)) {
+			throw new BusinessException("There is no car in this brandId: " + brandId);
+		}
+	}
+
+	public void checkIsExistsByCar_ColorId(int colorId) throws BusinessException {
+
+		if(!this.carDao.existsByColor_ColorId(colorId)) {
+			throw new BusinessException("There is no car in this colorId: " + colorId);
+		}
+	}
+
 	@Override
 	public void checkIsNotExistsByCar_BrandId(int brandId) throws BusinessException {
 
@@ -177,6 +220,14 @@ public class CarManager implements CarService{
 		}
 	}
 
+	@Override
+	public double getDailyPriceByCarId(int carId) {
+
+		Car car = this.carDao.getById(carId);
+		return car.getDailyPrice();
+
+	}
+
 	Sort selectSortedType(int sort) {
 
 		if(sort==1) {
@@ -187,4 +238,6 @@ public class CarManager implements CarService{
 			return Sort.by(Sort.Direction.DESC, "dailyPrice");
 		}
 	}
+
+
 }

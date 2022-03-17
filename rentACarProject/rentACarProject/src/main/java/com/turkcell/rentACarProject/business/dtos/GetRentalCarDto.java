@@ -20,6 +20,8 @@ public class GetRentalCarDto {
     private String brandName;
     private String colorName;
     private int rentedCityId;
+    private String rentedCityName;
     private int deliveredCityId;
+    private String deliveredCityName;
 
 }

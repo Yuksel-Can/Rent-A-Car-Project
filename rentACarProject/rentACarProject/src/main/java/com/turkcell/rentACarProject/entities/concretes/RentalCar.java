@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "rental_cars")
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler", "orderedAdditionals"})
 public class RentalCar {
 
     @Id
@@ -29,6 +31,7 @@ public class RentalCar {
     @Column(name = "finish_date")
     private LocalDate finishDate;
 
+    @JsonIgnore
     @Column(name = "rental_car_total_price")
     private double rentalCarTotalPrice;
 
@@ -37,11 +40,11 @@ public class RentalCar {
     private Car car;
 
     @ManyToOne()
-    @JoinColumn(name ="rented_city", referencedColumnName = "city_id", insertable = false, updatable = false)
+    @JoinColumn(name ="rented_city")
     private City rentedCity;
 
     @ManyToOne()
-    @JoinColumn(name = "delivered_city", referencedColumnName = "city_id", insertable = false, updatable = false)
+    @JoinColumn(name = "delivered_city")
     private City deliveredCity;
 
 

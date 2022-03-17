@@ -4,6 +4,7 @@ import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
+import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarWithOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -35,6 +36,11 @@ public class RentalCarsController {
     @PostMapping("/add")
     public Result add(@RequestBody @Valid CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
         return this.rentalCarService.add(createRentalCarRequest);
+    }
+
+    @PostMapping("/addWithOrderedAdditional")
+    public Result addWithOrderedAdditional(@RequestBody @Valid CreateRentalCarWithOrderedAdditionalRequest createRentalCarWithOrderedAdditionalRequest) throws BusinessException {
+        return this.rentalCarService.addWithOrderedAdditional(createRentalCarWithOrderedAdditionalRequest);
     }
 
     @PutMapping("/update")

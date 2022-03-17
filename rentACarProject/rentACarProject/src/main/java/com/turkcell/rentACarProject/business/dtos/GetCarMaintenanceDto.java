@@ -15,5 +15,7 @@ public class GetCarMaintenanceDto {
     private String description;
     private LocalDate returnDate;
     private int carId;
+    private String brandName;
+    private String colorName;
 
 }

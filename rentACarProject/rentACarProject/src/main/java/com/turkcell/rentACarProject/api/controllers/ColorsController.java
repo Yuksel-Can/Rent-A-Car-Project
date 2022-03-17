@@ -25,7 +25,7 @@ import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
 @RestController
-@RequestMapping("api/colors")
+@RequestMapping("/api/colors")
 public class ColorsController {
 	
 	private ColorService colorService;

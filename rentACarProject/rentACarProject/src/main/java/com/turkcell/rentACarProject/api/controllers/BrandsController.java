@@ -57,7 +57,7 @@ public class BrandsController {
 	}
 	
 	@GetMapping("/getById")
-	public DataResult<GetBrandDto> getById(@RequestParam int brandId) throws BusinessException{
+	public DataResult<GetBrandDto> getById(@RequestParam int brandId) throws BusinessException {
 		return this.brandService.getById(brandId);
 	}
 	

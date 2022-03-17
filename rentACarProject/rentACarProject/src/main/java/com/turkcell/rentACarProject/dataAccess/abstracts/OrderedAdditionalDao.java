@@ -12,6 +12,9 @@ public interface OrderedAdditionalDao extends JpaRepository<OrderedAdditional, I
     boolean existsByOrderedAdditionalId(int orderedAdditionalId);
     boolean existsByRentalCar_RentalCarId(int rentalCarId);
     boolean existsByAdditional_AdditionalId(int additionalId);
+    boolean existsByAdditional_AdditionalIdAndRentalCar_RentalCarId(int additionalId, int rentalCarId);
+    List<OrderedAdditional> getAllByAdditional_AdditionalIdAndRentalCar_RentalCarId(int additionalId, int rentalCarId);
+
     List<OrderedAdditional> getAllByRentalCar_RentalCarId(int rentalCarId);
     List<OrderedAdditional> getAllByAdditional_AdditionalId(int additionalId);
 
