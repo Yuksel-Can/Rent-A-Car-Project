@@ -25,7 +25,7 @@ public interface OrderedAdditionalService {
     DataResult<List<OrderedAdditionalListDto>> getByOrderedAdditional_RentalCarId(int rentalCarId) throws BusinessException;
     DataResult<List<OrderedAdditionalListDto>> getByOrderedAdditional_AdditionalId(int additionalId) throws BusinessException;
 
-    boolean checkAllValidationForCreate(CreateOrderedAdditionalForRentalCarRequest createOrderedAdditionalForRentalCarRequest) throws BusinessException;
+    boolean checkAllValidation(int additionalId, int orderedAdditionalQuantity) throws BusinessException ;
 
     void checkIsNotExistsOrderedAdditionalByAdditionalIdAndRentalCarId(int additionalId, int rentalCarId) throws BusinessException;
     boolean checkIsNotExistsByOrderedAdditional_RentalCarId(int rentalCarId) throws BusinessException;

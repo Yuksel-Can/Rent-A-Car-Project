@@ -96,23 +96,26 @@ public class RentalCarManager implements RentalCarService {
         /*_*/
         for(int i=0;i<createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().size();i++){          //her orderedAdditional için validation
 
-            this.orderedAdditionalService.checkAllValidationForCreate(new CreateOrderedAdditionalForRentalCarRequest
-                    (createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getOrderedAdditionalQuantity()
-                            ,createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getAdditionalId()));
+            this.orderedAdditionalService.checkAllValidation(createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getAdditionalId(),
+                                                                createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getOrderedAdditionalQuantity());
 
         }
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarWithOrderedAdditionalRequest, RentalCar.class);
+        rentalCar.setRentalCarId(0);
 
         calculateAndSetTotalPrice(rentalCar);
 
         int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
 
-        for(int i = 0; i<createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().size(); i++){      //her orderedAdditional için add
+        List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().stream()
+                .map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService.forRequest().map(createOrderedAdditionalForRentalCarRequest,
+                        CreateOrderedAdditionalRequest.class)).collect(Collectors.toList());
 
-            Result addOperation = this.orderedAdditionalService.add(new CreateOrderedAdditionalRequest((short) createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getOrderedAdditionalQuantity()
-                    , createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getAdditionalId()
-                    , rentalCarId));
+        for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){ //her orderedAdditional için add
+           createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
+            this.orderedAdditionalService.add(createOrderedAdditionalRequest);
+
         }
 
         return new SuccessResult("Rental Car Added");
@@ -168,7 +171,6 @@ public class RentalCarManager implements RentalCarService {
 
     @Override
     public RentalCar getById(int rentalCarId) throws BusinessException {
-        checkIsExistsByRentalCarId(rentalCarId);
         return this.rentalCarDao.getById(rentalCarId);
     }
 
@@ -366,7 +368,6 @@ public class RentalCarManager implements RentalCarService {
         double totalPrice = totalDayPrice + totalDiffCityPrice;
 
         rentalCar.setRentalCarTotalPrice(totalPrice);
-        this.saveChangesRentalCar(rentalCar);
 
     }
 

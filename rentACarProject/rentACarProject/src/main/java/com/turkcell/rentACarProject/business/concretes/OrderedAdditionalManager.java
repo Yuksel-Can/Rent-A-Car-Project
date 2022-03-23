@@ -61,8 +61,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     @Override
     public Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
 
-        this.additionalService.checkIfExistsByAdditionalId(createOrderedAdditionalRequest.getAdditionalId());
-        checkIfTheAdditionalQuantityOrderedIsValid(createOrderedAdditionalRequest);
+        checkAllValidation(createOrderedAdditionalRequest.getAdditionalId(), createOrderedAdditionalRequest.getOrderedAdditionalQuantity());
         this.rentalCarService.checkIsExistsByRentalCarId(createOrderedAdditionalRequest.getRentalCarId());
         checkIsNotExistsOrderedAdditionalByAdditionalIdAndRentalCarId(createOrderedAdditionalRequest.getAdditionalId(), createOrderedAdditionalRequest.getRentalCarId());
 
@@ -81,7 +80,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
 
         checkIsExistsByOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
-        this.additionalService.checkIfExistsByAdditionalId(updateOrderedAdditionalRequest.getAdditionalId());
+        checkAllValidation(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getOrderedAdditionalQuantity());
         this.rentalCarService.checkIsExistsByRentalCarId(updateOrderedAdditionalRequest.getRentalCarId());
         checkIsOnlyOneOrderedAdditionalByAdditionalIdAndRentalCarIdForUpdate(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getRentalCarId());
 
@@ -172,6 +171,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         rentalCar.setRentalCarTotalPrice(previousTotalPrice + total);
         this.rentalCarService.saveChangesRentalCar(rentalCar);
+
     }
     private void calculateAndUpdateRentalCarTotalPriceForUpdate(OrderedAdditional beforeOrderedAdditional, OrderedAdditional afterOrderedAdditional) throws BusinessException {
 
@@ -214,10 +214,10 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
     }
 
-    public boolean checkAllValidationForCreate(CreateOrderedAdditionalForRentalCarRequest createOrderedAdditionalForRentalCarRequest) throws BusinessException {
+    public boolean checkAllValidation(int additionalId, int orderedAdditionalQuantity) throws BusinessException {
 
-        this.additionalService.checkIfExistsByAdditionalId(createOrderedAdditionalForRentalCarRequest.getAdditionalId());
-        checkIfTheAdditionalQuantityOrderedIsValid(createOrderedAdditionalForRentalCarRequest);
+        this.additionalService.checkIfExistsByAdditionalId(additionalId);
+        checkIfTheAdditionalQuantityOrderedIsValid(additionalId, orderedAdditionalQuantity);
 
         return true;
 
@@ -226,7 +226,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     @Override
     public void checkIsNotExistsOrderedAdditionalByAdditionalIdAndRentalCarId(int additionalId, int rentalCarId) throws BusinessException {
         if(this.orderedAdditionalDao.existsByAdditional_AdditionalIdAndRentalCar_RentalCarId(additionalId, rentalCarId)){
-            throw new BusinessException("This Ordered is already exists");
+            throw new BusinessException("This Ordered is already exists for this rentalCar, rentalCarId: " + rentalCarId + ", additionalId: " + additionalId);
         }
     }
 
@@ -271,15 +271,9 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         }
     }
 
-    private void checkIfTheAdditionalQuantityOrderedIsValid(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
-        int maxUnitsPerRental = this.additionalService.getByAdditionalId(createOrderedAdditionalRequest.getAdditionalId()).getData().getMaxUnitsPerRental();
-        if(createOrderedAdditionalRequest.getOrderedAdditionalQuantity() > maxUnitsPerRental || createOrderedAdditionalRequest.getOrderedAdditionalQuantity() < 1){
-            throw new BusinessException("For this additional service, the Minimum quantity can be 1, the maximum quantity is: " + maxUnitsPerRental);
-        }
-    }
-    private void checkIfTheAdditionalQuantityOrderedIsValid(CreateOrderedAdditionalForRentalCarRequest createOrderedAdditionalForRentalCarRequest) throws BusinessException {
-        int maxUnitsPerRental = this.additionalService.getByAdditionalId(createOrderedAdditionalForRentalCarRequest.getAdditionalId()).getData().getMaxUnitsPerRental();
-        if(createOrderedAdditionalForRentalCarRequest.getOrderedAdditionalQuantity() > maxUnitsPerRental || createOrderedAdditionalForRentalCarRequest.getOrderedAdditionalQuantity() < 1){
+    private void checkIfTheAdditionalQuantityOrderedIsValid( int additionalId, int orderedAdditionalQuantity) throws BusinessException {
+        int maxUnitsPerRental = this.additionalService.getByAdditionalId(additionalId).getData().getMaxUnitsPerRental();
+        if(orderedAdditionalQuantity > maxUnitsPerRental || orderedAdditionalQuantity < 1){
             throw new BusinessException("For this additional service, the Minimum quantity can be 1, the maximum quantity is: " + maxUnitsPerRental);
         }
     }
