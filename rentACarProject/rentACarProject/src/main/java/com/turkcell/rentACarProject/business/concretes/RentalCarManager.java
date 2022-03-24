@@ -3,7 +3,6 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalForRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarWithOrderedAdditionalRequest;
@@ -16,15 +15,12 @@ import com.turkcell.rentACarProject.core.utilities.result.Result;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.RentalCarDao;
-import com.turkcell.rentACarProject.entities.concretes.City;
-import com.turkcell.rentACarProject.entities.concretes.OrderedAdditional;
 import com.turkcell.rentACarProject.entities.concretes.RentalCar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -86,36 +82,41 @@ public class RentalCarManager implements RentalCarService {
     @Override
     public Result addWithOrderedAdditional(CreateRentalCarWithOrderedAdditionalRequest createRentalCarWithOrderedAdditionalRequest) throws BusinessException {
 
-        this.carService.checkIsExistsByCarId(createRentalCarWithOrderedAdditionalRequest.getCarId());
-        checkIfStartDateAfterToday(createRentalCarWithOrderedAdditionalRequest.getStartDate());
-        checkIfStartDateBeforeFinishDate(createRentalCarWithOrderedAdditionalRequest.getStartDate(), createRentalCarWithOrderedAdditionalRequest.getFinishDate());
-        checkIfCarAlreadyRentedForCreate(createRentalCarWithOrderedAdditionalRequest.getCarId(), createRentalCarWithOrderedAdditionalRequest.getStartDate(), createRentalCarWithOrderedAdditionalRequest.getFinishDate());
-        this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(createRentalCarWithOrderedAdditionalRequest.getCarId(), createRentalCarWithOrderedAdditionalRequest.getStartDate());
-        this.cityService.checkIfExistsByCityId(createRentalCarWithOrderedAdditionalRequest.getRentedCityId());
-        this.cityService.checkIfExistsByCityId(createRentalCarWithOrderedAdditionalRequest.getDeliveredCityId());
+        this.carService.checkIsExistsByCarId(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getCarId());
+        checkIfStartDateAfterToday(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getStartDate());
+        checkIfStartDateBeforeFinishDate(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getStartDate(), createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getFinishDate());
+        checkIfCarAlreadyRentedForCreate(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getCarId(), createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getStartDate(), createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getFinishDate());
+        this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getCarId(), createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getStartDate());
+        this.cityService.checkIfExistsByCityId(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getRentedCityCityId());
+        this.cityService.checkIfExistsByCityId(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getDeliveredCityId());
         /*_*/
-        for(int i=0;i<createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().size();i++){          //her orderedAdditional için validation
+        if(createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals() !=null){
 
-            this.orderedAdditionalService.checkAllValidation(createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getAdditionalId(),
-                                                                createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getOrderedAdditionalQuantity());
+            for(int i=0;i<createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().size();i++){          //her orderedAdditional için validation
 
+                this.orderedAdditionalService.checkAllValidation(createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getAdditionalId(),
+                        createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getOrderedAdditionalQuantity());
+
+            }
         }
 
-        RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarWithOrderedAdditionalRequest, RentalCar.class);
+        RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest(), RentalCar.class);
         rentalCar.setRentalCarId(0);
 
         calculateAndSetTotalPrice(rentalCar);
 
         int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
+        if(createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals() != null){
 
-        List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().stream()
-                .map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService.forRequest().map(createOrderedAdditionalForRentalCarRequest,
-                        CreateOrderedAdditionalRequest.class)).collect(Collectors.toList());
+            List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().stream()
+                    .map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService.forRequest().map(createOrderedAdditionalForRentalCarRequest,
+                            CreateOrderedAdditionalRequest.class)).collect(Collectors.toList());
 
-        for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){ //her orderedAdditional için add
-           createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
+            for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){ //her orderedAdditional için add
+            createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
             this.orderedAdditionalService.add(createOrderedAdditionalRequest);
 
+            }
         }
 
         return new SuccessResult("Rental Car Added");
