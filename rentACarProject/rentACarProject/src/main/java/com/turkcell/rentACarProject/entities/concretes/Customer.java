@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,14 +20,14 @@ import java.time.LocalDate;
 @Table(name = "customers")
 public class Customer extends User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "customer_id")
+    @Column(name = "customer_id", insertable = false, updatable = false)
     private int customerId;
 
     @JsonIgnore
-    @CreationTimestamp
+   // @CreationTimestamp
     @Column(name = "registration_date")
     private LocalDate registrationDate;
 
+    @OneToMany(mappedBy = "customer")
+    private List<RentalCar> rentedCars;
 }
