@@ -24,7 +24,7 @@ public class Customer extends User {
     private int customerId;
 
     @JsonIgnore
-   // @CreationTimestamp
+    @CreationTimestamp
     @Column(name = "registration_date")
     private LocalDate registrationDate;
 

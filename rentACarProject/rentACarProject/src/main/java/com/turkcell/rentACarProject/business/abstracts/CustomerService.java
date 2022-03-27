@@ -20,3 +20,4 @@ public interface CustomerService {
 
     DataResult<GetCustomerDto> getById(int customerId);
 }
+
