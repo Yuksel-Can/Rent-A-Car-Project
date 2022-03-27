@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class CreateCustomerRequest extends CreateUserRequest{
 
     @JsonIgnore
+    @CreationTimestamp
     private LocalDate registrationDate;
 
 }

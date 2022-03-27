@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateCorporateCustomerRequest extends CreateCustomerRequest{
+public class CreateCorporateCustomerRequest extends CreateCustomerRequest {
 
     @NotNull
     @NotBlank

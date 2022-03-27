@@ -6,6 +6,7 @@ import com.turkcell.rentACarProject.business.dtos.UserListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateUserRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteUserRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateUserRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -45,38 +46,48 @@ public class UserManager implements UserService {
     }
 
     @Override
-    public Result add(CreateUserRequest createUserRequest) {
+    public Result add(CreateUserRequest createUserRequest) throws BusinessException {
+
+        checkIfUserEmailNotExists(createUserRequest.getEmail());
 
         User user  = this.modelMapperService.forRequest().map(createUserRequest, User.class);
 
-        //this.userDao.save(user);
+        this.userDao.save(user);
 
         return new SuccessResult("User added");
 
     }
 
     @Override
-    public Result update(UpdateUserRequest updateUserRequest) {
+    public Result update(UpdateUserRequest updateUserRequest) throws BusinessException {
+
+        checkIfUserIdExists(updateUserRequest.getUserId());
+        checkIfUserEmailNotExists(updateUserRequest.getEmail());
 
         User user = this.modelMapperService.forRequest().map(updateUserRequest, User.class);
 
-        //this.userDao.save(user);
+        this.userDao.save(user);
 
         return new SuccessResult(("User updated"));
 
     }
 
     @Override
-    public Result delete(DeleteUserRequest deleteUserRequest) {
+    public Result delete(DeleteUserRequest deleteUserRequest) throws BusinessException {
 
-        //this.userDao.deleteById(deleteUserRequest.getUserId());
+        checkIfUserIdExists(deleteUserRequest.getUserId());
+        //todo:rentte bu id li kişinin herhangi kırası varmı
+
+        this.userDao.deleteById(deleteUserRequest.getUserId());
 
         return new SuccessResult("User deleted");
 
     }
 
     @Override
-    public DataResult<GetUserDto> getById(int userId) {
+    public DataResult<GetUserDto> getById(int userId) throws BusinessException {
+
+        checkIfUserIdExists(userId);
 
         User user = this.userDao.getById(userId);
 
@@ -85,4 +96,25 @@ public class UserManager implements UserService {
         return new SuccessDataResult<>(result, "User listed");
 
     }
+
+
+    @Override
+    public boolean checkIfUserIdExists(int userId) throws BusinessException {
+        if(!this.userDao.existsByUserId(userId)){
+          throw new BusinessException("User id not exists, userId: " + userId);
+        }
+
+
+        return true;
+    }
+
+    @Override
+    public boolean checkIfUserEmailNotExists(String email) throws BusinessException {
+        if(this.userDao.existsByEmail(email)){
+            throw new BusinessException("User Already exists, email: " + email);
+        }
+
+        return true;
+    }
+
 }
