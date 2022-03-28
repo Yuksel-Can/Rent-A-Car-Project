@@ -5,6 +5,7 @@ import com.turkcell.rentACarProject.business.dtos.lists.CorporateCustomerListDto
 import com.turkcell.rentACarProject.business.requests.create.CreateCorporateCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteCorporateCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateCorporateCustomerRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
@@ -14,9 +15,11 @@ public interface CorporateCustomerService {
 
     DataResult<List<CorporateCustomerListDto>> getAll();
 
-    Result add(CreateCorporateCustomerRequest createCorporateCustomerRequest);
-    Result update(UpdateCorporateCustomerRequest updateCorporateCustomerRequest);
-    Result delete(DeleteCorporateCustomerRequest deleteCorporateCustomerRequest);
+    Result add(CreateCorporateCustomerRequest createCorporateCustomerRequest) throws BusinessException;
+    Result update(UpdateCorporateCustomerRequest updateCorporateCustomerRequest) throws BusinessException;
+    Result delete(DeleteCorporateCustomerRequest deleteCorporateCustomerRequest) throws BusinessException;
 
-    DataResult<GetCorporateCustomerDto> getById(int corporateCustomerId);
+    DataResult<GetCorporateCustomerDto> getById(int corporateCustomerId) throws BusinessException;
+
+    void checkIfCorporateCustomerIdExists(int corporateCustomerId) throws BusinessException;
 }

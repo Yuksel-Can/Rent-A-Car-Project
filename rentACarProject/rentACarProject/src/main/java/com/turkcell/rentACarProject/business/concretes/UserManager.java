@@ -76,7 +76,6 @@ public class UserManager implements UserService {
     public Result delete(DeleteUserRequest deleteUserRequest) throws BusinessException {
 
         checkIfUserIdExists(deleteUserRequest.getUserId());
-        //todo:rentte bu id li kişinin herhangi kırası varmı
 
         this.userDao.deleteById(deleteUserRequest.getUserId());
 
@@ -113,7 +112,14 @@ public class UserManager implements UserService {
         if(this.userDao.existsByEmail(email)){
             throw new BusinessException("User Already exists, email: " + email);
         }
+        return true;
+    }
 
+    @Override
+    public boolean checkIfUserEmailNotExistsForUpdate(int userId, String email) throws BusinessException {
+        if(this.userDao.existsByEmailAndUserIdIsNot(email, userId)){
+            throw new BusinessException("User Already exists, email: " + email);
+        }
         return true;
     }
 

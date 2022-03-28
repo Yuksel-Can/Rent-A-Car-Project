@@ -6,6 +6,7 @@ import com.turkcell.rentACarProject.business.dtos.lists.CorporateCustomerListDto
 import com.turkcell.rentACarProject.business.requests.create.CreateCorporateCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteCorporateCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateCorporateCustomerRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,22 +32,22 @@ public class CorporateCustomersController {
     }
 
     @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateCorporateCustomerRequest createCorporateCustomerRequest){
+    public Result add(@RequestBody @Valid CreateCorporateCustomerRequest createCorporateCustomerRequest) throws BusinessException {
         return this.corporateCustomerService.add(createCorporateCustomerRequest);
     }
 
     @PutMapping("/update")
-    public Result update(@RequestBody @Valid UpdateCorporateCustomerRequest updateCorporateCustomerRequest){
+    public Result update(@RequestBody @Valid UpdateCorporateCustomerRequest updateCorporateCustomerRequest) throws BusinessException {
         return this.corporateCustomerService.update(updateCorporateCustomerRequest);
     }
 
     @DeleteMapping("/delete")
-    public Result delete(@RequestBody @Valid DeleteCorporateCustomerRequest deleteCorporateCustomerRequest){
+    public Result delete(@RequestBody @Valid DeleteCorporateCustomerRequest deleteCorporateCustomerRequest) throws BusinessException {
         return this.corporateCustomerService.delete(deleteCorporateCustomerRequest);
     }
 
     @GetMapping("/getById")
-    public DataResult<GetCorporateCustomerDto> getById(@RequestParam int corporateCustomerId){
+    public DataResult<GetCorporateCustomerDto> getById(@RequestParam int corporateCustomerId) throws BusinessException {
         return this.corporateCustomerService.getById(corporateCustomerId);
     }
 

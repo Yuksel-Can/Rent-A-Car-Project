@@ -22,5 +22,5 @@ public class RentalCarListDto {
     private String rentedCityName;
     private int deliveredCityId;
     private String deliveredCityName;
-
+    private String email;
 }

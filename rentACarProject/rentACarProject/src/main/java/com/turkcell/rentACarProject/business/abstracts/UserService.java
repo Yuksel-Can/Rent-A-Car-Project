@@ -23,5 +23,6 @@ public interface UserService {
 
     boolean checkIfUserIdExists(int userId) throws BusinessException;
     boolean checkIfUserEmailNotExists(String email) throws BusinessException;
+    boolean checkIfUserEmailNotExistsForUpdate(int userId, String email) throws BusinessException;
 
 }

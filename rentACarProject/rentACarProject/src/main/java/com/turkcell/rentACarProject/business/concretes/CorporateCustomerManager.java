@@ -1,11 +1,15 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CorporateCustomerService;
+import com.turkcell.rentACarProject.business.abstracts.CustomerService;
+import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
+import com.turkcell.rentACarProject.business.abstracts.UserService;
 import com.turkcell.rentACarProject.business.dtos.gets.GetCorporateCustomerDto;
 import com.turkcell.rentACarProject.business.dtos.lists.CorporateCustomerListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateCorporateCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteCorporateCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateCorporateCustomerRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -23,11 +27,17 @@ import java.util.stream.Collectors;
 public class CorporateCustomerManager implements CorporateCustomerService {
 
     private CorporateCustomerDao corporateCustomerDao;
+    private CustomerService customerService;
+    private RentalCarService rentalCarService;
+    private UserService userService;
     private ModelMapperService modelMapperService;
 
     @Autowired
-    public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService) {
+    public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService, CustomerService customerService, RentalCarService rentalCarService, UserService userService) {
         this.corporateCustomerDao = corporateCustomerDao;
+        this.customerService = customerService;
+        this.rentalCarService = rentalCarService;
+        this.userService = userService;
         this.modelMapperService = modelMapperService;
     }
 
@@ -43,7 +53,10 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     }
 
     @Override
-    public Result add(CreateCorporateCustomerRequest createCorporateCustomerRequest) {
+    public Result add(CreateCorporateCustomerRequest createCorporateCustomerRequest) throws BusinessException {
+
+        this.userService.checkIfUserEmailNotExists(createCorporateCustomerRequest.getEmail());
+        checkIfTaxNumberNotExists(createCorporateCustomerRequest.getTaxNumber());
 
         CorporateCustomer corporateCustomer = this.modelMapperService.forRequest().map(createCorporateCustomerRequest, CorporateCustomer.class);
 
@@ -54,7 +67,11 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     }
 
     @Override
-    public Result update(UpdateCorporateCustomerRequest updateCorporateCustomerRequest) {
+    public Result update(UpdateCorporateCustomerRequest updateCorporateCustomerRequest) throws BusinessException {
+
+        checkIfCorporateCustomerIdExists(updateCorporateCustomerRequest.getUserId());
+        this.userService.checkIfUserEmailNotExistsForUpdate(updateCorporateCustomerRequest.getUserId(), updateCorporateCustomerRequest.getEmail());
+        checkIfTaxNumberNotExistsForUpdate(updateCorporateCustomerRequest.getUserId(), updateCorporateCustomerRequest.getTaxNumber());
 
         CorporateCustomer corporateCustomer = this.modelMapperService.forRequest().map(updateCorporateCustomerRequest, CorporateCustomer.class);
 
@@ -65,7 +82,10 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     }
 
     @Override
-    public Result delete(DeleteCorporateCustomerRequest deleteCorporateCustomerRequest) {
+    public Result delete(DeleteCorporateCustomerRequest deleteCorporateCustomerRequest) throws BusinessException {
+
+        checkIfCorporateCustomerIdExists(deleteCorporateCustomerRequest.getUserId());
+        this.rentalCarService.checkIfRentalCar_CustomerIdNotExists(deleteCorporateCustomerRequest.getUserId());
 
         this.corporateCustomerDao.deleteById(deleteCorporateCustomerRequest.getUserId());
 
@@ -74,7 +94,9 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     }
 
     @Override
-    public DataResult<GetCorporateCustomerDto> getById(int corporateCustomerId) {
+    public DataResult<GetCorporateCustomerDto> getById(int corporateCustomerId) throws BusinessException {
+
+        checkIfCorporateCustomerIdExists(corporateCustomerId);
 
         CorporateCustomer corporateCustomer = this.corporateCustomerDao.getById(corporateCustomerId);
 
@@ -83,4 +105,25 @@ public class CorporateCustomerManager implements CorporateCustomerService {
         return new SuccessDataResult<>(result, "Corporate Customer listed");
 
     }
+
+    @Override
+    public void checkIfCorporateCustomerIdExists(int corporateCustomerId) throws BusinessException {
+        if(!this.corporateCustomerDao.existsByCorporateCustomerId(corporateCustomerId)){
+            throw new BusinessException("Corporate Customer Id not exists, corporateCustomerId: " + corporateCustomerId);
+        }
+
+    }
+
+    void checkIfTaxNumberNotExists(String taxNumber) throws BusinessException {
+        if(this.corporateCustomerDao.existsByTaxNumber(taxNumber)){
+            throw new BusinessException("Tax Number already exists, taxNumber: " + taxNumber);
+        }
+    }
+
+    void checkIfTaxNumberNotExistsForUpdate(int corporateCustomerId, String taxNumber) throws BusinessException {
+        if(this.corporateCustomerDao.existsByTaxNumberAndCorporateCustomerIdIsNot(taxNumber, corporateCustomerId)){
+            throw new BusinessException("Tax Number already exists, taxNumber: " + taxNumber);
+        }
+    }
+
 }

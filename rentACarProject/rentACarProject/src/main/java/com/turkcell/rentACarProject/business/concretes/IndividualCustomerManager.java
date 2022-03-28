@@ -1,11 +1,14 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.IndividualCustomerService;
+import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
+import com.turkcell.rentACarProject.business.abstracts.UserService;
 import com.turkcell.rentACarProject.business.dtos.GetIndividualCustomerDto;
 import com.turkcell.rentACarProject.business.dtos.IndividualCustomerListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateIndividualCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteIndividualCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateIndividualCustomerRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -22,12 +25,16 @@ import java.util.stream.Collectors;
 @Service
 public class IndividualCustomerManager implements IndividualCustomerService {
 
-    private IndividualCustomerDao individualCustomerDao;
-    private ModelMapperService modelMapperService;
+    private final IndividualCustomerDao individualCustomerDao;
+    private final UserService userService;
+    private final RentalCarService rentalCarService;
+    private final ModelMapperService modelMapperService;
 
     @Autowired
-    public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao, ModelMapperService modelMapperService) {
+    public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao, ModelMapperService modelMapperService, UserService userService, RentalCarService rentalCarService) {
         this.individualCustomerDao = individualCustomerDao;
+        this.userService = userService;
+        this.rentalCarService = rentalCarService;
         this.modelMapperService = modelMapperService;
     }
 
@@ -45,17 +52,25 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest) {
+    public Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest) throws BusinessException {
+
+        this.userService.checkIfUserEmailNotExists(createIndividualCustomerRequest.getEmail());
+        checkIfNationalIdentityNotExists(createIndividualCustomerRequest.getNationalIdentity());
 
         IndividualCustomer individualCustomer = this.modelMapperService.forRequest().map(createIndividualCustomerRequest, IndividualCustomer.class);
 
         this.individualCustomerDao.save(individualCustomer);
+
         return new SuccessResult("Individual Customer added");
 
     }
 
     @Override
-    public Result update(UpdateIndividualCustomerRequest updateIndividualCustomerRequest) {
+    public Result update(UpdateIndividualCustomerRequest updateIndividualCustomerRequest) throws BusinessException {
+
+        checkIfIndividualCustomerIdExists(updateIndividualCustomerRequest.getUserId());
+        this.userService.checkIfUserEmailNotExistsForUpdate(updateIndividualCustomerRequest.getUserId(), updateIndividualCustomerRequest.getEmail());
+        checkIfNationalIdentityNotExistsForUpdate(updateIndividualCustomerRequest.getUserId(), updateIndividualCustomerRequest.getNationalIdentity());
 
         IndividualCustomer individualCustomer = this.modelMapperService.forRequest().map(updateIndividualCustomerRequest, IndividualCustomer.class);
 
@@ -66,7 +81,10 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public Result delete(DeleteIndividualCustomerRequest deleteIndividualCustomerRequest) {
+    public Result delete(DeleteIndividualCustomerRequest deleteIndividualCustomerRequest) throws BusinessException {
+
+        checkIfIndividualCustomerIdExists(deleteIndividualCustomerRequest.getUserId());
+        this.rentalCarService.checkIfRentalCar_CustomerIdNotExists(deleteIndividualCustomerRequest.getUserId());
 
         this.individualCustomerDao.deleteById(deleteIndividualCustomerRequest.getUserId());
 
@@ -75,7 +93,9 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public DataResult<GetIndividualCustomerDto> getById(int individualCustomerId) {
+    public DataResult<GetIndividualCustomerDto> getById(int individualCustomerId) throws BusinessException {
+
+        checkIfIndividualCustomerIdExists(individualCustomerId);
 
         IndividualCustomer individualCustomer = this.individualCustomerDao.getById(individualCustomerId);
 
@@ -84,4 +104,26 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         return new SuccessDataResult<>(result, "Individual Customer listed");
 
     }
+
+
+    @Override
+    public boolean checkIfIndividualCustomerIdExists(int individualCustomerId) throws BusinessException {
+        if(!this.individualCustomerDao.existsByIndividualCustomerId(individualCustomerId)){
+            throw new BusinessException("Individual Customer Id not exists, individualCustomerId: " + individualCustomerId);
+        }
+        return false;
+    }
+
+    void checkIfNationalIdentityNotExists(String nationalIdentity) throws BusinessException {
+        if(this.individualCustomerDao.existsByNationalIdentity(nationalIdentity)){
+            throw new BusinessException("National Identity already exists, nationalIdentity: " + nationalIdentity);
+        }
+    }
+
+    void checkIfNationalIdentityNotExistsForUpdate(int individualCustomerId, String nationalIdentity) throws BusinessException {
+        if(this.individualCustomerDao.existsByNationalIdentityAndIndividualCustomerIdIsNot(nationalIdentity, individualCustomerId)){
+            throw new BusinessException("National Identity already exists, nationalIdentity: " + nationalIdentity);
+        }
+    }
+
 }

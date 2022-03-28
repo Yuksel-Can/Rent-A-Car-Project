@@ -18,8 +18,9 @@ public interface RentalCarService {
 
     DataResult<List<RentalCarListDto>> getAll();
 
-    Result add(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
-    void saveChangesRentalCar(RentalCar rentalCar) throws BusinessException;
+    //Result add(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    Result addForIndividualCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    Result addForCorporateCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
     Result addWithOrderedAdditional(CreateRentalCarWithOrderedAdditionalRequest createRentalCarWithOrderedAdditionalRequest) throws BusinessException;
     Result update(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
@@ -29,6 +30,9 @@ public interface RentalCarService {
     DataResult<List<RentalCarListDto>> getAllByRentalCar_CarId(int carId) throws BusinessException;
     DataResult<List<RentalCarListDto>> getAllByRentedCity_CityId(int rentedCity) throws BusinessException;
     DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(int deliveredCity) throws BusinessException;
+    DataResult<List<RentalCarListDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException;
+    DataResult<List<RentalCarListDto>> getAllByIndividualCustomer_IndividualCustomerId(int individualCustomerId) throws BusinessException;
+    DataResult<List<RentalCarListDto>> getAllByCorporateCustomer_CorporateCustomerId(int corporateCustomerId) throws BusinessException;
 
     void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException;
     void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException;
@@ -49,8 +53,11 @@ public interface RentalCarService {
     void checkIsExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
     void checkIsNotExistsByRentedCity_CityId(int rentedCityId) throws BusinessException;
     void checkIsNotExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
+    void checkIfRentalCar_CustomerIdExists(int customerId) throws BusinessException;
+    void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException;
 
     void updateTotalPriceBasedOnOrderedAdditionalService(int quantity, double dailyPrice, int rentalCarId);
+    void saveChangesRentalCar(RentalCar rentalCar) throws BusinessException;
     int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate);
 
 }

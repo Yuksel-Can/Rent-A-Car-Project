@@ -39,4 +39,8 @@ public class UpdateRentalCarRequest {
     @Min(1)
     private int deliveredCityId;
 
+    @NotNull
+    @Min(1)
+    private int customerId;
+
 }

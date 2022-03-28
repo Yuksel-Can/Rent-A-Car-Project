@@ -9,5 +9,8 @@ public interface UserDao extends JpaRepository<User, Integer> {
 
     boolean existsByUserId(int userId);
     boolean existsByEmail(String email);
+    boolean existsByEmailAndUserIdIsNot(String email,int userId);
+
+
 
 }

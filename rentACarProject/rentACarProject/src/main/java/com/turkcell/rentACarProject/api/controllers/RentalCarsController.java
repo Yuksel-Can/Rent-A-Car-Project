@@ -33,9 +33,14 @@ public class RentalCarsController {
         return this.rentalCarService.getAll();
     }
 
-    @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
-        return this.rentalCarService.add(createRentalCarRequest);
+    @PostMapping("/addForIndividualCustomer")
+    public Result addForIndividualCustomer(@RequestBody @Valid CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
+        return this.rentalCarService.addForIndividualCustomer(createRentalCarRequest);
+    }
+
+    @PostMapping("/addForCorporateCustomer")
+    public Result addForCorporateCustomer(@RequestBody @Valid CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
+        return this.rentalCarService.addForCorporateCustomer(createRentalCarRequest);
     }
 
     @PostMapping("/addWithOrderedAdditional")
@@ -72,4 +77,20 @@ public class RentalCarsController {
     public DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(@RequestParam int deliveredCityId) throws BusinessException {
         return this.rentalCarService.getAllByDeliveredCity_CityId(deliveredCityId);
     }
+
+    @GetMapping("/getByCustomer_CustomerId")
+    public DataResult<List<RentalCarListDto>> getAllByCustomer_CustomerId(@RequestParam int customerId) throws BusinessException {
+        return this.rentalCarService.getAllByCustomer_CustomerId(customerId);
+    }
+
+    @GetMapping("/getByIndividualCustomer_IndividualCustomerId")
+    public DataResult<List<RentalCarListDto>> getAllByIndividualCustomer_IndividualCustomerId(@RequestParam int individualCustomerId) throws BusinessException {
+        return this.rentalCarService.getAllByIndividualCustomer_IndividualCustomerId(individualCustomerId);
+    }
+
+    @GetMapping("/getByCorporateCustomer_CorporateCustomerId")
+    public DataResult<List<RentalCarListDto>> getAllByCorporateCustomer_CorporateCustomerId(@RequestParam int corporateCustomerId) throws BusinessException {
+        return this.rentalCarService.getAllByCorporateCustomer_CorporateCustomerId(corporateCustomerId);
+    }
+
 }

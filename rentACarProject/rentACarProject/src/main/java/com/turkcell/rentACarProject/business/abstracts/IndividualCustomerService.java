@@ -5,6 +5,7 @@ import com.turkcell.rentACarProject.business.dtos.GetIndividualCustomerDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateIndividualCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteIndividualCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateIndividualCustomerRequest;
+import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
@@ -14,10 +15,12 @@ public interface IndividualCustomerService {
 
     DataResult<List<IndividualCustomerListDto>> getAll();
 
-    Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest);
-    Result update(UpdateIndividualCustomerRequest updateIndividualCustomerRequest);
-    Result delete(DeleteIndividualCustomerRequest deleteIndividualCustomerRequest);
+    Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest) throws BusinessException;
+    Result update(UpdateIndividualCustomerRequest updateIndividualCustomerRequest) throws BusinessException;
+    Result delete(DeleteIndividualCustomerRequest deleteIndividualCustomerRequest) throws BusinessException;
 
-    DataResult<GetIndividualCustomerDto> getById(int individualCustomerId);
+    DataResult<GetIndividualCustomerDto> getById(int individualCustomerId) throws BusinessException;
+
+    boolean checkIfIndividualCustomerIdExists(int individualCustomerId) throws BusinessException;
 }
 
