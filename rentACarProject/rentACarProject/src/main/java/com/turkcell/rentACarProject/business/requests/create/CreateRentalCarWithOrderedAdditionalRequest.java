@@ -28,3 +28,4 @@ public class CreateRentalCarWithOrderedAdditionalRequest {
     private List<CreateOrderedAdditionalForRentalCarRequest> orderedAdditionals;
 
 }
+//todo:bu class'ı sil

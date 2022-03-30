@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.api.controllers;
 
+import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
@@ -34,13 +35,13 @@ public class RentalCarsController {
     }
 
     @PostMapping("/addForIndividualCustomer")
-    public Result addForIndividualCustomer(@RequestBody @Valid CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
-        return this.rentalCarService.addForIndividualCustomer(createRentalCarRequest);
+    public Result addForIndividualCustomer(@RequestBody @Valid RentalCarAddModel rentalCarAddModel) throws BusinessException {
+        return this.rentalCarService.addForIndividualCustomer(rentalCarAddModel);
     }
 
     @PostMapping("/addForCorporateCustomer")
-    public Result addForCorporateCustomer(@RequestBody @Valid CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
-        return this.rentalCarService.addForCorporateCustomer(createRentalCarRequest);
+    public Result addForCorporateCustomer(@RequestBody @Valid RentalCarAddModel rentalCarAddModel) throws BusinessException {
+        return this.rentalCarService.addForCorporateCustomer(rentalCarAddModel);
     }
 
     @PostMapping("/addWithOrderedAdditional")
@@ -48,9 +49,14 @@ public class RentalCarsController {
         return this.rentalCarService.addWithOrderedAdditional(createRentalCarWithOrderedAdditionalRequest);
     }
 
-    @PutMapping("/update")
-    public Result update(@RequestBody @Valid UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
-        return this.rentalCarService.update(updateRentalCarRequest);
+    @PutMapping("/updateForIndividualCustomer")
+    public Result updateForIndividualCustomer(@RequestBody @Valid UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
+        return this.rentalCarService.updateForIndividualCustomer(updateRentalCarRequest);
+    }
+
+    @PutMapping("/updateForCorporateCustomer")
+    public Result updateForCorporateCustomer(@RequestBody @Valid UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
+        return this.rentalCarService.updateForCorporateCustomer(updateRentalCarRequest);
     }
 
     @DeleteMapping("/delete")

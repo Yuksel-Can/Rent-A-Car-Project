@@ -38,7 +38,7 @@ public class CarManager implements CarService{
 	private RentalCarService rentalCarService;
 	
 	@Autowired
-	public  CarManager(CarDao carDao,ModelMapperService modelMapperService, @Lazy BrandService brandService, @Lazy ColorService colorService, @Lazy RentalCarService rentalCarService) {
+	public  CarManager(CarDao carDao,ModelMapperService modelMapperService, @Lazy BrandService brandService, @Lazy ColorService colorService, RentalCarService rentalCarService) {
 		this.carDao = carDao;
 		this.brandService = brandService;
 		this.colorService = colorService;

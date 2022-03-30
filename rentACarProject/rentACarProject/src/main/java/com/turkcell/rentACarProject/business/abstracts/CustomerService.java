@@ -8,6 +8,7 @@ import com.turkcell.rentACarProject.business.requests.update.UpdateCustomerReque
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
+import com.turkcell.rentACarProject.entities.concretes.Customer;
 
 import java.util.List;
 
@@ -22,6 +23,8 @@ public interface CustomerService {
     DataResult<GetCustomerDto> getById(int customerId) throws BusinessException;
 
     void checkIfCustomerIdExists(int customerId) throws BusinessException;
+
+    Customer getCustomerById(int customerId);
 
 }
 

@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 @Service
 public class CityManager implements CityService {
 
-    private CityDao cityDao;
-    private RentalCarService rentalCarService;
-    private ModelMapperService modelMapperService;
+    private final CityDao cityDao;
+    private final RentalCarService rentalCarService;
+    private final ModelMapperService modelMapperService;
 
     @Autowired
     public CityManager(CityDao cityDao, ModelMapperService modelMapperService, @Lazy RentalCarService rentalCarService) {
@@ -45,7 +45,6 @@ public class CityManager implements CityService {
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Cities listed");
-
     }
 
     @Override
@@ -55,7 +54,7 @@ public class CityManager implements CityService {
 
         City city = this.modelMapperService.forRequest().map(createCityRequest, City.class);
 
-//      this.cityDao.save(city);
+        this.cityDao.save(city);
 
         return new SuccessResult("City added");
 
@@ -69,7 +68,7 @@ public class CityManager implements CityService {
 
         City city = this.modelMapperService.forRequest().map(updateCityRequest, City.class);
 
-//      this.cityDao.save(city);
+        this.cityDao.save(city);
 
         return new SuccessResult("City updated, cityId: " + updateCityRequest.getCityId());
 
@@ -81,7 +80,8 @@ public class CityManager implements CityService {
         checkIfExistsByCityId(deleteCityRequest.getCityId());
         this.rentalCarService.checkIsNotExistsByRentedCity_CityId(deleteCityRequest.getCityId());
         this.rentalCarService.checkIsNotExistsByDeliveredCity_CityId(deleteCityRequest.getCityId());
-//        this.cityDao.deleteById(deleteCityRequest.getCityId());
+
+        this.cityDao.deleteById(deleteCityRequest.getCityId());
 
         return new SuccessResult("City deleted, cityId: " + deleteCityRequest.getCityId());
 

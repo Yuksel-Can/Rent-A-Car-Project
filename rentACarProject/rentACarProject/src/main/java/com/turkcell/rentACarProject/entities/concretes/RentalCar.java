@@ -55,4 +55,6 @@ public class RentalCar {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
+    @OneToMany(mappedBy = "rentalCar")
+    private List<Invoice> invoices;
 }

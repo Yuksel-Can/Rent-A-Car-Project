@@ -69,7 +69,6 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         orderedAdditional.setOrderedAdditionalId(0);
 
         this.orderedAdditionalDao.save(orderedAdditional);
-
         calculateAndUpdateRentalCarTotalPriceForAdd(orderedAdditional);
 
         return new SuccessResult("Ordered Additional Service added");

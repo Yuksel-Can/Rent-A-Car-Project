@@ -32,25 +32,8 @@ public class CitiesController {
         return this.cityService.getAll();
     }
 
-    @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateCityRequest createCityRequest) throws BusinessException {
-        return this.cityService.add(createCityRequest);
-    }
-
-    @PutMapping("/update")
-    public Result update(@RequestBody @Valid UpdateCityRequest updateCityRequest) throws BusinessException {
-        return this.cityService.update(updateCityRequest);
-    }
-
-    @DeleteMapping("/delete")
-    public Result delte(@RequestBody @Valid DeleteCityRequest deleteCityRequest) throws BusinessException {
-        return this.cityService.delete(deleteCityRequest);
-    }
-
     @GetMapping("getByCityId")
     public DataResult<GetCityDto> getByCityId(@RequestParam int cityId) throws BusinessException {
         return this.cityService.getByCityId(cityId);
     }
-
-
 }

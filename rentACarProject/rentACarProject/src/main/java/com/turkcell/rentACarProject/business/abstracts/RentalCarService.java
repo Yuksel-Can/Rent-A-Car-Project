@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.abstracts;
 
+import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
@@ -19,10 +20,11 @@ public interface RentalCarService {
     DataResult<List<RentalCarListDto>> getAll();
 
     //Result add(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
-    Result addForIndividualCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
-    Result addForCorporateCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    Result addForIndividualCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException;
+    Result addForCorporateCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException;
     Result addWithOrderedAdditional(CreateRentalCarWithOrderedAdditionalRequest createRentalCarWithOrderedAdditionalRequest) throws BusinessException;
-    Result update(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
+    Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
+    Result updateForCorporateCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
 
     DataResult<GetRentalCarDto> getByRentalCarId(int rentalCarId) throws BusinessException;
@@ -50,10 +52,8 @@ public interface RentalCarService {
     void checkIsExistsByRentalCar_CarId(int carId) throws BusinessException;
     void checkIsNotExistsByRentalCar_CarId(int carId) throws BusinessException;
     void checkIsExistsByRentedCity_CityId(int rentedCityId) throws BusinessException;
-    void checkIsExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
     void checkIsNotExistsByRentedCity_CityId(int rentedCityId) throws BusinessException;
     void checkIsNotExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
-    void checkIfRentalCar_CustomerIdExists(int customerId) throws BusinessException;
     void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException;
 
     void updateTotalPriceBasedOnOrderedAdditionalService(int quantity, double dailyPrice, int rentalCarId);

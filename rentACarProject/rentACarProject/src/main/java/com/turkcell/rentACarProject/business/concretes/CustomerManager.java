@@ -109,4 +109,9 @@ public class CustomerManager implements CustomerService {
             throw new BusinessException("Customer id not found, customerId: " + customerId);
         }
     }
+
+    @Override
+    public Customer getCustomerById(int customerId){
+        return this.customerDao.getById(customerId);
+    }
 }
