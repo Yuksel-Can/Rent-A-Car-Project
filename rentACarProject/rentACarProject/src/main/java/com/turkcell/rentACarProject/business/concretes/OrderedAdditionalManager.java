@@ -203,13 +203,11 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
     }
 
-    private double getPriceCalculatorForAdditional(OrderedAdditional orderedAdditional,RentalCar rentalCar) throws BusinessException {
+    @Override
+    public double getPriceCalculatorForAdditional(int additionalId,double orderedAdditionalQuantity, int totalDays) throws BusinessException {
 
-        double dailyPrice = this.additionalService.getByAdditionalId(orderedAdditional.getAdditional().getAdditionalId()).getData().getAdditionalDailyPrice();
-        double quantity = orderedAdditional.getOrderedAdditionalQuantity();
-        int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate());
-
-        return dailyPrice * quantity * totalDays;
+        double dailyPrice = this.additionalService.getByAdditionalId(additionalId).getData().getAdditionalDailyPrice();
+        return dailyPrice * orderedAdditionalQuantity * totalDays;
 
     }
 

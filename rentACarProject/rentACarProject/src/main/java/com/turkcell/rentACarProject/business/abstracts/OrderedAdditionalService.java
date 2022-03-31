@@ -9,6 +9,8 @@ import com.turkcell.rentACarProject.business.requests.update.UpdateOrderedAdditi
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
+import com.turkcell.rentACarProject.entities.concretes.OrderedAdditional;
+import com.turkcell.rentACarProject.entities.concretes.RentalCar;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,4 +33,5 @@ public interface OrderedAdditionalService {
     boolean checkIsNotExistsByOrderedAdditional_RentalCarId(int rentalCarId) throws BusinessException;
     boolean checkIsNotExistsByOrderedAdditional_AdditionalId(int additionalId) throws BusinessException;
 
+    double getPriceCalculatorForAdditional(int additionalId,double orderedAdditionalQuantity, int totalDays) throws BusinessException;
 }

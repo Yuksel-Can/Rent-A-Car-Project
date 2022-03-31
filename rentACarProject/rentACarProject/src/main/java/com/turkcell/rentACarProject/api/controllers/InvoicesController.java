@@ -1,7 +1,7 @@
 package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
-import com.turkcell.rentACarProject.business.dtos.lists.InvoiceListDto;
+import com.turkcell.rentACarProject.business.dtos.lists.invoice.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteInvoiceRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateInvoiceRequest;

@@ -4,9 +4,9 @@ import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
+import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarWithOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -39,12 +39,13 @@ public class RentalCarManager implements RentalCarService {
     private final CustomerService customerService;
     private final IndividualCustomerService individualCustomerService;
     private final CorporateCustomerService corporateCustomerService;
+    private final InvoiceService invoiceService;
     private final ModelMapperService modelMapperService;
 
     @Autowired
     public RentalCarManager(RentalCarDao rentalCarDao, ModelMapperService modelMapperService, @Lazy CarService carService, @Lazy CarMaintenanceService carMaintenanceService
             , @Lazy CityService cityService, @Lazy OrderedAdditionalService orderedAdditionalService, @Lazy CustomerService customerService
-            , @Lazy IndividualCustomerService individualCustomerService, @Lazy CorporateCustomerService corporateCustomerService) {
+            , @Lazy IndividualCustomerService individualCustomerService, @Lazy CorporateCustomerService corporateCustomerService, @Lazy InvoiceService invoiceService) {
 
         this.rentalCarDao = rentalCarDao;
         this.carService = carService;
@@ -54,6 +55,7 @@ public class RentalCarManager implements RentalCarService {
         this.customerService = customerService;
         this.individualCustomerService = individualCustomerService;
         this.corporateCustomerService = corporateCustomerService;
+        this.invoiceService = invoiceService;
         this.modelMapperService = modelMapperService;
     }
 
@@ -80,27 +82,38 @@ public class RentalCarManager implements RentalCarService {
         this.individualCustomerService.checkIfIndividualCustomerIdExists(createRentalCarRequest.getCustomerId());
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarRequest, RentalCar.class);
-        rentalCar.setCustomer(this.customerService.getCustomerById(createRentalCarRequest.getCustomerId()));
+        rentalCar.setCustomer(this.customerService.getCustomerById(createRentalCarRequest.getCustomerId()));    //(*)
         rentalCar.setRentalCarId(0);
-        calculateAndSetTotalPrice(rentalCar);
 
         int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
+
         System.out.println("rental car eklendi id:"+rentalCarId);
+//todo:sys sil
         List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = rentalCarAddModel.getOrderedAdditionals()
                 .stream().map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService
                         .forRequest().map(createOrderedAdditionalForRentalCarRequest, CreateOrderedAdditionalRequest.class))
                 .collect(Collectors.toList());
 
+        double rentalTotalPrice = calculateAndReturnTotalPrice(rentalCar);
+        double additionalsTotalPrice = 0;
+        System.out.println("rentalTotalPrice:" + rentalTotalPrice);
         for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
+
             createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
             this.orderedAdditionalService.add(createOrderedAdditionalRequest);
+            additionalsTotalPrice += this.orderedAdditionalService.getPriceCalculatorForAdditional(createOrderedAdditionalRequest.getAdditionalId()
+                    ,createOrderedAdditionalRequest.getOrderedAdditionalQuantity(), getTotalDaysForRental(rentalCar.getStartDate(),rentalCar.getFinishDate()) );
         }
+
+        rentalTotalPrice += additionalsTotalPrice;
+        System.out.println("rentalTotalPrice:" + rentalTotalPrice);
+        createAndAddInvoice(rentalCar, rentalTotalPrice);
 
         return new SuccessResult("Rental Car Added");
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = BusinessException.class)
     public Result addForCorporateCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException {
 
         CreateRentalCarRequest createRentalCarRequest = this.modelMapperService.forRequest()
@@ -115,7 +128,7 @@ public class RentalCarManager implements RentalCarService {
         calculateAndSetTotalPrice(rentalCar);
 
         int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
-        System.out.println("rental car eklendi id:"+rentalCarId);
+
         List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = rentalCarAddModel.getOrderedAdditionals()
                 .stream().map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService
                         .forRequest().map(createOrderedAdditionalForRentalCarRequest, CreateOrderedAdditionalRequest.class))
@@ -130,52 +143,9 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    public Result addWithOrderedAdditional(CreateRentalCarWithOrderedAdditionalRequest createRentalCarWithOrderedAdditionalRequest) throws BusinessException {
-        //todo:Bu metod islevsizlestirilecek
-//        this.carService.checkIsExistsByCarId(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getCarId());
-//        checkIfStartDateAfterToday(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getStartDate());
-//        checkIfStartDateBeforeFinishDate(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getStartDate(), createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getFinishDate());
-//        checkIfCarAlreadyRentedForCreate(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getCarId(), createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getStartDate(), createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getFinishDate());
-//        this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getCarId(), createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getStartDate());
-//        this.cityService.checkIfExistsByCityId(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getRentedCityCityId());
-//        this.cityService.checkIfExistsByCityId(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getDeliveredCityId());
-//        this.customerService.checkIfCustomerIdExists(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest().getCustomerId());
-        /*_*/
-        if(createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals() !=null){
-
-            for(int i=0;i<createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().size();i++){          //her orderedAdditional için validation
-
-                this.orderedAdditionalService.checkAllValidation(createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getAdditionalId(),
-                        createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().get(i).getOrderedAdditionalQuantity());
-
-            }
-        }
-
-        RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarWithOrderedAdditionalRequest.getCreateRentalCarRequest(), RentalCar.class);
-        rentalCar.setRentalCarId(0);
-
-        calculateAndSetTotalPrice(rentalCar);
-
-        int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
-        if(createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals() != null){
-
-            List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = createRentalCarWithOrderedAdditionalRequest.getOrderedAdditionals().stream()
-                    .map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService.forRequest().map(createOrderedAdditionalForRentalCarRequest,
-                            CreateOrderedAdditionalRequest.class)).collect(Collectors.toList());
-
-            for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){ //her orderedAdditional için add
-            createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
-            this.orderedAdditionalService.add(createOrderedAdditionalRequest);
-
-            }
-        }
-
-        return new SuccessResult("Rental Car Added");
-
-    }
-
-    @Override
     public Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
+
+
 
         checkCommonValidationsForUpdateRent(updateRentalCarRequest);
         this.individualCustomerService.checkIfIndividualCustomerIdExists(updateRentalCarRequest.getCustomerId());
@@ -197,8 +167,9 @@ public class RentalCarManager implements RentalCarService {
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(updateRentalCarRequest, RentalCar.class);
         rentalCar.setCustomer(this.customerService.getCustomerById(updateRentalCarRequest.getCustomerId()));
-        calculateAndSetTotalPrice(rentalCar);
-
+        //calculateAndSetTotalPrice(rentalCar);
+        calculateAndReturnTotalPrice(rentalCar);
+        //todo:faturalar kalıcak,yeni fatura kes
         this.rentalCarDao.save(rentalCar);
 
         return new SuccessResult("Rental Car Updated, id: " + updateRentalCarRequest.getRentalCarId());
@@ -331,6 +302,18 @@ public class RentalCarManager implements RentalCarService {
         this.cityService.checkIfExistsByCityId(updateRentalCarRequest.getRentedCityId());
         this.cityService.checkIfExistsByCityId(updateRentalCarRequest.getDeliveredCityId());
         this.customerService.checkIfCustomerIdExists(updateRentalCarRequest.getCustomerId());
+    }
+
+    private void createAndAddInvoice(RentalCar rentalCar, double totalPrice) throws BusinessException {
+
+        CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
+        createInvoiceRequest.setRentalCarId(rentalCar.getRentalCarId());
+        createInvoiceRequest.setTotalRentalDay((short) getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate()));
+        createInvoiceRequest.setRentalCarTotalPrice(totalPrice);
+        System.out.println("rentalCar id: " + rentalCar.getRentalCarId());
+        System.out.println("invoice için total price: " + totalPrice);
+        //todo:sys sil x2
+        this.invoiceService.add(createInvoiceRequest);
     }
 
     @Override
@@ -484,21 +467,18 @@ public class RentalCarManager implements RentalCarService {
     }
 
 
-    private void calculateAndSetTotalPrice(RentalCar rentalCar) throws BusinessException {
+    private double calculateAndReturnTotalPrice(RentalCar rentalCar) throws BusinessException {
 
         double totalDayPrice = calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
         double totalDiffCityPrice = calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(),rentalCar.getDeliveredCity().getCityId());
 
         double totalPrice = totalDayPrice + totalDiffCityPrice;
-
-        rentalCar.setRentalCarTotalPrice(totalPrice);
+        return totalPrice;
     }
 
     public double calculateRentalCarTotalDayPrice(LocalDate startDate, LocalDate finishDate, double dailyPrice) {
-
         int diff = getTotalDaysForRental(startDate, finishDate);
-        double totalDayPrice = diff * dailyPrice;
-        return totalDayPrice;
+        return diff * dailyPrice;
     }
 
     public int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate){

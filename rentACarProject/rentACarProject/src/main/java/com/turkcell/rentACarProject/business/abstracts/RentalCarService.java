@@ -19,10 +19,8 @@ public interface RentalCarService {
 
     DataResult<List<RentalCarListDto>> getAll();
 
-    //Result add(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
     Result addForIndividualCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException;
     Result addForCorporateCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException;
-    Result addWithOrderedAdditional(CreateRentalCarWithOrderedAdditionalRequest createRentalCarWithOrderedAdditionalRequest) throws BusinessException;
     Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result updateForCorporateCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;

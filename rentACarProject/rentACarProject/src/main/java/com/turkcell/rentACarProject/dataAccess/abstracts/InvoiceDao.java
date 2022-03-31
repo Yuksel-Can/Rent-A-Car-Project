@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
+    boolean existsByInvoiceId(int invoiceId);
+    boolean existsByInvoiceNo(String invoiceNo);
     Invoice getInvoiceByInvoiceNo(String invoiceNo);
 
 }
