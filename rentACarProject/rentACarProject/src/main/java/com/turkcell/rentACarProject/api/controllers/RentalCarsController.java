@@ -44,11 +44,6 @@ public class RentalCarsController {
         return this.rentalCarService.addForCorporateCustomer(rentalCarAddModel);
     }
 
-    @PostMapping("/addWithOrderedAdditional")
-    public Result addWithOrderedAdditional(@RequestBody @Valid CreateRentalCarWithOrderedAdditionalRequest createRentalCarWithOrderedAdditionalRequest) throws BusinessException {
-        return this.rentalCarService.addWithOrderedAdditional(createRentalCarWithOrderedAdditionalRequest);
-    }
-
     @PutMapping("/updateForIndividualCustomer")
     public Result updateForIndividualCustomer(@RequestBody @Valid UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
         return this.rentalCarService.updateForIndividualCustomer(updateRentalCarRequest);

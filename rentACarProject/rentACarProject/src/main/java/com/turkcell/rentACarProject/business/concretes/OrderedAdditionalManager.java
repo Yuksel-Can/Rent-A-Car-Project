@@ -4,9 +4,7 @@ import com.turkcell.rentACarProject.business.abstracts.AdditionalService;
 import com.turkcell.rentACarProject.business.abstracts.OrderedAdditionalService;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.GetOrderedAdditionalDto;
-import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.OrderedAdditionalListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalForRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateOrderedAdditionalRequest;
@@ -18,9 +16,9 @@ import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.OrderedAdditionalDao;
 import com.turkcell.rentACarProject.entities.concretes.OrderedAdditional;
-import com.turkcell.rentACarProject.entities.concretes.RentalCar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,10 +26,10 @@ import java.util.stream.Collectors;
 @Service
 public class OrderedAdditionalManager implements OrderedAdditionalService {
 
-    private OrderedAdditionalDao orderedAdditionalDao;
-    private ModelMapperService modelMapperService;
-    private AdditionalService additionalService;
-    private RentalCarService rentalCarService;
+    private final OrderedAdditionalDao orderedAdditionalDao;
+    private final ModelMapperService modelMapperService;
+    private final AdditionalService additionalService;
+    private final RentalCarService rentalCarService;
 
     @Autowired
     public OrderedAdditionalManager(OrderedAdditionalDao orderedAdditionalDao, ModelMapperService modelMapperService, AdditionalService additionalService, RentalCarService rentalCarService) {
@@ -61,37 +59,31 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     @Override
     public Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
 
-        checkAllValidation(createOrderedAdditionalRequest.getAdditionalId(), createOrderedAdditionalRequest.getOrderedAdditionalQuantity());
-        this.rentalCarService.checkIsExistsByRentalCarId(createOrderedAdditionalRequest.getRentalCarId());
+        checkAllValidation(createOrderedAdditionalRequest.getAdditionalId(), createOrderedAdditionalRequest.getOrderedAdditionalQuantity(), createOrderedAdditionalRequest.getRentalCarId());
         checkIsNotExistsOrderedAdditionalByAdditionalIdAndRentalCarId(createOrderedAdditionalRequest.getAdditionalId(), createOrderedAdditionalRequest.getRentalCarId());
 
         OrderedAdditional orderedAdditional = this.modelMapperService.forRequest().map(createOrderedAdditionalRequest, OrderedAdditional.class);
         orderedAdditional.setOrderedAdditionalId(0);
 
         this.orderedAdditionalDao.save(orderedAdditional);
-        calculateAndUpdateRentalCarTotalPriceForAdd(orderedAdditional);
 
         return new SuccessResult("Ordered Additional Service added");
 
     }
 
     @Override
+    @Transactional(rollbackFor = BusinessException.class)
     public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
 
         checkIsExistsByOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
-        checkAllValidation(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getOrderedAdditionalQuantity());
-        this.rentalCarService.checkIsExistsByRentalCarId(updateOrderedAdditionalRequest.getRentalCarId());
+        checkAllValidation(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getOrderedAdditionalQuantity(), updateOrderedAdditionalRequest.getRentalCarId());
         checkIsOnlyOneOrderedAdditionalByAdditionalIdAndRentalCarIdForUpdate(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getRentalCarId());
 
-        OrderedAdditional beforeOrderedAdditional = this.orderedAdditionalDao.getById(updateOrderedAdditionalRequest.getOrderedAdditionalId());
+        OrderedAdditional orderedAdditional = this.modelMapperService.forRequest().map(updateOrderedAdditionalRequest, OrderedAdditional.class);
+        orderedAdditional.setOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
 
-        OrderedAdditional afterOrderedAdditional = this.modelMapperService.forRequest().map(updateOrderedAdditionalRequest, OrderedAdditional.class);
-        afterOrderedAdditional.setOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
-
-
-        calculateAndUpdateRentalCarTotalPriceForUpdate(beforeOrderedAdditional,afterOrderedAdditional);
-
-        this.orderedAdditionalDao.save(afterOrderedAdditional);
+        this.orderedAdditionalDao.save(orderedAdditional);
+        this.rentalCarService.createAndAddInvoice(orderedAdditional.getRentalCar().getRentalCarId());
 
         return new SuccessResult("Ordered Additional Service updated");
 
@@ -106,7 +98,8 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         this.orderedAdditionalDao.deleteById(orderedAdditional.getOrderedAdditionalId());
 
-        calculateAndUpdateRentalCarTotalPriceForDelete(orderedAdditional);
+        //todo:buda hatalı çalışıyor
+//        calculateAndUpdateRentalCarTotalPriceForDelete(orderedAdditional);
 
         return new SuccessResult("Ordered Additional Service deleted");
 
@@ -160,64 +153,93 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         return new SuccessDataResult<>(result, "Ordered Additional Service of the Additional listed by AdditionalId: " + additionalId);
     }
-
+/*
     private void calculateAndUpdateRentalCarTotalPriceForAdd(OrderedAdditional orderedAdditional) throws BusinessException {
 
         RentalCar rentalCar = this.rentalCarService.getById(orderedAdditional.getRentalCar().getRentalCarId());
 
-        double total = getPriceCalculatorForAdditional(orderedAdditional,rentalCar);
+//        double total = getPriceCalculatorForAdditional(orderedAdditional,rentalCar);
+        double total = getPriceCalculatorForAdditional(orderedAdditional.getOrderedAdditionalId()
+        , orderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate()));
         double previousTotalPrice = rentalCar.getRentalCarTotalPrice();
 
         rentalCar.setRentalCarTotalPrice(previousTotalPrice + total);
         this.rentalCarService.saveChangesRentalCar(rentalCar);
 
     }
-    private void calculateAndUpdateRentalCarTotalPriceForUpdate(OrderedAdditional beforeOrderedAdditional, OrderedAdditional afterOrderedAdditional) throws BusinessException {
+*/
+    @Override
+    public double calculateTotalPriceForOrderedAdditionals(int rentalCarId, int totalDays) throws BusinessException {
 
-        RentalCar rentalCar = this.rentalCarService.getById(beforeOrderedAdditional.getRentalCar().getRentalCarId());
+        List<OrderedAdditional> orderedAdditionalList = this.orderedAdditionalDao.getAllByRentalCar_RentalCarId(rentalCarId);
 
-        double beforeTotalPrice = getPriceCalculatorForAdditional(beforeOrderedAdditional, rentalCar);
-        double afterTotalPrice = getPriceCalculatorForAdditional(afterOrderedAdditional, rentalCar);
+        double totalPrice = 0;
+        if(orderedAdditionalList != null){
+            for (OrderedAdditional orderedAdditional : orderedAdditionalList){
+                totalPrice += getPriceCalculatorForAdditional(orderedAdditional.getAdditional().getAdditionalId(), orderedAdditional.getOrderedAdditionalQuantity(), totalDays);
 
-        double previouesTotalPrice = rentalCar.getRentalCarTotalPrice();
-
-        if(beforeTotalPrice>afterTotalPrice){
-            rentalCar.setRentalCarTotalPrice(previouesTotalPrice-(beforeTotalPrice-afterTotalPrice));
-        }else{
-            rentalCar.setRentalCarTotalPrice(previouesTotalPrice+(afterTotalPrice-beforeTotalPrice));
+            }
         }
-
-        this.rentalCarService.saveChangesRentalCar(rentalCar);
-
+        return totalPrice;
     }
 
-    private void calculateAndUpdateRentalCarTotalPriceForDelete(OrderedAdditional orderedAdditional) throws BusinessException {
 
-        RentalCar rentalCar = this.rentalCarService.getById(orderedAdditional.getRentalCar().getRentalCarId());
 
-        double total = getPriceCalculatorForAdditional(orderedAdditional, rentalCar);
-        double previousTotalPrice = rentalCar.getRentalCarTotalPrice();
+//todo:bu metod da hatalı çalışıyor
 
-        rentalCar.setRentalCarTotalPrice(previousTotalPrice-total);
-        this.rentalCarService.saveChangesRentalCar(rentalCar);
+//    private void calculateAndUpdateRentalCarTotalPriceForUpdate(OrderedAdditional beforeOrderedAdditional, OrderedAdditional afterOrderedAdditional) throws BusinessException {
+//
+//        RentalCar rentalCar = this.rentalCarService.getById(beforeOrderedAdditional.getRentalCar().getRentalCarId());
+//
+////        double beforeTotalPrice = getPriceCalculatorForAdditional(beforeOrderedAdditional, rentalCar);
+////        double afterTotalPrice = getPriceCalculatorForAdditional(afterOrderedAdditional, rentalCar);
+//        double beforeTotalPrice = getPriceCalculatorForAdditional(beforeOrderedAdditional.getAdditional().getAdditionalId()
+//                , beforeOrderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate()
+//                , rentalCar.getFinishDate()));
+//        double afterTotalPrice = getPriceCalculatorForAdditional(afterOrderedAdditional.getAdditional().getAdditionalId()
+//                , afterOrderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate()
+//                , rentalCar.getFinishDate()));
+//
+//        double previousTotalPrice = rentalCar.getRentalCarTotalPrice();
+//
+//        if(beforeTotalPrice>afterTotalPrice){
+//            rentalCar.setRentalCarTotalPrice(previousTotalPrice-(beforeTotalPrice-afterTotalPrice));
+//        }else{
+//            rentalCar.setRentalCarTotalPrice(previousTotalPrice+(afterTotalPrice-beforeTotalPrice));
+//        }
+//
+//        this.rentalCarService.saveChangesRentalCar(rentalCar);
+//
+//    }
 
-    }
+//todo:bu metoda bakılacak hatalı çalışıyor
+
+//    private void calculateAndUpdateRentalCarTotalPriceForDelete(OrderedAdditional orderedAdditional) throws BusinessException {
+//
+//        RentalCar rentalCar = this.rentalCarService.getById(orderedAdditional.getRentalCar().getRentalCarId());
+//
+//        //double total = getPriceCalculatorForAdditional(orderedAdditional, rentalCar);
+//        double total = getPriceCalculatorForAdditional(orderedAdditional.getAdditional().getAdditionalId()
+//                , orderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate()
+//                , rentalCar.getFinishDate()));
+//        double previousTotalPrice = rentalCar.getRentalCarTotalPrice();
+//
+//        rentalCar.setRentalCarTotalPrice(previousTotalPrice-total);
+//        this.rentalCarService.saveChangesRentalCar(rentalCar);
+//
+//    }
 
     @Override
     public double getPriceCalculatorForAdditional(int additionalId,double orderedAdditionalQuantity, int totalDays) throws BusinessException {
 
         double dailyPrice = this.additionalService.getByAdditionalId(additionalId).getData().getAdditionalDailyPrice();
         return dailyPrice * orderedAdditionalQuantity * totalDays;
-
     }
 
-    public boolean checkAllValidation(int additionalId, int orderedAdditionalQuantity) throws BusinessException {
-
+    public void checkAllValidation(int additionalId, int orderedAdditionalQuantity, int rentalCarId) throws BusinessException {
+        this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
         this.additionalService.checkIfExistsByAdditionalId(additionalId);
         checkIfTheAdditionalQuantityOrderedIsValid(additionalId, orderedAdditionalQuantity);
-
-        return true;
-
     }
 
     @Override

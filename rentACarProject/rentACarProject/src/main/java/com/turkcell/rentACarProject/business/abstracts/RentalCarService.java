@@ -3,8 +3,6 @@ package com.turkcell.rentACarProject.business.abstracts;
 import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarWithOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -54,8 +52,8 @@ public interface RentalCarService {
     void checkIsNotExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
     void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException;
 
-    void updateTotalPriceBasedOnOrderedAdditionalService(int quantity, double dailyPrice, int rentalCarId);
-    void saveChangesRentalCar(RentalCar rentalCar) throws BusinessException;
     int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate);
+    double calculateAndReturnTotalPrice(RentalCar rentalCar);
+    void createAndAddInvoice(int rentalCarId) throws BusinessException;
 
 }

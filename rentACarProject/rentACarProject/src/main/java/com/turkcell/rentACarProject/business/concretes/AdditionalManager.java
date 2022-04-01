@@ -104,7 +104,7 @@ public class AdditionalManager implements AdditionalService {
     @Override
     public void checkIfExistsByAdditionalId(int additionalId) throws BusinessException {
         if(!this.additionalDao.existsByAdditionalId(additionalId)){
-            throw new BusinessException("Additional Service ıd not exists");
+            throw new BusinessException("Additional Service ıd not exists, additionalId: " + additionalId);
         }
     }
 

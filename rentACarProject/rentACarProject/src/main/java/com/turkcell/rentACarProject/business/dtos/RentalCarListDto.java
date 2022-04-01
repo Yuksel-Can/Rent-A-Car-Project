@@ -14,7 +14,7 @@ public class RentalCarListDto {
     private int rentalCarId;
     private LocalDate startDate;
     private LocalDate finishDate;
-    private double rentalCarTotalPrice;
+//    private double rentalCarTotalPrice;
     private int carId;
     private String brandName;
     private String colorName;

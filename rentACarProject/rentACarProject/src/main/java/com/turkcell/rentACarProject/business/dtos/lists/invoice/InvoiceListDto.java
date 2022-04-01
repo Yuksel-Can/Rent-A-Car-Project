@@ -20,6 +20,7 @@ public class InvoiceListDto {
     private short totalRentalDay;
     private double rentalCarTotalPrice;
     private String email;
+    private int customerId;
     //todo:buraya ad soyad vs
 
 }

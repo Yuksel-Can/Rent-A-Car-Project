@@ -19,9 +19,9 @@ public class CreateRentalCarRequest {
 
     @NotNull
     private LocalDate finishDate;
-
-    @JsonIgnore
-    private double rentalCarTotalPrice;
+//
+//    @JsonIgnore
+//    private double rentalCarTotalPrice;
 
     @NotNull
     @Min(1)
