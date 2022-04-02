@@ -3,7 +3,7 @@ package com.turkcell.rentACarProject.business.abstracts;
 import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
-import com.turkcell.rentACarProject.business.dtos.gets.car.GetCarStatus;
+import com.turkcell.rentACarProject.business.dtos.gets.GetRentalCarStatus;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -23,8 +23,8 @@ public interface RentalCarService {
     Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result updateForCorporateCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
-    DataResult<GetCarStatus> deliverTheCar(int rentalCarId, int carId) throws BusinessException;
-    DataResult<GetCarStatus> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException;
+    DataResult<GetRentalCarStatus> deliverTheCar(int rentalCarId, int carId) throws BusinessException;
+    DataResult<GetRentalCarStatus> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException;
 
     DataResult<GetRentalCarDto> getByRentalCarId(int rentalCarId) throws BusinessException;
     RentalCar getById(int rentalCarId) throws BusinessException;
@@ -56,7 +56,7 @@ public interface RentalCarService {
 
     void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException;
     int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate);
-    double calculateAndReturnTotalPrice(RentalCar rentalCar);
+//    double calculateAndReturnTotalPrice(RentalCar rentalCar);
 
     void createAndAddInvoice(int rentalCarId) throws BusinessException;
 

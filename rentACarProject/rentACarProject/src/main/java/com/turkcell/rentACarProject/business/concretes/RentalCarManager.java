@@ -4,7 +4,7 @@ import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
-import com.turkcell.rentACarProject.business.dtos.gets.car.GetCarStatus;
+import com.turkcell.rentACarProject.business.dtos.gets.GetRentalCarStatus;
 import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
@@ -173,33 +173,36 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    public DataResult<GetCarStatus> deliverTheCar(int rentalCarId, int carId) throws BusinessException {
+    public DataResult<GetRentalCarStatus> deliverTheCar(int rentalCarId, int carId) throws BusinessException {
 
         checkIfExistsRentalCarIdAndCarId(rentalCarId,carId);
-
         RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
-
-        //kira başlangıç eski olabilir, aynı gün+ olması lazım
-        //rental da başlangıç kilometresi boş olmalı
+        checkIfStartDateAfterToday(rentalCar.getStartDate());
+        checkIfRentedKilometerIsNull(rentalCar.getRentedKilometer());
 
         rentalCar.setRentedKilometer(rentalCar.getCar().getKilometer());
+        this.rentalCarDao.save(rentalCar);
 
+        GetRentalCarStatus result = this.modelMapperService.forDto().map(rentalCar,GetRentalCarStatus.class);
 
-        return null;
+        return new SuccessDataResult<>(result,"The car was delivered");
     }
 
     @Override
-    public DataResult<GetCarStatus> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException {
+    public DataResult<GetRentalCarStatus> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException {
 
         checkIfExistsRentalCarIdAndCarId(rentalCarId,carId);
-        //veriş kilometresi boş olamaz
-        //dönüş kilometresi boş olmalıdır
         RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
+        checkIfRentedKilometerIsNotNull(rentalCar.getRentedKilometer());
+        checkIfDeliveredKilometerIsNull(rentalCar.getDeliveredKilometer());
 
         this.carService.updateKilometer(carId, deliveredKilometer);
         rentalCar.setDeliveredKilometer(rentalCar.getCar().getKilometer());
+        this.rentalCarDao.save(rentalCar);
 
-        return null;
+        GetRentalCarStatus result = this.modelMapperService.forDto().map(rentalCar, GetRentalCarStatus.class);
+
+        return new SuccessDataResult<>(result, "The car received");
     }
 
     @Override
@@ -341,8 +344,9 @@ public class RentalCarManager implements RentalCarService {
         this.invoiceService.add(createInvoiceRequest);
     }
 
-    @Override
-    public double calculateAndReturnTotalPrice(RentalCar rentalCar) {
+
+//    @Override
+    private double calculateAndReturnTotalPrice(RentalCar rentalCar) {
 
         double totalDayPrice = calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
         double totalDiffCityPrice = calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(),rentalCar.getDeliveredCity().getCityId());
@@ -354,7 +358,6 @@ public class RentalCarManager implements RentalCarService {
         int diff = getTotalDaysForRental(startDate, finishDate);
         return diff * dailyPrice;
     }
-
     public int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate){
         return (int) ChronoUnit.DAYS.between(startDate, finishDate);
     }
@@ -430,6 +433,7 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
+
     //for maintenance(*)
     @Override
     public void checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
@@ -443,6 +447,7 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
+
     //for maintenance(*)
     @Override
     public void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
@@ -457,6 +462,24 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
+    private void checkIfRentedKilometerIsNull(Integer rentedKilometer) throws BusinessException {
+        if(rentedKilometer != null){
+            throw new BusinessException("The rented kilometer is already exists, the car has already been rented");
+        }
+    }
+
+    private void checkIfRentedKilometerIsNotNull(Integer rentedKilometer) throws BusinessException {
+        if(rentedKilometer == null){
+            throw new BusinessException("The car has not yet been delivered to the customer, the rented kilometer cannot be null");
+        }
+    }
+
+    private void checkIfDeliveredKilometerIsNull(Integer deliveredKilometer) throws BusinessException {
+        if(deliveredKilometer != null){
+            throw new BusinessException("The delivered kilometer is already exists, the car has already been delivered, deliveredKilometer: " + deliveredKilometer);
+        }
+    }
+
 
     @Override
     public void checkIsExistsByRentalCarId(int rentalCarId) throws BusinessException {

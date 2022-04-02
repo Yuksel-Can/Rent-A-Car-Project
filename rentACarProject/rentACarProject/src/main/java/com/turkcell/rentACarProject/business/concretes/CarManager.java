@@ -106,9 +106,10 @@ public class CarManager implements CarService{
 		checkIsExistsByCarId(carId);
 		//gelen kilometre öncekinden yüksekmi
 		Car car = this.carDao.getById(carId);
-		checkIfReturnKilometerValid(car.getKilometer(), kilometer)
+		checkIfReturnKilometerValid(car.getKilometer(), kilometer);
 
 		car.setKilometer(kilometer);
+		this.carDao.save(car);
 
 	}
 
@@ -199,7 +200,7 @@ public class CarManager implements CarService{
 
 	private void checkIfReturnKilometerValid(int beforeKilometer, int afterKilometer) throws BusinessException {
 		if(beforeKilometer> afterKilometer){
-			throw new BusinessException("Güncellenen Kilometre önceki kilomere bilgisinden düşük olamaz");
+			throw new BusinessException("Delivered kilometer cannot be lower than rented kilometer");
 		}
 	}
 

@@ -48,10 +48,10 @@ public class RentalCar {
     private City deliveredCity;
 
     @Column(name = "rented_kilometer")
-    private int rentedKilometer;
+    private Integer rentedKilometer;
 
     @Column(name = "delivered_kilometer")
-    private int deliveredKilometer;
+    private Integer deliveredKilometer;
 
     @OneToMany(mappedBy = "rentalCar")
     private List<OrderedAdditional> orderedAdditionals;

@@ -18,6 +18,8 @@ public class RentalCarListDto {
     private int carId;
     private String brandName;
     private String colorName;
+    private Integer rentedKilometer;
+    private Integer deliveredKilometer;
     private int rentedCityId;
     private String rentedCityName;
     private int deliveredCityId;
