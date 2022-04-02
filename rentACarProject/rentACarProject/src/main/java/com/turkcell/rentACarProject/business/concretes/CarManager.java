@@ -101,10 +101,22 @@ public class CarManager implements CarService{
 	}
 
 	@Override
+	public void updateKilometer(int carId, int kilometer) throws BusinessException {
+
+		checkIsExistsByCarId(carId);
+		//gelen kilometre öncekinden yüksekmi
+		Car car = this.carDao.getById(carId);
+		checkIfReturnKilometerValid(car.getKilometer(), kilometer)
+
+		car.setKilometer(kilometer);
+
+	}
+
+	@Override
 	public DataResult<GetCarDto> getById(int id) throws BusinessException {
 
 		checkIsExistsByCarId(id);
-		
+
 		Car car = this.carDao.getById(id);
 
 		GetCarDto carDto = this.modelMapperService.forDto().map(car, GetCarDto.class);
@@ -144,24 +156,24 @@ public class CarManager implements CarService{
 
 	@Override
 	public DataResult<List<CarListByDailyPrice>> findByDailyPriceLessThenEqual(double dailyPrice) {
-		
+
 		List<Car> cars = this.carDao.findByDailyPriceLessThanEqual(dailyPrice);
 		List<CarListByDailyPrice> response = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByDailyPrice.class))
 					.collect(Collectors.toList());
 
 		return new SuccessDataResult<List<CarListByDailyPrice>>(response, "Less than Car listed");
-		
+
 	}
-	
+
 	@Override
 	public DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize) {
-		
+
 		if(pageNo <= 0 || pageSize <= 0) {
 			return new ErrorDataResult<>("please enter valid value");
 		}
 		Pageable pageable = PageRequest.of(pageNo-1, pageSize);
 		List<Car> cars = this.carDao.findAll(pageable).getContent();
-		
+
 		List<CarPagedDto> carPagedDtos = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarPagedDto.class))
 				.collect(Collectors.toList());
 
@@ -184,6 +196,13 @@ public class CarManager implements CarService{
 	}
 
 	/**/
+
+	private void checkIfReturnKilometerValid(int beforeKilometer, int afterKilometer) throws BusinessException {
+		if(beforeKilometer> afterKilometer){
+			throw new BusinessException("Güncellenen Kilometre önceki kilomere bilgisinden düşük olamaz");
+		}
+	}
+
 	@Override
 	public void checkIsExistsByCarId(int carId) throws BusinessException {
 

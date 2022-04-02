@@ -4,6 +4,7 @@ import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
+import com.turkcell.rentACarProject.business.dtos.gets.car.GetCarStatus;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarWithOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequest;
@@ -57,6 +58,16 @@ public class RentalCarsController {
     @DeleteMapping("/delete")
     public Result delete(@RequestBody @Valid DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException {
         return this.rentalCarService.delete(deleteRentalCarRequest);
+    }
+
+    @PutMapping("/deliverTheCar")
+    public DataResult<GetCarStatus> deliverTheCar(@RequestParam int rentalCarId, @RequestParam int carId) throws BusinessException{
+        return this.rentalCarService.deliverTheCar(rentalCarId, carId);
+    }
+
+    @PutMapping("/receiveTheCar")
+    public DataResult<GetCarStatus> receiveTheCar(@RequestParam int rentalCarId, @RequestParam int carId, int deliveredKilometer) throws BusinessException {
+        return this.rentalCarService.receiveTheCar(rentalCarId, carId, deliveredKilometer);
     }
 
     @GetMapping("/getById")

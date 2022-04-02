@@ -6,6 +6,7 @@ import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequ
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ public class RentalCarAddModel {
     private CreateRentalCarRequest createRentalCarRequest;
 
     @Valid
+    @Nullable
     private List<CreateOrderedAdditionalForRentalCarRequest> orderedAdditionals;
 
 }

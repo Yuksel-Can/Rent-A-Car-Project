@@ -46,44 +46,6 @@ public class UserManager implements UserService {
     }
 
     @Override
-    public Result add(CreateUserRequest createUserRequest) throws BusinessException {
-
-        checkIfUserEmailNotExists(createUserRequest.getEmail());
-
-        User user  = this.modelMapperService.forRequest().map(createUserRequest, User.class);
-
-        this.userDao.save(user);
-
-        return new SuccessResult("User added");
-
-    }
-
-    @Override
-    public Result update(UpdateUserRequest updateUserRequest) throws BusinessException {
-
-        checkIfUserIdExists(updateUserRequest.getUserId());
-        checkIfUserEmailNotExists(updateUserRequest.getEmail());
-
-        User user = this.modelMapperService.forRequest().map(updateUserRequest, User.class);
-
-        this.userDao.save(user);
-
-        return new SuccessResult(("User updated"));
-
-    }
-
-    @Override
-    public Result delete(DeleteUserRequest deleteUserRequest) throws BusinessException {
-
-        checkIfUserIdExists(deleteUserRequest.getUserId());
-
-        this.userDao.deleteById(deleteUserRequest.getUserId());
-
-        return new SuccessResult("User deleted");
-
-    }
-
-    @Override
     public DataResult<GetUserDto> getById(int userId) throws BusinessException {
 
         checkIfUserIdExists(userId);

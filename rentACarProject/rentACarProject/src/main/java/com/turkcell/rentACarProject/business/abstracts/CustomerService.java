@@ -15,11 +15,6 @@ import java.util.List;
 public interface CustomerService {
 
     DataResult<List<CustomerListDto>> getAll();
-
-    Result add(CreateCustomerRequest createCustomerRequest) throws BusinessException;
-    Result update(UpdateCustomerRequest updateCustomerRequest) throws BusinessException;
-    Result delete(DeleteCustomerRequest deleteCustomerRequest) throws BusinessException;
-
     DataResult<GetCustomerDto> getById(int customerId) throws BusinessException;
 
     void checkIfCustomerIdExists(int customerId) throws BusinessException;

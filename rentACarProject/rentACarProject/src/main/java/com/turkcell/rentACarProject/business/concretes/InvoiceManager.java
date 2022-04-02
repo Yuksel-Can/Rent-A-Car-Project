@@ -1,15 +1,11 @@
 package com.turkcell.rentACarProject.business.concretes;
 
-import com.turkcell.rentACarProject.business.abstracts.CorporateCustomerService;
-import com.turkcell.rentACarProject.business.abstracts.IndividualCustomerService;
-import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
-import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
+import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetCorporateCustomerInvoiceDto;
 import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetIndividualCustomerInvoiceDto;
 import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetInvoiceDto;
 import com.turkcell.rentACarProject.business.dtos.lists.invoice.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteInvoiceRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateInvoiceRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.generate.GenerateRandomCode;
@@ -24,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,15 +28,17 @@ import java.util.stream.Collectors;
 public class InvoiceManager implements InvoiceService {
 
     private final InvoiceDao invoiceDao;
+    private final CustomerService customerService;
     private final IndividualCustomerService individualCustomerService;
     private final CorporateCustomerService corporateCustomerService;
     private final RentalCarService rentalCarService;
     private final ModelMapperService modelMapperService;
 
     @Autowired
-    public InvoiceManager(InvoiceDao invoiceDao, IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService
+    public InvoiceManager(InvoiceDao invoiceDao, CustomerService customerService, IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService
             , RentalCarService rentalCarService, ModelMapperService modelMapperService) {
         this.invoiceDao = invoiceDao;
+        this.customerService = customerService;
         this.individualCustomerService = individualCustomerService;
         this.corporateCustomerService = corporateCustomerService;
         this.rentalCarService = rentalCarService;
@@ -51,12 +50,8 @@ public class InvoiceManager implements InvoiceService {
 
         List<Invoice> invoices = this.invoiceDao.findAll();
 
-        List<InvoiceListDto> result = invoices.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class))
-                .collect(Collectors.toList());
-        for(int i=0; i<invoices.size();i++){
-            result.get(i).setRentalCarId(invoices.get(i).getRentalCar().getRentalCarId());
-            result.get(i).setCustomerId(invoices.get(i).getRentalCar().getCustomer().getCustomerId());
-        }
+        List<InvoiceListDto> result = invoices.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
+        manuelFieldSetter(invoices, result);
 
         return new SuccessDataResult<>(result, "Invoices listed");
     }
@@ -66,7 +61,7 @@ public class InvoiceManager implements InvoiceService {
     public Result add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException {
 
         this.rentalCarService.checkIsExistsByRentalCarId(createInvoiceRequest.getRentalCarId());
-        createInvoiceRequest.setInvoiceNo(GenerateRandomCode.generate());
+        createInvoiceRequest.setInvoiceNo(generateCode());
 
         Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequest, Invoice.class);
         invoice.setInvoiceId(0);
@@ -86,16 +81,6 @@ public class InvoiceManager implements InvoiceService {
         //this.invoiceDao.save(invoice);
 
         return new SuccessResult("Invoice updated, invoiceId: " + updateInvoiceRequest.getInvoiceId());
-    }
-
-    @Override
-    public Result delete(DeleteInvoiceRequest deleteInvoiceRequest) throws BusinessException {
-
-        checkIfInvoiceIdExists(deleteInvoiceRequest.getInvoiceId());
-
-        this.invoiceDao.deleteById(deleteInvoiceRequest.getInvoiceId());
-
-        return new SuccessResult("Invoice deleted");
     }
 
     @Override
@@ -157,10 +142,65 @@ public class InvoiceManager implements InvoiceService {
 
     }
 
+    @Override
+    public DataResult<List<InvoiceListDto>> getAllByRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
+
+        this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
+
+        List<Invoice> invoiceList = this.invoiceDao.getAllByRentalCar_RentalCarId(rentalCarId);
+
+        List<InvoiceListDto> result = invoiceList.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
+        manuelFieldSetter(invoiceList, result);
+
+        return new SuccessDataResult<>(result, "Invoice listed by rentalCarId, rentalCarId: " + rentalCarId);
+    }
+
+    @Override
+    public DataResult<List<InvoiceListDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException {
+
+        this.customerService.checkIfCustomerIdExists(customerId);
+
+        List<Invoice> invoiceList = this.invoiceDao.getAllByCustomer_CustomerId(customerId);
+
+        List<InvoiceListDto> result = invoiceList.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
+        manuelFieldSetter(invoiceList, result);
+
+        return new SuccessDataResult<>(result, "Invoice listed by customerId, customerId: " + customerId);
+    }
+
+    @Override
+    public DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(Date startDate, Date endDate) {
+
+        List<Invoice> invoices = this.invoiceDao.getByCreationDateBetween(startDate, endDate);
+
+        List<InvoiceListDto> result = invoices.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
+        manuelFieldSetter(invoices, result);
+
+        return new SuccessDataResult<>(result, "Girilen tarihler arasındaki faturalar başarıyla listelendi");
+    }
+
     private void manuelFieldSetter(Invoice invoice, GetInvoiceDto result) {
 
         result.setRentalCarId(invoice.getRentalCar().getRentalCarId());
         result.setCustomerId(invoice.getRentalCar().getCustomer().getCustomerId());
+    }
+
+    private void manuelFieldSetter(List<Invoice> invoices, List<InvoiceListDto> invoiceListDtos){
+
+        for(int i=0; i<invoices.size();i++){
+            invoiceListDtos.get(i).setRentalCarId(invoices.get(i).getRentalCar().getRentalCarId());
+            invoiceListDtos.get(i).setCustomerId(invoices.get(i).getRentalCar().getCustomer().getCustomerId());
+        }
+
+    }
+
+    private String generateCode() {
+        while (true){
+            String code = GenerateRandomCode.generate();
+            if(!this.invoiceDao.existsByInvoiceNo(code)){
+                return code;
+            }
+        }
     }
 
     private void checkIfInvoiceIdExists(int invoiceId) throws BusinessException {

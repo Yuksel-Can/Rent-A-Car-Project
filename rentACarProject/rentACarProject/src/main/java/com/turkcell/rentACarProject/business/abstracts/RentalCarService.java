@@ -3,6 +3,7 @@ package com.turkcell.rentACarProject.business.abstracts;
 import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
+import com.turkcell.rentACarProject.business.dtos.gets.car.GetCarStatus;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -22,6 +23,8 @@ public interface RentalCarService {
     Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result updateForCorporateCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
+    DataResult<GetCarStatus> deliverTheCar(int rentalCarId, int carId) throws BusinessException;
+    DataResult<GetCarStatus> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException;
 
     DataResult<GetRentalCarDto> getByRentalCarId(int rentalCarId) throws BusinessException;
     RentalCar getById(int rentalCarId) throws BusinessException;
@@ -30,30 +33,31 @@ public interface RentalCarService {
     DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(int deliveredCity) throws BusinessException;
     DataResult<List<RentalCarListDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException;
     DataResult<List<RentalCarListDto>> getAllByIndividualCustomer_IndividualCustomerId(int individualCustomerId) throws BusinessException;
+
     DataResult<List<RentalCarListDto>> getAllByCorporateCustomer_CorporateCustomerId(int corporateCustomerId) throws BusinessException;
-
     void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException;
-    void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException;
 
+    void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException;
     void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
     void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
     void checkIfCarAlreadyRentedOnTheEnteredDate(RentalCar rentalCar, LocalDate enteredDate) throws BusinessException;                                           //4
-    void checkIfCarAlreadyRentedBetweenStartAndFinishDates(RentalCar rentalCar, LocalDate startDate, LocalDate finishDate) throws BusinessException;             //5
 
+    void checkIfCarAlreadyRentedBetweenStartAndFinishDates(RentalCar rentalCar, LocalDate startDate, LocalDate finishDate) throws BusinessException;             //5
     //for maintenance
     void checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
-    void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException;
 
+    void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException;
     void checkIsExistsByRentalCarId(int rentalCarId) throws BusinessException;
     void checkIsExistsByRentalCar_CarId(int carId) throws BusinessException;
     void checkIsNotExistsByRentalCar_CarId(int carId) throws BusinessException;
     void checkIsExistsByRentedCity_CityId(int rentedCityId) throws BusinessException;
     void checkIsNotExistsByRentedCity_CityId(int rentedCityId) throws BusinessException;
     void checkIsNotExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
-    void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException;
 
+    void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException;
     int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate);
     double calculateAndReturnTotalPrice(RentalCar rentalCar);
+
     void createAndAddInvoice(int rentalCarId) throws BusinessException;
 
 }

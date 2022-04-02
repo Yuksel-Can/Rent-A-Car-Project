@@ -4,6 +4,7 @@ import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
+import com.turkcell.rentACarProject.business.dtos.gets.car.GetCarStatus;
 import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
@@ -11,10 +12,7 @@ import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequ
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
-import com.turkcell.rentACarProject.core.utilities.result.DataResult;
-import com.turkcell.rentACarProject.core.utilities.result.Result;
-import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
-import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
+import com.turkcell.rentACarProject.core.utilities.result.*;
 import com.turkcell.rentACarProject.dataAccess.abstracts.RentalCarDao;
 import com.turkcell.rentACarProject.entities.concretes.RentalCar;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,15 +80,19 @@ public class RentalCarManager implements RentalCarService {
         rentalCar.setRentalCarId(0);
 
         int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
+        System.out.println("patladı");
+
         List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = rentalCarAddModel.getOrderedAdditionals()
                 .stream().map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService
                         .forRequest().map(createOrderedAdditionalForRentalCarRequest, CreateOrderedAdditionalRequest.class))
                 .collect(Collectors.toList());
-
+        System.out.println("patladı");
         for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
             createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
             this.orderedAdditionalService.add(createOrderedAdditionalRequest);
         }
+        System.out.println("patladı");
+
         createAndAddInvoice(rentalCarId);
 
         return new SuccessResult("Rental Car Added");
@@ -168,6 +170,36 @@ public class RentalCarManager implements RentalCarService {
 
         return new SuccessResult("Rental Car Deleted, id: " + deleteRentalCarRequest.getRentalCarId());
 
+    }
+
+    @Override
+    public DataResult<GetCarStatus> deliverTheCar(int rentalCarId, int carId) throws BusinessException {
+
+        checkIfExistsRentalCarIdAndCarId(rentalCarId,carId);
+
+        RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
+
+        //kira başlangıç eski olabilir, aynı gün+ olması lazım
+        //rental da başlangıç kilometresi boş olmalı
+
+        rentalCar.setRentedKilometer(rentalCar.getCar().getKilometer());
+
+
+        return null;
+    }
+
+    @Override
+    public DataResult<GetCarStatus> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException {
+
+        checkIfExistsRentalCarIdAndCarId(rentalCarId,carId);
+        //veriş kilometresi boş olamaz
+        //dönüş kilometresi boş olmalıdır
+        RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
+
+        this.carService.updateKilometer(carId, deliveredKilometer);
+        rentalCar.setDeliveredKilometer(rentalCar.getCar().getKilometer());
+
+        return null;
     }
 
     @Override
@@ -291,12 +323,21 @@ public class RentalCarManager implements RentalCarService {
 
         RentalCar rentalCar = rentalCarDao.getById(rentalCarId);
         int totalDays = getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate());
-        double totalPrice = calculateAndReturnTotalPrice(rentalCar) + this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(rentalCar.getRentalCarId(), totalDays);
+        double priceOfDays = calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
+        double priceOfDiffCity = calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(), rentalCar.getDeliveredCity().getCityId());
+        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(rentalCar.getRentalCarId(), totalDays);
+        double totalPrice = priceOfDays + priceOfDiffCity + priceOfAdditionals;
 
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
-        createInvoiceRequest.setRentalCarId(rentalCarId);
+        createInvoiceRequest.setStartDate(rentalCar.getStartDate());
+        createInvoiceRequest.setFinishDate(rentalCar.getFinishDate());
         createInvoiceRequest.setTotalRentalDay((short) totalDays);
+        createInvoiceRequest.setPriceOfDays(priceOfDays);
+        createInvoiceRequest.setPriceOfDiffCity(priceOfDiffCity);
+        createInvoiceRequest.setPriceOfAdditionals(priceOfAdditionals);
         createInvoiceRequest.setRentalCarTotalPrice(totalPrice);
+        createInvoiceRequest.setRentalCarId(rentalCarId);
+        createInvoiceRequest.setCustomerId(rentalCar.getCustomer().getCustomerId());
         this.invoiceService.add(createInvoiceRequest);
     }
 
@@ -465,6 +506,11 @@ public class RentalCarManager implements RentalCarService {
     public void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException {
         if (this.rentalCarDao.existsByCustomer_CustomerId(customerId)) {
             throw new BusinessException("Customer id exists in rental car list, customerId: " + customerId);
+        }
+    }
+    private void checkIfExistsRentalCarIdAndCarId(int rentalCarId, int carId) throws BusinessException {
+        if(!this.rentalCarDao.existsByRentalCarIdAndCar_CarId(rentalCarId,carId)){
+            throw new BusinessException("Rental car id and car id not found rental car table, rentalCarId: " + rentalCarId + ", carId: " + carId);
         }
     }
 }

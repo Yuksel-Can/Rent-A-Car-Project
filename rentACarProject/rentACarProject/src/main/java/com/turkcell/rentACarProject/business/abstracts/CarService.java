@@ -22,6 +22,8 @@ public interface CarService {
 	Result update(UpdateCarRequest updateCarRequest) throws BusinessException;
 	Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException;
 
+	void updateKilometer(int carId, int kilometer) throws BusinessException;
+
 	DataResult<List<CarListByDailyPrice>> findByDailyPriceLessThenEqual(double dailyPrice);
 	DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize);
 	DataResult<List<CarSortedDto>> getAllSortedCar(int sort);

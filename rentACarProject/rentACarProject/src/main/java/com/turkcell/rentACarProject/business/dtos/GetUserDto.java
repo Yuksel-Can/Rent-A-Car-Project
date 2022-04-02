@@ -11,6 +11,5 @@ public class GetUserDto {
 
     private int userId;
     private String email;
-    private String password;
 
 }

@@ -4,11 +4,18 @@ import com.turkcell.rentACarProject.entities.concretes.Invoice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+import java.util.List;
+
 @Repository
 public interface InvoiceDao extends JpaRepository<Invoice, Integer> {
 
     boolean existsByInvoiceId(int invoiceId);
     boolean existsByInvoiceNo(String invoiceNo);
     Invoice getInvoiceByInvoiceNo(String invoiceNo);
+
+    List<Invoice> getAllByCustomer_CustomerId(int customerId);
+    List<Invoice> getAllByRentalCar_RentalCarId(int rentalCarId);
+    List<Invoice> getByCreationDateBetween(Date startDate, Date endDate);
 
 }

@@ -12,6 +12,7 @@ public class CarPagedDto {
 	private int carId;
 	private double dailyPrice;
 	private int modelYear;
+	private int kilometer;
 	private String colorName;
 	private String brandName;
 	

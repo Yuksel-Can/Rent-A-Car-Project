@@ -10,6 +10,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.sql.Date;
 import java.time.LocalDate;
 
 @Data
@@ -27,11 +28,27 @@ public class UpdateInvoiceRequest {
 
     @JsonIgnore
     @CreationTimestamp
-    private LocalDate creationDate;
+    private Date creationDate;
+
+    @NotNull
+    private LocalDate startDate;
+
+    @NotNull
+    private LocalDate finishDate;
 
     @NotNull
     @Min(1)
     private short totalRentalDay;
+
+    @NotNull
+    @Min(0)
+    private double priceOfDays;
+
+    @Min(0)
+    private double priceOfDiffCity;
+
+    @Min(0)
+    private double priceOfAdditionals;
 
     @NotNull
     @Min(1)
@@ -40,5 +57,9 @@ public class UpdateInvoiceRequest {
     @NotNull
     @Min(1)
     private int rentalCarId;
+
+    @NotNull
+    @Min(1)
+    private int customerId;
 
 }

@@ -52,45 +52,6 @@ public class CustomerManager implements CustomerService {
     }
 
     @Override
-    public Result add(CreateCustomerRequest createCustomerRequest) throws BusinessException {
-
-        this.userService.checkIfUserEmailNotExists(createCustomerRequest.getEmail());
-
-        Customer customer = this.modelMapperService.forRequest().map(createCustomerRequest, Customer.class);
-
-        this.customerDao.save(customer);
-
-        return new SuccessResult("Customer added");
-
-    }
-
-    @Override
-    public Result update(UpdateCustomerRequest updateCustomerRequest) throws BusinessException {
-
-        checkIfCustomerIdExists(updateCustomerRequest.getUserId());
-        this.userService.checkIfUserEmailNotExists(updateCustomerRequest.getEmail());
-
-        Customer customer = this.modelMapperService.forRequest().map(updateCustomerRequest, Customer.class);
-
-        this.customerDao.save(customer);
-
-        return new SuccessResult("Customer updated");
-
-    }
-
-    @Override
-    public Result delete(DeleteCustomerRequest deleteCustomerRequest) throws BusinessException {
-
-        checkIfCustomerIdExists(deleteCustomerRequest.getUserId());
-        this.rentalCarService.checkIfRentalCar_CustomerIdNotExists(deleteCustomerRequest.getUserId());
-
-        this.customerDao.deleteById(deleteCustomerRequest.getUserId());
-
-        return new SuccessResult("Customer deleted");
-
-    }
-
-    @Override
     public DataResult<GetCustomerDto> getById(int customerId) throws BusinessException {
 
         checkIfCustomerIdExists(customerId);

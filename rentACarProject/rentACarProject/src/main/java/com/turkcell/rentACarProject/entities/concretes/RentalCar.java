@@ -47,6 +47,11 @@ public class RentalCar {
     @JoinColumn(name = "delivered_city")
     private City deliveredCity;
 
+    @Column(name = "rented_kilometer")
+    private int rentedKilometer;
+
+    @Column(name = "delivered_kilometer")
+    private int deliveredKilometer;
 
     @OneToMany(mappedBy = "rentalCar")
     private List<OrderedAdditional> orderedAdditionals;

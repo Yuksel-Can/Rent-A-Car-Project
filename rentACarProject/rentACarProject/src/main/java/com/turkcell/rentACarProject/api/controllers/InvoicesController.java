@@ -2,18 +2,14 @@ package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
 import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetIndividualCustomerInvoiceDto;
-import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetInvoiceDto;
 import com.turkcell.rentACarProject.business.dtos.lists.invoice.InvoiceListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteInvoiceRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateInvoiceRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
-import com.turkcell.rentACarProject.core.utilities.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,21 +26,6 @@ public class InvoicesController {
     @GetMapping("/getAll")
     public DataResult<List<InvoiceListDto>> getAll(){
         return this.invoiceService.getAll();
-    }
-
-    @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateInvoiceRequest createInvoiceRequest) throws BusinessException {
-        return this.invoiceService.add(createInvoiceRequest);
-    }
-
-    @PutMapping("/update")
-    public Result update(@RequestBody @Valid UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException {
-        return this.invoiceService.update(updateInvoiceRequest);
-    }
-
-    @DeleteMapping("/delete")
-    public Result delete(@RequestBody @Valid DeleteInvoiceRequest deleteInvoiceRequest) throws BusinessException {
-        return this.invoiceService.delete(deleteInvoiceRequest);
     }
 
     @GetMapping("/getIndividualCustomerInvoiceByInvoiceId")
@@ -65,6 +46,21 @@ public class InvoicesController {
     @GetMapping("/getCorporateCustomerInvoiceByInvoiceNo")
     public DataResult getCorporateCustomerInvoiceByInvoiceNo(@RequestParam String invoiceNo) throws BusinessException {
         return this.invoiceService.getCorporateCustomerInvoiceByInvoiceNo(invoiceNo);
+    }
+
+    @GetMapping("/getAllByRentalCar_RentalCarId")
+    public DataResult<List<InvoiceListDto>> getAllByRentalCar_RentalCarId(@RequestParam int rentalCarId) throws BusinessException {
+        return this.invoiceService.getAllByRentalCar_RentalCarId(rentalCarId);
+    }
+
+    @GetMapping("/getAllByCustomer_CustomerId")
+    public DataResult<List<InvoiceListDto>> getAllByCustomer_CustomerId(@RequestParam int customerId) throws BusinessException {
+        return this.invoiceService.getAllByCustomer_CustomerId(customerId);
+    }
+
+    @GetMapping("/getDateBetween")
+    public DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate){
+        return this.invoiceService.findByInvoiceDateBetween(startDate, endDate);
     }
 }
 
