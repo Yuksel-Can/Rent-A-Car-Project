@@ -3,7 +3,7 @@ package com.turkcell.rentACarProject.business.abstracts;
 import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
-import com.turkcell.rentACarProject.business.dtos.gets.GetRentalCarStatus;
+import com.turkcell.rentACarProject.business.dtos.gets.rentalCar.GetRentalCarStatus;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;

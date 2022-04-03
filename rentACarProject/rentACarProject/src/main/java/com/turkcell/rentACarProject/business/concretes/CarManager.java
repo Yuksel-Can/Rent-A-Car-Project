@@ -3,7 +3,7 @@ package com.turkcell.rentACarProject.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
+import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -12,9 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.turkcell.rentACarProject.business.abstracts.BrandService;
-import com.turkcell.rentACarProject.business.abstracts.CarService;
-import com.turkcell.rentACarProject.business.abstracts.ColorService;
 import com.turkcell.rentACarProject.business.requests.create.CreateCarRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateCarRequest;
@@ -36,15 +33,20 @@ public class CarManager implements CarService{
 	private BrandService brandService;
 	private ColorService colorService;
 	private RentalCarService rentalCarService;
+	private CarCrashService carCrashService;
 	
 	@Autowired
-	public  CarManager(CarDao carDao,ModelMapperService modelMapperService, @Lazy BrandService brandService, @Lazy ColorService colorService, RentalCarService rentalCarService) {
+	public  CarManager(CarDao carDao, ModelMapperService modelMapperService, @Lazy BrandService brandService, @Lazy ColorService colorService,
+					   RentalCarService rentalCarService, @Lazy CarCrashService carCrashService) {
 		this.carDao = carDao;
 		this.brandService = brandService;
 		this.colorService = colorService;
 		this.rentalCarService = rentalCarService;
+		this.carCrashService = carCrashService;
 		this.modelMapperService = modelMapperService;
+
 	}
+
 	@Override
 	public DataResult<List<CarListDto>> getAll() {
 		
@@ -93,6 +95,7 @@ public class CarManager implements CarService{
 		
 		checkIsExistsByCarId(deleteCarRequest.getCarId());
 		this.rentalCarService.checkIsNotExistsByRentalCar_CarId(deleteCarRequest.getCarId());
+		this.carCrashService.checkIfNotExistsCarCrashByCar_CarId(deleteCarRequest.getCarId());
 
 		this.carDao.deleteById(deleteCarRequest.getCarId());
 

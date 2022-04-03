@@ -4,7 +4,7 @@ import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
-import com.turkcell.rentACarProject.business.dtos.gets.GetRentalCarStatus;
+import com.turkcell.rentACarProject.business.dtos.gets.rentalCar.GetRentalCarStatus;
 import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
