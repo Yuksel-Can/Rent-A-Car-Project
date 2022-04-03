@@ -30,10 +30,6 @@ public class RentalCar {
 
     @Column(name = "finish_date")
     private LocalDate finishDate;
-//
-//    @JsonIgnore
-//    @Column(name = "rental_car_total_price")
-//    private double rentalCarTotalPrice;
 
     @ManyToOne
     @JoinColumn(name = "car_id")
@@ -62,4 +58,8 @@ public class RentalCar {
 
     @OneToMany(mappedBy = "rentalCar")
     private List<Invoice> invoices;
+
+    @OneToMany(mappedBy = "rentalCar")
+    private List<Payment> payments;
+
 }
