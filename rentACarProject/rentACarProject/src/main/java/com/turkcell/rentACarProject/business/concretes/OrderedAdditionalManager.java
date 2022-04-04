@@ -59,7 +59,8 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     @Override
     public Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
 
-        checkAllValidation(createOrderedAdditionalRequest.getAdditionalId(), createOrderedAdditionalRequest.getOrderedAdditionalQuantity(), createOrderedAdditionalRequest.getRentalCarId());
+//        checkAllValidation(createOrderedAdditionalRequest.getAdditionalId(), createOrderedAdditionalRequest.getOrderedAdditionalQuantity(), createOrderedAdditionalRequest.getRentalCarId());
+        this.rentalCarService.checkIsExistsByRentalCarId(createOrderedAdditionalRequest.getRentalCarId());
         checkIsNotExistsOrderedAdditionalByAdditionalIdAndRentalCarId(createOrderedAdditionalRequest.getAdditionalId(), createOrderedAdditionalRequest.getRentalCarId());
 
         OrderedAdditional orderedAdditional = this.modelMapperService.forRequest().map(createOrderedAdditionalRequest, OrderedAdditional.class);
@@ -76,7 +77,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
 
         checkIsExistsByOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
-        checkAllValidation(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getOrderedAdditionalQuantity(), updateOrderedAdditionalRequest.getRentalCarId());
+        checkAllValidation2(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getOrderedAdditionalQuantity(), updateOrderedAdditionalRequest.getRentalCarId());
         checkIsOnlyOneOrderedAdditionalByAdditionalIdAndRentalCarIdForUpdate(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getRentalCarId());
 
         OrderedAdditional orderedAdditional = this.modelMapperService.forRequest().map(updateOrderedAdditionalRequest, OrderedAdditional.class);
@@ -183,6 +184,18 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         return totalPrice;
     }
 
+    //todo:tekrarlayan metod var buraları sil düzenle
+    @Override
+    public double calculateTotalPriceForOrderedAdditionals(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws BusinessException {
+
+        double totalPrice = 0;
+        if(createOrderedAdditionalRequestList != null){
+            for(CreateOrderedAdditionalRequest orderedAdditionalList : createOrderedAdditionalRequestList) {
+                totalPrice += getPriceCalculatorForAdditional(orderedAdditionalList.getAdditionalId(),orderedAdditionalList.getOrderedAdditionalQuantity(), totalDays);
+            }
+        }
+        return totalPrice;
+    }
 
 
 //todo:bu metod da hatalı çalışıyor
@@ -236,10 +249,21 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         return dailyPrice * orderedAdditionalQuantity * totalDays;
     }
 
-    public void checkAllValidation(int additionalId, int orderedAdditionalQuantity, int rentalCarId) throws BusinessException {
-        this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
+    @Override
+    public void checkAllValidation2(int additionalId, int orderedAdditionalQuantity, int rentalCarId) throws BusinessException {
+//        this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
         this.additionalService.checkIfExistsByAdditionalId(additionalId);
         checkIfTheAdditionalQuantityOrderedIsValid(additionalId, orderedAdditionalQuantity);
+    }
+    //todo:tekrarlayan metodlar oldu kontrol et
+    @Override
+    public void checkAllValidationForAddOrderedAdditional(List<CreateOrderedAdditionalRequest> orderedAdditionalRequestList) throws BusinessException {
+
+        for (CreateOrderedAdditionalRequest orderedAdditionalRequest : orderedAdditionalRequestList){
+//          this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
+            this.additionalService.checkIfExistsByAdditionalId(orderedAdditionalRequest.getAdditionalId());
+            checkIfTheAdditionalQuantityOrderedIsValid(orderedAdditionalRequest.getAdditionalId(), orderedAdditionalRequest.getOrderedAdditionalQuantity());
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.requests.create;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,8 +21,9 @@ public class CreateOrderedAdditionalRequest {
     @Min(1)
     private int additionalId;
 
-    @NotNull
-    @Min(1)
+//    @NotNull
+//    @Min(1)
+    @JsonIgnore
     private int rentalCarId;
 
 }

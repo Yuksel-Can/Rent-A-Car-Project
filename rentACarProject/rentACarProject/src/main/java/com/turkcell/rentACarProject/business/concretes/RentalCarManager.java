@@ -72,7 +72,37 @@ public class RentalCarManager implements RentalCarService {
     @Transactional(rollbackFor = BusinessException.class)
     public Result   addForIndividualCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException {
 
-        checkCommonValidationsForAddRent(rentalCarAddModel.getCreateRentalCarRequest());
+//        checkCommonValidationsForAddRent(rentalCarAddModel.getCreateRentalCarRequest());
+        this.individualCustomerService.checkIfIndividualCustomerIdExists(rentalCarAddModel.getCreateRentalCarRequest().getCustomerId());
+
+        RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalCarAddModel.getCreateRentalCarRequest(), RentalCar.class);
+        rentalCar.setCustomer(this.customerService.getCustomerById(rentalCarAddModel.getCreateRentalCarRequest().getCustomerId()));    //(*)
+        rentalCar.setRentalCarId(0);
+
+        int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
+        System.out.println("patladı");
+
+        List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = rentalCarAddModel.getOrderedAdditionals()
+                .stream().map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService
+                        .forRequest().map(createOrderedAdditionalForRentalCarRequest, CreateOrderedAdditionalRequest.class))
+                .collect(Collectors.toList());
+        System.out.println("patladı");
+        for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
+            createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
+            this.orderedAdditionalService.add(createOrderedAdditionalRequest);
+        }
+        System.out.println("patladı");
+
+        createAndAddInvoice(rentalCarId);
+
+        return new SuccessResult("Rental Car Added");
+    }
+//todo:üstteki tekrar etti birini sil
+    @Override
+    @Transactional(rollbackFor = BusinessException.class)
+    public Result   addForIndividualCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException {
+
+//        checkCommonValidationsForAddRent(rentalCarAddModel.getCreateRentalCarRequest());
         this.individualCustomerService.checkIfIndividualCustomerIdExists(rentalCarAddModel.getCreateRentalCarRequest().getCustomerId());
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalCarAddModel.getCreateRentalCarRequest(), RentalCar.class);
@@ -102,7 +132,7 @@ public class RentalCarManager implements RentalCarService {
     @Transactional(rollbackFor = BusinessException.class)
     public Result addForCorporateCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException {
 
-        checkCommonValidationsForAddRent(rentalCarAddModel.getCreateRentalCarRequest());
+        checkAllValidationsForAddRent(rentalCarAddModel.getCreateRentalCarRequest());
         this.corporateCustomerService.checkIfCorporateCustomerIdExists(rentalCarAddModel.getCreateRentalCarRequest().getCustomerId());
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalCarAddModel.getCreateRentalCarRequest(), RentalCar.class);
@@ -296,7 +326,8 @@ public class RentalCarManager implements RentalCarService {
     }
 
 
-    private void checkCommonValidationsForAddRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
+    @Override
+    public void checkAllValidationsForAddRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
 
         this.carService.checkIsExistsByCarId(createRentalCarRequest.getCarId());
         checkIfStartDateAfterToday(createRentalCarRequest.getStartDate());
@@ -325,6 +356,7 @@ public class RentalCarManager implements RentalCarService {
     public void createAndAddInvoice(int rentalCarId) throws BusinessException {
 
         RentalCar rentalCar = rentalCarDao.getById(rentalCarId);
+        //todo:bunları buradan sil
         int totalDays = getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate());
         double priceOfDays = calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
         double priceOfDiffCity = calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(), rentalCar.getDeliveredCity().getCityId());
@@ -354,7 +386,8 @@ public class RentalCarManager implements RentalCarService {
         return totalDayPrice + totalDiffCityPrice;
     }
 
-    private double calculateRentalCarTotalDayPrice(LocalDate startDate, LocalDate finishDate, double dailyPrice) {
+    @Override
+    public double calculateRentalCarTotalDayPrice(LocalDate startDate, LocalDate finishDate, double dailyPrice) {
         int diff = getTotalDaysForRental(startDate, finishDate);
         return diff * dailyPrice;
     }
@@ -362,7 +395,8 @@ public class RentalCarManager implements RentalCarService {
         return (int) ChronoUnit.DAYS.between(startDate, finishDate);
     }
 
-    private int calculateCarDeliveredToTheSamCity(int rentedCityId, int deliveredCityId){
+    @Override
+    public int calculateCarDeliveredToTheSamCity(int rentedCityId, int deliveredCityId){
         if(rentedCityId != deliveredCityId){
             return 750;
         }

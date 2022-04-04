@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.requests.create;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class CreatePaymentRequest {
     private String cardExpirationDate;
 
     @NotNull
+    @JsonIgnore
     @Min(1)
     private int rentalCarId;
 

@@ -34,4 +34,8 @@ public interface OrderedAdditionalService {
     double getPriceCalculatorForAdditional(int additionalId,double orderedAdditionalQuantity, int totalDays) throws BusinessException;
     double calculateTotalPriceForOrderedAdditionals(int rentalCarId, int totalDays) throws BusinessException;
 
-    }
+    void checkAllValidation2(int additionalId, int orderedAdditionalQuantity, int rentalCarId) throws BusinessException;
+    void checkAllValidationForAddOrderedAdditional(List<CreateOrderedAdditionalRequest> orderedAdditionalRequestList) throws BusinessException;
+    double calculateTotalPriceForOrderedAdditionals(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws BusinessException;
+
+}

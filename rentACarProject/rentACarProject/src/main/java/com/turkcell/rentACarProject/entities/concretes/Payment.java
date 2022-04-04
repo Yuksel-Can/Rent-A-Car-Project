@@ -30,6 +30,9 @@ public class Payment {
     @Column(name = "card_expiration_date")
     private String cardExpirationDate;      //son kullanma tarihi
 
+    @Column(name = "total_price")
+    private double totalPrice;
+
     @ManyToOne()
     @JoinColumn(name = "rental_car_id")
     private RentalCar rentalCar;

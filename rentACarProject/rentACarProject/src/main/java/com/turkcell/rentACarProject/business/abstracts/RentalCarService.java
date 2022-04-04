@@ -4,6 +4,7 @@ import com.turkcell.rentACarProject.api.models.rentalCar.RentalCarAddModel;
 import com.turkcell.rentACarProject.business.dtos.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.RentalCarListDto;
 import com.turkcell.rentACarProject.business.dtos.gets.rentalCar.GetRentalCarStatus;
+import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -59,5 +60,9 @@ public interface RentalCarService {
 //    double calculateAndReturnTotalPrice(RentalCar rentalCar);
 
     void createAndAddInvoice(int rentalCarId) throws BusinessException;
+    void checkAllValidationsForAddRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    double calculateRentalCarTotalDayPrice(LocalDate startDate, LocalDate finishDate, double dailyPrice);
+    int calculateCarDeliveredToTheSamCity(int rentedCityId, int deliveredCityId);
 
-}
+
+    }
