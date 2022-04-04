@@ -19,6 +19,8 @@ public interface RentalCarService {
 
     DataResult<List<RentalCarListDto>> getAll();
 
+    int addForIndividualCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+
     Result addForIndividualCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException;
     Result addForCorporateCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException;
     Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
@@ -59,10 +61,14 @@ public interface RentalCarService {
     int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate);
 //    double calculateAndReturnTotalPrice(RentalCar rentalCar);
 
-    void createAndAddInvoice(int rentalCarId) throws BusinessException;
-    void checkAllValidationsForAddRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
-    double calculateRentalCarTotalDayPrice(LocalDate startDate, LocalDate finishDate, double dailyPrice);
+//    void createAndAddInvoice(int rentalCarId) throws BusinessException;
+//    void checkAllValidationsForAddRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    void checkAllValidationsForAddIndividualRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    void checkAllValidationsForAddCorporateRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+
+        double calculateRentalCarTotalDayPrice(LocalDate startDate, LocalDate finishDate, double dailyPrice);
     int calculateCarDeliveredToTheSamCity(int rentedCityId, int deliveredCityId);
+    double calculateAndReturnRentPrice(LocalDate startDate, LocalDate finishDate, double carDailyPrice, int rentedCityId, int deliveredCityId);
 
 
     }

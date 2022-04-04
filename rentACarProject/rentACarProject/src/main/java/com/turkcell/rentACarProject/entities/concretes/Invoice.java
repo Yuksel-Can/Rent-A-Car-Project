@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -56,7 +59,12 @@ public class Invoice {
     private RentalCar rentalCar;
 
     @ManyToOne
+    @Cascade(CascadeType.REMOVE)
     @JoinColumn(name = "customer_id")
     private Customer customer;
+
+    @OneToOne()
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
 
 }

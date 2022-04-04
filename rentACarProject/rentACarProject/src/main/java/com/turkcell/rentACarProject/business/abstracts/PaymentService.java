@@ -4,7 +4,6 @@ import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporate
 import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualCustomer;
 import com.turkcell.rentACarProject.business.dtos.gets.payment.GetPaymentDto;
 import com.turkcell.rentACarProject.business.dtos.lists.payment.PaymentListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreatePaymentRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -16,7 +15,7 @@ public interface PaymentService {
     DataResult<List<PaymentListDto>> getAll();
 
     Result makePaymentForIndividualCustomer(MakePaymentForIndividualCustomer makePaymentForIndividualCustomer) throws BusinessException;
-    Result makePaymentForIndividualCustomer(MakePaymentForCorporateCustomer makePaymentForCorporateCustomer);
+    Result makePaymentForCorporateCustomer(MakePaymentForCorporateCustomer makePaymentForCorporateCustomer) throws BusinessException;
 
     DataResult<GetPaymentDto> getById(int paymentId) throws BusinessException;
     DataResult<List<PaymentListDto>> getAllPaymentByRentalCar_RentalCarId(int rentalCarId) throws BusinessException;

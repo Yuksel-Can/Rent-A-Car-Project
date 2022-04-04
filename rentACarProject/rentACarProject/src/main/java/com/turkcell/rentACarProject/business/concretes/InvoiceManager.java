@@ -16,7 +16,9 @@ import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.InvoiceDao;
 import com.turkcell.rentACarProject.entities.concretes.Invoice;
+import com.turkcell.rentACarProject.entities.concretes.RentalCar;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,20 +30,25 @@ import java.util.stream.Collectors;
 public class InvoiceManager implements InvoiceService {
 
     private final InvoiceDao invoiceDao;
+    private final CarService carService;
     private final CustomerService customerService;
     private final IndividualCustomerService individualCustomerService;
     private final CorporateCustomerService corporateCustomerService;
     private final RentalCarService rentalCarService;
+    private final OrderedAdditionalService orderedAdditionalService;
     private final ModelMapperService modelMapperService;
 
     @Autowired
-    public InvoiceManager(InvoiceDao invoiceDao, CustomerService customerService, IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService
-            , RentalCarService rentalCarService, ModelMapperService modelMapperService) {
+    public InvoiceManager(InvoiceDao invoiceDao, CarService carService, CustomerService customerService,
+                          IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService,
+                          RentalCarService rentalCarService, ModelMapperService modelMapperService, @Lazy OrderedAdditionalService orderedAdditionalService) {
         this.invoiceDao = invoiceDao;
+        this.carService = carService;
         this.customerService = customerService;
         this.individualCustomerService = individualCustomerService;
         this.corporateCustomerService = corporateCustomerService;
         this.rentalCarService = rentalCarService;
+        this.orderedAdditionalService = orderedAdditionalService;
         this.modelMapperService = modelMapperService;
     }
 
@@ -65,8 +72,11 @@ public class InvoiceManager implements InvoiceService {
 
         Invoice invoice = this.modelMapperService.forRequest().map(createInvoiceRequest, Invoice.class);
         invoice.setInvoiceId(0);
+        invoice.setCustomer(this.customerService.getCustomerById(createInvoiceRequest.getCustomerId()));
 
         this.invoiceDao.save(invoice);
+
+        System.out.println("invoice eklendi,customerid: " + invoice.getCustomer().getCustomerId());
 
         return new SuccessResult("Invoice added");
     }
@@ -192,6 +202,35 @@ public class InvoiceManager implements InvoiceService {
             invoiceListDtos.get(i).setCustomerId(invoices.get(i).getRentalCar().getCustomer().getCustomerId());
         }
 
+    }
+
+    @Override
+    public void createAndAddInvoice(int rentalCarId, int paymentId, double totalPrice) throws BusinessException {
+        //todo:parametre olarak total price verildi dogru mu?
+        RentalCar rentalCar = this.rentalCarService.getById(rentalCarId);
+        //todo:bunları buradan sil
+        //todo: heryerde tekrar eden veri
+        int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate());
+        double priceOfDays = this.rentalCarService.calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
+        double priceOfDiffCity = this.rentalCarService.calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(), rentalCar.getDeliveredCity().getCityId());
+        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(rentalCar.getRentalCarId(), totalDays);      //todo:bu kayıtlı additionalları hesaplıyor
+//        double totalPrice = priceOfDays + priceOfDiffCity + priceOfAdditionals;
+
+        CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
+        createInvoiceRequest.setStartDate(rentalCar.getStartDate());
+        createInvoiceRequest.setFinishDate(rentalCar.getFinishDate());
+        createInvoiceRequest.setTotalRentalDay((short) totalDays);
+        createInvoiceRequest.setPriceOfDays(priceOfDays);
+        createInvoiceRequest.setPriceOfDiffCity(priceOfDiffCity);
+        createInvoiceRequest.setPriceOfAdditionals(priceOfAdditionals);
+        createInvoiceRequest.setRentalCarTotalPrice(totalPrice);
+        createInvoiceRequest.setRentalCarId(rentalCarId);
+        createInvoiceRequest.setCustomerId(rentalCar.getCustomer().getCustomerId());
+        createInvoiceRequest.setPaymentId(paymentId);
+
+        System.out.println("invoice verileri eklendi");
+
+        add(createInvoiceRequest);
     }
 
     private String generateCode() {

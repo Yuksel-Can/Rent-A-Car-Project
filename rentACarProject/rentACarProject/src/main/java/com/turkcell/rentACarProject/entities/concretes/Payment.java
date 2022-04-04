@@ -37,4 +37,7 @@ public class Payment {
     @JoinColumn(name = "rental_car_id")
     private RentalCar rentalCar;
 
+    @OneToOne(mappedBy = "payment")
+    private Invoice invoice;
+
 }

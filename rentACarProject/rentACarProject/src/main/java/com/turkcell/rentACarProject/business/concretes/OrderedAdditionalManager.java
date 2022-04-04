@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.AdditionalService;
+import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
 import com.turkcell.rentACarProject.business.abstracts.OrderedAdditionalService;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.GetOrderedAdditionalDto;
@@ -30,13 +31,17 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     private final ModelMapperService modelMapperService;
     private final AdditionalService additionalService;
     private final RentalCarService rentalCarService;
+    private final InvoiceService invoiceService;
 
     @Autowired
-    public OrderedAdditionalManager(OrderedAdditionalDao orderedAdditionalDao, ModelMapperService modelMapperService, AdditionalService additionalService, RentalCarService rentalCarService) {
+    public OrderedAdditionalManager(OrderedAdditionalDao orderedAdditionalDao, ModelMapperService modelMapperService,
+                                    AdditionalService additionalService, RentalCarService rentalCarService,
+                                    InvoiceService invoiceService) {
         this.orderedAdditionalDao = orderedAdditionalDao;
         this.modelMapperService = modelMapperService;
         this.additionalService = additionalService;
         this.rentalCarService = rentalCarService;
+        this.invoiceService = invoiceService;
     }
 
 
@@ -55,7 +60,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         return new SuccessDataResult<>(result,"Ordered Additional Service listed");
 
     }
-
+/*
     @Override
     public Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
 
@@ -71,10 +76,25 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         return new SuccessResult("Ordered Additional Service added");
 
     }
+    */
+    //todo:üst tekrar ediyor düzenle
+    @Override
+    public Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
+
+        this.rentalCarService.checkIsExistsByRentalCarId(createOrderedAdditionalRequest.getRentalCarId());
+
+        OrderedAdditional orderedAdditional = this.modelMapperService.forRequest().map(createOrderedAdditionalRequest, OrderedAdditional.class);
+        orderedAdditional.setOrderedAdditionalId(0);
+
+        this.orderedAdditionalDao.save(orderedAdditional);
+
+        return new SuccessResult("Ordered Additional Service added");
+    }
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
     public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
+/*
 
         checkIsExistsByOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
         checkAllValidation2(updateOrderedAdditionalRequest.getAdditionalId(), updateOrderedAdditionalRequest.getOrderedAdditionalQuantity(), updateOrderedAdditionalRequest.getRentalCarId());
@@ -84,7 +104,8 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         orderedAdditional.setOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
 
         this.orderedAdditionalDao.save(orderedAdditional);
-        this.rentalCarService.createAndAddInvoice(orderedAdditional.getRentalCar().getRentalCarId());
+        this.invoiceService.createAndAddInvoice(orderedAdditional.getRentalCar().getRentalCarId());
+*/
 
         return new SuccessResult("Ordered Additional Service updated");
 

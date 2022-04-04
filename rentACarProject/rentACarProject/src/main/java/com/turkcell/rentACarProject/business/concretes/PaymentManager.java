@@ -6,7 +6,6 @@ import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.gets.payment.GetPaymentDto;
 import com.turkcell.rentACarProject.business.dtos.lists.payment.PaymentListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreatePaymentRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.core.postServices.PostService;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -17,9 +16,9 @@ import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.PaymentDao;
 import com.turkcell.rentACarProject.entities.concretes.Payment;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,13 +26,13 @@ import java.util.stream.Collectors;
 @Service
 public class PaymentManager implements PaymentService {
 
-    private PaymentDao paymentDao;
-    private ModelMapperService modelMapperService;
-    private CarService carService;
-    private RentalCarService rentalCarService;
-    private OrderedAdditionalService orderedAdditionalService;
-    private InvoiceService invoiceService;
-    private PostService postService;
+    private final PaymentDao paymentDao;
+    private final ModelMapperService modelMapperService;
+    private final CarService carService;
+    private final RentalCarService rentalCarService;
+    private final OrderedAdditionalService orderedAdditionalService;
+    private final InvoiceService invoiceService;
+    private final PostService postService;
 
     public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, @Lazy CarService carService,
                           @Lazy RentalCarService rentalCarService, @Lazy OrderedAdditionalService orderedAdditionalService,
@@ -55,64 +54,61 @@ public class PaymentManager implements PaymentService {
 
         List<PaymentListDto> result = payments.stream().map(payment -> this.modelMapperService.forDto()
                 .map(payment, PaymentListDto.class)).collect(Collectors.toList());
+        manuelIdSetter(payments, result);
 
         return new SuccessDataResult<>(result, "payment lister");
     }
 
     @Override
+    @Transactional(rollbackFor = BusinessException.class)
     public Result makePaymentForIndividualCustomer(MakePaymentForIndividualCustomer makePayment) throws BusinessException {
 
-        checkAllValidations(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
+        checkAllValidationsForIndividual(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
 
         double totalPrice = calculateTotalPrice(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
+        makePayment.getCreatePaymentRequest().setTotalPrice(totalPrice);
 
         this.postService.payment(makePayment.getCreatePaymentRequest().getCardNumber(), makePayment.getCreatePaymentRequest().getCardOwner(),
-                                    makePayment.getCreatePaymentRequest().getCardCvv(), makePayment.getCreatePaymentRequest().getCardExpirationDate(), totalPrice);
+                                    makePayment.getCreatePaymentRequest().getCardCvv(), makePayment.getCreatePaymentRequest().getCardExpirationDate(), makePayment.getCreatePaymentRequest().getTotalPrice());
 
+        int rentalCarId = this.rentalCarService.addForIndividualCustomer(makePayment.getCreateRentalCarRequest());
 
-
-
+        makePayment.getCreatePaymentRequest().setRentalCarId(rentalCarId);
         Payment payment = this.modelMapperService.forRequest().map(makePayment.getCreatePaymentRequest(), Payment.class);
+        payment.setPaymentId(0);
+        int paymentId = this.paymentDao.save(payment).getPaymentId();
 
-        this.paymentDao.save(payment);
+        saveOrderedAdditional(makePayment.getCreateOrderedAdditionalRequestList(), rentalCarId);
 
+        this.invoiceService.createAndAddInvoice(rentalCarId, paymentId, payment.getTotalPrice())    ;
 
-        //validasyon yap
-        //tutar hesapla
-        //ödeme yap
-        //ödeme kaydet
-        //rent kaydet
-        //ordered kaydet
-        //fatura oluştur
-
-
-
-
-
-
-        this.paymentDao.save(payment);
-
-        return new SuccessResult("Payment added");
-    }
-
-    private double calculateTotalPrice(CreateRentalCarRequest rentalCarRequest, List<CreateOrderedAdditionalRequest> orderedAdditionalRequestList) throws BusinessException {
-
-        int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCarRequest.getStartDate(),rentalCarRequest.getFinishDate());
-        double priceOfDays = this.rentalCarService.calculateRentalCarTotalDayPrice(rentalCarRequest.getStartDate(), rentalCarRequest.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCarRequest.getCarId()));
-        double priceOfDiffCity = this.rentalCarService.calculateCarDeliveredToTheSamCity(rentalCarRequest.getRentedCityCityId(), rentalCarRequest.getRentedCityCityId());
-        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(orderedAdditionalRequestList,totalDays);
-
-        return priceOfDays + priceOfDiffCity + priceOfAdditionals;
+        return new SuccessResult("Payment, Car Rental, Additional Service adding and Invoice creation successful");
     }
 
     @Override
-    public Result makePaymentForIndividualCustomer(MakePaymentForCorporateCustomer makePaymentForCorporateCustomer) {
+    @Transactional(rollbackFor = BusinessException.class)
+    public Result makePaymentForCorporateCustomer(MakePaymentForCorporateCustomer makePayment) throws BusinessException {
 
-        Payment payment = this.modelMapperService.forRequest().map(createPaymentRequest, Payment.class);
+        checkAllValidationsForCorporate(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
 
-        this.paymentDao.save(payment);
+        double totalPrice = calculateTotalPrice(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
+        makePayment.getCreatePaymentRequest().setTotalPrice(totalPrice);
 
-        return new SuccessResult("Payment added");
+        this.postService.payment(makePayment.getCreatePaymentRequest().getCardNumber(), makePayment.getCreatePaymentRequest().getCardOwner(),
+                makePayment.getCreatePaymentRequest().getCardCvv(), makePayment.getCreatePaymentRequest().getCardExpirationDate(), makePayment.getCreatePaymentRequest().getTotalPrice());
+
+        int rentalCarId = this.rentalCarService.addForIndividualCustomer(makePayment.getCreateRentalCarRequest());
+
+        makePayment.getCreatePaymentRequest().setRentalCarId(rentalCarId);
+        Payment payment = this.modelMapperService.forRequest().map(makePayment.getCreatePaymentRequest(), Payment.class);
+        payment.setPaymentId(0);
+        int paymentId = this.paymentDao.save(payment).getPaymentId();
+
+        saveOrderedAdditional(makePayment.getCreateOrderedAdditionalRequestList(), rentalCarId);
+
+        this.invoiceService.createAndAddInvoice(rentalCarId, paymentId, payment.getTotalPrice())    ;
+
+        return new SuccessResult("Payment, Car Rental, Additional Service adding and Invoice creation successful");
     }
 
     @Override
@@ -123,6 +119,8 @@ public class PaymentManager implements PaymentService {
         Payment payment = this.paymentDao.getById(paymentId);
 
         GetPaymentDto result = this.modelMapperService.forDto().map(payment, GetPaymentDto.class);
+        result.setRentalCarId(payment.getRentalCar().getRentalCarId());
+        result.setInvoiceId(payment.getPaymentId());
 
         return new SuccessDataResult<>(result, "Payment getted by id, paymentId: " + paymentId );
     }
@@ -136,15 +134,37 @@ public class PaymentManager implements PaymentService {
 
         List<PaymentListDto> result = payments.stream().map(payment -> this.modelMapperService.forDto()
                 .map(payment, PaymentListDto.class)).collect(Collectors.toList());
+        manuelIdSetter(payments, result);
 
         return new SuccessDataResult<>(result, "Payments listed by rental car id, rentalCarId: " + rentalCarId);
     }
 
 
-    private void checkAllValidations(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
+    private void saveOrderedAdditional(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int rentalCarId) throws BusinessException {
+        for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
+            createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
+            this.orderedAdditionalService.add(createOrderedAdditionalRequest);
+        }
+    }
 
-        this.rentalCarService.checkAllValidationsForAddRent(createRentalCarRequest);
+    private void checkAllValidationsForIndividual(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
+        this.rentalCarService.checkAllValidationsForAddIndividualRent(createRentalCarRequest);
         this.orderedAdditionalService.checkAllValidationForAddOrderedAdditional(createOrderedAdditionalRequestList);
+    }
+
+    private void checkAllValidationsForCorporate(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
+        this.rentalCarService.checkAllValidationsForAddCorporateRent(createRentalCarRequest);
+        this.orderedAdditionalService.checkAllValidationForAddOrderedAdditional(createOrderedAdditionalRequestList);
+    }
+
+    private double calculateTotalPrice(CreateRentalCarRequest rentalCarRequest, List<CreateOrderedAdditionalRequest> orderedAdditionalRequestList) throws BusinessException {
+
+        int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCarRequest.getStartDate(), rentalCarRequest.getFinishDate());
+        double priceOfRental = this.rentalCarService.calculateAndReturnRentPrice(rentalCarRequest.getStartDate(), rentalCarRequest.getFinishDate(),
+                this.carService.getDailyPriceByCarId(rentalCarRequest.getCarId()), rentalCarRequest.getRentedCityCityId(), rentalCarRequest.getDeliveredCityId());
+        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(orderedAdditionalRequestList,totalDays);
+
+        return priceOfRental + priceOfAdditionals;
     }
 
     private void checkIfExistsByPaymentId(int paymentId) throws BusinessException {
@@ -156,6 +176,12 @@ public class PaymentManager implements PaymentService {
     private void checkIfExistsByRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
         if(!this.paymentDao.existsByRentalCar_RentalCarId(rentalCarId)){
             throw new BusinessException("Payment not found by rental car id, rentalCarId: " + rentalCarId);
+        }
+    }
+
+    private void manuelIdSetter(List<Payment> paymentList, List<PaymentListDto> paymentListDtoList){
+        for(int i=0;i<paymentList.size();i++){
+            paymentListDtoList.get(i).setRentalCarId(paymentList.get(i).getRentalCar().getRentalCarId());
         }
     }
 }

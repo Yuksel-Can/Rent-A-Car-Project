@@ -14,6 +14,8 @@ public class PaymentListDto {
     private String cardOwner;
     private String cardCvv;
     private String cardExpirationDate;
+    private double totalPrice;
     private int rentalCarId;
+    private int invoiceId;
 
 }

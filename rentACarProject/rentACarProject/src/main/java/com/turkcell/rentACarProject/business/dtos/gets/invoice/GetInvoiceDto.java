@@ -25,5 +25,7 @@ public class GetInvoiceDto {
     private double rentalCarTotalPrice;
     private int customerId;
     private String email;
+    private int paymentId;
+
 
 }

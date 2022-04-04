@@ -21,8 +21,6 @@ public class CreateOrderedAdditionalRequest {
     @Min(1)
     private int additionalId;
 
-//    @NotNull
-//    @Min(1)
     @JsonIgnore
     private int rentalCarId;
 

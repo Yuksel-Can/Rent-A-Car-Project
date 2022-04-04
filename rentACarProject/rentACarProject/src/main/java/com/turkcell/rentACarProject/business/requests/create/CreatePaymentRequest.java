@@ -34,9 +34,10 @@ public class CreatePaymentRequest {
     @Size(min = 4, max = 5)
     private String cardExpirationDate;
 
-    @NotNull
     @JsonIgnore
-    @Min(1)
+    private double totalPrice;
+
+    @JsonIgnore
     private int rentalCarId;
 
 }

@@ -20,6 +20,8 @@ public interface InvoiceService {
     Result add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException;
     Result update(UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException;
 
+    void createAndAddInvoice(int rentalCarId, int paymentId, double totalPrice) throws BusinessException;
+
     DataResult<GetIndividualCustomerInvoiceDto> getIndividualCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException;
     DataResult<GetCorporateCustomerInvoiceDto> getCorporateCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException;
 

@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.turkcell.rentACarProject.entities.abstracts.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +32,6 @@ public class Customer extends User {
     @OneToMany(mappedBy = "customer")
     private List<RentalCar> rentedCars;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Invoice> invoices;
 }

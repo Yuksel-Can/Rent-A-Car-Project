@@ -1,5 +1,7 @@
 package com.turkcell.rentACarProject.api.controllers;
 
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateCustomer;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualCustomer;
 import com.turkcell.rentACarProject.business.abstracts.PaymentService;
 import com.turkcell.rentACarProject.business.dtos.gets.payment.GetPaymentDto;
 import com.turkcell.rentACarProject.business.dtos.lists.payment.PaymentListDto;
@@ -29,9 +31,14 @@ public class PaymentsController {
         return this.paymentService.getAll();
     }
 
-    @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreatePaymentRequest createPaymentRequest){
-        return this.paymentService.add(createPaymentRequest);
+    @PostMapping("/makePaymentForIndividualCustomer")
+    public Result makePaymentForIndividualCustomer(@RequestBody @Valid MakePaymentForIndividualCustomer makePaymentForIndividualCustomer) throws BusinessException {
+        return this.paymentService.makePaymentForIndividualCustomer(makePaymentForIndividualCustomer);
+    }
+
+    @PostMapping("/makePaymentForCorporateCustomer")
+    public Result makePaymentForCorporateCustomer(@RequestBody @Valid MakePaymentForCorporateCustomer makePaymentForCorporateCustomer) throws BusinessException {
+        return this.paymentService.makePaymentForCorporateCustomer(makePaymentForCorporateCustomer);
     }
 
     @GetMapping("/getById")

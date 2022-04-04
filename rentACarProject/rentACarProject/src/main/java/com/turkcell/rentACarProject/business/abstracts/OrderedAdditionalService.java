@@ -20,6 +20,8 @@ public interface OrderedAdditionalService {
     DataResult<List<OrderedAdditionalListDto>> getAll();
 
     Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException;
+
+//    Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException;
     Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException;
     Result delete(DeleteOrderedAdditionalRequest deleteOrderedAdditionalRequest) throws BusinessException;
 

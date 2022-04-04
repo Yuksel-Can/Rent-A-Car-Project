@@ -62,4 +62,8 @@ public class UpdateInvoiceRequest {
     @Min(1)
     private int customerId;
 
+    @NotNull
+    @Min(1)
+    private int paymentId;
+
 }
