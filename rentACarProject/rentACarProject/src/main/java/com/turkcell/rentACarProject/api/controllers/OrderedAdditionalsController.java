@@ -32,11 +32,6 @@ public class OrderedAdditionalsController {
         return this.orderedAdditionalService.getAll();
     }
 
-    @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
-        return this.orderedAdditionalService.add(createOrderedAdditionalRequest);
-    }
-
     @PutMapping("/update")
     public Result update(@RequestBody @Valid UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest)throws BusinessException {
         return this.orderedAdditionalService.update(updateOrderedAdditionalRequest);

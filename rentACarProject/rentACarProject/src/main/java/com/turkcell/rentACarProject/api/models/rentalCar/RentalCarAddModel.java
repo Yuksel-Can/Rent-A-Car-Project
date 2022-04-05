@@ -1,7 +1,7 @@
 package com.turkcell.rentACarProject.api.models.rentalCar;
 
 
-import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalForRentalCarRequest;
+import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalForExtraRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +23,6 @@ public class RentalCarAddModel {
 
     @Valid
     @Nullable
-    private List<CreateOrderedAdditionalForRentalCarRequest> orderedAdditionals;
+    private List<CreateOrderedAdditionalForExtraRequest> orderedAdditionals;
 
 }

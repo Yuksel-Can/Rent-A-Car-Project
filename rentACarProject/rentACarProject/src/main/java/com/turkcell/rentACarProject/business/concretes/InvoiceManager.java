@@ -205,7 +205,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public void createAndAddInvoice(int rentalCarId, int paymentId, double totalPrice) throws BusinessException {
+    public void createAndAddInvoice(int rentalCarId, int paymentId) throws BusinessException {
         //todo:parametre olarak total price verildi dogru mu?
         RentalCar rentalCar = this.rentalCarService.getById(rentalCarId);
         //todo:bunları buradan sil
@@ -214,7 +214,7 @@ public class InvoiceManager implements InvoiceService {
         double priceOfDays = this.rentalCarService.calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
         double priceOfDiffCity = this.rentalCarService.calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(), rentalCar.getDeliveredCity().getCityId());
         double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(rentalCar.getRentalCarId(), totalDays);      //todo:bu kayıtlı additionalları hesaplıyor
-//        double totalPrice = priceOfDays + priceOfDiffCity + priceOfAdditionals;
+        double totalPrice = priceOfDays + priceOfDiffCity + priceOfAdditionals;
 
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
         createInvoiceRequest.setStartDate(rentalCar.getStartDate());

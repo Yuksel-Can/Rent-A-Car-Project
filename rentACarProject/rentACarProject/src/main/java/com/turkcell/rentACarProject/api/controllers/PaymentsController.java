@@ -1,5 +1,7 @@
 package com.turkcell.rentACarProject.api.controllers;
 
+import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalAddModel;
+import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalUpdateModel;
 import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateCustomer;
 import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualCustomer;
 import com.turkcell.rentACarProject.business.abstracts.PaymentService;
@@ -39,6 +41,16 @@ public class PaymentsController {
     @PostMapping("/makePaymentForCorporateCustomer")
     public Result makePaymentForCorporateCustomer(@RequestBody @Valid MakePaymentForCorporateCustomer makePaymentForCorporateCustomer) throws BusinessException {
         return this.paymentService.makePaymentForCorporateCustomer(makePaymentForCorporateCustomer);
+    }
+
+    @PostMapping("/makePaymentForOrderedAdditionalAdd")
+    public Result makePaymentForOrderedAdditionalAdd(@RequestBody @Valid OrderedAdditionalAddModel orderedAdditionalAddModel) throws BusinessException {
+        return this.paymentService.makePaymentForOrderedAdditionalAdd(orderedAdditionalAddModel);
+    }
+
+    @PutMapping("/makePaymentForOrderedAdditionalUpdate")
+    public Result makePaymentForOrderedAdditionalUpdate(@RequestBody @Valid OrderedAdditionalUpdateModel orderedAdditionalUpdateModel) throws BusinessException {
+        return this.paymentService.makePaymentForOrderedAdditionalUpdate(orderedAdditionalUpdateModel);
     }
 
     @GetMapping("/getById")

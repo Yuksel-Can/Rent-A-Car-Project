@@ -320,6 +320,12 @@ public class RentalCarManager implements RentalCarService {
         return (int) ChronoUnit.DAYS.between(startDate, finishDate);
     }
 
+    public int getTotalDaysForRental(int rentalCarId){
+        RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
+        return (int) ChronoUnit.DAYS.between(rentalCar.getStartDate(), rentalCar.getFinishDate());
+    }
+
+
     @Override
     public int calculateCarDeliveredToTheSamCity(int rentedCityId, int deliveredCityId){
         if(rentedCityId != deliveredCityId){
@@ -333,22 +339,19 @@ public class RentalCarManager implements RentalCarService {
         return this.rentalCarDao.getById(rentalCarId);
     }
 
-    @Override
-    public void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException {
+    private void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException {
         if(startDate.isBefore(LocalDate.now())){
         throw new BusinessException("Start date cannot be earlier than today");
         }
     }
 
-    @Override
-    public void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException {
+    private void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException {
         if(finishDate.isBefore(startDate)){
             throw new BusinessException("finish date cannot be earlier than start date");
         }
     }
 
-    @Override
-    public void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
+    private void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
 
             if(rentalCars != null) {
@@ -359,7 +362,7 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
-
+/*
     @Override
     public void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
@@ -372,7 +375,7 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
-
+*/
     private void checkIfCarAlreadyRentedOnTheEnteredDate(RentalCar rentalCar, LocalDate enteredDate) throws BusinessException {
         if(rentalCar.getStartDate().isBefore(enteredDate) && (rentalCar.getFinishDate().isAfter(enteredDate))){
             throw new BusinessException("The car rented between entered dates");
@@ -401,7 +404,6 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
-
     //for maintenance(*)
     @Override
     public void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
@@ -443,7 +445,7 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
-    public void checkIsExistsByRentalCar_CarId(int carId) throws BusinessException {
+    private void checkIsExistsByRentalCar_CarId(int carId) throws BusinessException {
         if(!this.rentalCarDao.existsByCar_CarId(carId)){
         throw new BusinessException("Car id not found in rental car list, carId: " + carId);
         }

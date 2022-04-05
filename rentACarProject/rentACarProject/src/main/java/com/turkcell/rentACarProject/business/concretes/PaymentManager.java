@@ -1,5 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
+import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalAddModel;
+import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalUpdateModel;
 import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateCustomer;
 import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualCustomer;
 import com.turkcell.rentACarProject.business.abstracts.*;
@@ -15,6 +17,7 @@ import com.turkcell.rentACarProject.core.utilities.result.Result;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.PaymentDao;
+import com.turkcell.rentACarProject.entities.concretes.OrderedAdditional;
 import com.turkcell.rentACarProject.entities.concretes.Payment;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -80,7 +83,7 @@ public class PaymentManager implements PaymentService {
 
         saveOrderedAdditional(makePayment.getCreateOrderedAdditionalRequestList(), rentalCarId);
 
-        this.invoiceService.createAndAddInvoice(rentalCarId, paymentId, payment.getTotalPrice())    ;
+        this.invoiceService.createAndAddInvoice(rentalCarId, paymentId);
 
         return new SuccessResult("Payment, Car Rental, Additional Service adding and Invoice creation successful");
     }
@@ -106,10 +109,38 @@ public class PaymentManager implements PaymentService {
 
         saveOrderedAdditional(makePayment.getCreateOrderedAdditionalRequestList(), rentalCarId);
 
-        this.invoiceService.createAndAddInvoice(rentalCarId, paymentId, payment.getTotalPrice())    ;
+        this.invoiceService.createAndAddInvoice(rentalCarId, paymentId);
 
         return new SuccessResult("Payment, Car Rental, Additional Service adding and Invoice creation successful");
     }
+
+    @Override
+    @Transactional(rollbackFor = BusinessException.class)
+    public Result makePaymentForOrderedAdditionalAdd(OrderedAdditionalAddModel orderedAdditionalAddModel) throws BusinessException {
+
+        this.rentalCarService.checkIsExistsByRentalCarId(orderedAdditionalAddModel.getRentalCarId());
+        this.orderedAdditionalService.checkAllValidationForAddOrderedAdditional(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList());
+
+        double totalPrice = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList(),
+                                                                                    this.rentalCarService.getTotalDaysForRental(orderedAdditionalAddModel.getRentalCarId()));
+        orderedAdditionalAddModel.getCreatePaymentRequest().setTotalPrice(totalPrice);
+        orderedAdditionalAddModel.getCreatePaymentRequest().setRentalCarId(orderedAdditionalAddModel.getRentalCarId());
+
+        this.postService.payment(orderedAdditionalAddModel.getCreatePaymentRequest().getCardNumber(), orderedAdditionalAddModel.getCreatePaymentRequest().getCardOwner(),
+                orderedAdditionalAddModel.getCreatePaymentRequest().getCardCvv(), orderedAdditionalAddModel.getCreatePaymentRequest().getCardExpirationDate(), orderedAdditionalAddModel.getCreatePaymentRequest().getTotalPrice());
+
+        Payment payment = this.modelMapperService.forRequest().map(orderedAdditionalAddModel.getCreatePaymentRequest(), Payment.class);
+        payment.setPaymentId(0);
+        int paymentId = this.paymentDao.save(payment).getPaymentId();
+
+        saveOrderedAdditional(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList(), orderedAdditionalAddModel.getRentalCarId());
+
+        this.invoiceService.createAndAddInvoice(orderedAdditionalAddModel.getRentalCarId(), paymentId);
+
+        return new SuccessResult("Payment, Additional Service adding and Invoice creation successful");
+
+    }
+
 
     @Override
     public DataResult<GetPaymentDto> getById(int paymentId) throws BusinessException {

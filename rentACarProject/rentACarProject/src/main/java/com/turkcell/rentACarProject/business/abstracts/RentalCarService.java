@@ -39,11 +39,11 @@ public interface RentalCarService {
     DataResult<List<RentalCarListDto>> getAllByIndividualCustomer_IndividualCustomerId(int individualCustomerId) throws BusinessException;
 
     DataResult<List<RentalCarListDto>> getAllByCorporateCustomer_CorporateCustomerId(int corporateCustomerId) throws BusinessException;
-    void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException;
+//    void checkIfStartDateAfterToday(LocalDate startDate) throws BusinessException;
 
-    void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException;
-    void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
-    void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
+//    void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws BusinessException;
+//    void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
+//   void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
     //for maintenance
     void checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;
 
@@ -57,6 +57,8 @@ public interface RentalCarService {
 
     void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException;
     int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate);
+    //todo:bunu teke indir
+    int getTotalDaysForRental(int rentalCarId);
 //    double calculateAndReturnTotalPrice(RentalCar rentalCar);
 
 //    void createAndAddInvoice(int rentalCarId) throws BusinessException;
