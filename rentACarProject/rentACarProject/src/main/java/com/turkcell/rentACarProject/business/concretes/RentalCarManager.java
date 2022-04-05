@@ -70,85 +70,39 @@ public class RentalCarManager implements RentalCarService {
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
-    public Result   addForIndividualCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException {
-
-//        checkCommonValidationsForAddRent(rentalCarAddModel.getCreateRentalCarRequest());
-/*
-        RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalCarAddModel.getCreateRentalCarRequest(), RentalCar.class);
-        rentalCar.setCustomer(this.customerService.getCustomerById(rentalCarAddModel.getCreateRentalCarRequest().getCustomerId()));    //(*)
-        rentalCar.setRentalCarId(0);
-
-        int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
-        System.out.println("patladı");
-
-        List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = rentalCarAddModel.getOrderedAdditionals()
-                .stream().map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService
-                        .forRequest().map(createOrderedAdditionalForRentalCarRequest, CreateOrderedAdditionalRequest.class))
-                .collect(Collectors.toList());
-        System.out.println("patladı");
-        for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
-            createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
-            this.orderedAdditionalService.add(createOrderedAdditionalRequest);
-        }
-        System.out.println("patladı");
-
-        this.invoiceService.createAndAddInvoice(rentalCarId);
-*/
-        return new SuccessResult("Rental Car Added");
-    }
-//todo:üstteki tekrar etti birini sil
-
-    @Override
-    @Transactional(rollbackFor = BusinessException.class)
     public int addForIndividualCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarRequest, RentalCar.class);
-        rentalCar.setCustomer(this.customerService.getCustomerById(createRentalCarRequest.getCustomerId()));    //(*)
+        rentalCar.setCustomer(this.customerService.getCustomerById(createRentalCarRequest.getCustomerId()));        //(*)
         rentalCar.setRentalCarId(0);
 
-        int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
+        int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();
 
         return rentalCarId;
     }
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
-    public Result addForCorporateCustomer(RentalCarAddModel rentalCarAddModel) throws BusinessException {
+    public int addForCorporateCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
 
-        //todo:burası düzenlenecek
-/*
-
-        checkAllValidationsForAddRent(rentalCarAddModel.getCreateRentalCarRequest());
-        this.corporateCustomerService.checkIfCorporateCustomerIdExists(rentalCarAddModel.getCreateRentalCarRequest().getCustomerId());
-
-        RentalCar rentalCar = this.modelMapperService.forRequest().map(rentalCarAddModel.getCreateRentalCarRequest(), RentalCar.class);
-        rentalCar.setCustomer(this.customerService.getCustomerById(rentalCarAddModel.getCreateRentalCarRequest().getCustomerId()));    //(*)
+        RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarRequest, RentalCar.class);
+        rentalCar.setCustomer(this.customerService.getCustomerById(createRentalCarRequest.getCustomerId()));
         rentalCar.setRentalCarId(0);
 
-        int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();   //(*)
+        int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();
 
-        List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList = rentalCarAddModel.getOrderedAdditionals()
-                .stream().map(createOrderedAdditionalForRentalCarRequest -> this.modelMapperService
-                        .forRequest().map(createOrderedAdditionalForRentalCarRequest, CreateOrderedAdditionalRequest.class))
-                .collect(Collectors.toList());
-
-        for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
-            createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
-            this.orderedAdditionalService.add(createOrderedAdditionalRequest);
-        }
-
-        this.invoiceService.createAndAddInvoice(rentalCarId);
-*/
-
-        return new SuccessResult("Rental Car Added");
+        return rentalCarId;
     }
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
     public Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
+        //todo:payment ta update yazılırken burası düzeltilecek
 /*
 
-        checkCommonValidationsForUpdateRent(updateRentalCarRequest);
+        checkIsExistsByRentalCarId(updateRentalCarRequest.getRentalCarId());
+        checkAllCommonValidation(updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate(),
+                updateRentalCarRequest.getRentedCityId(), updateRentalCarRequest.getDeliveredCityId(), updateRentalCarRequest.getCustomerId());
         this.individualCustomerService.checkIfIndividualCustomerIdExists(updateRentalCarRequest.getCustomerId());
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(updateRentalCarRequest, RentalCar.class);
@@ -157,17 +111,21 @@ public class RentalCarManager implements RentalCarService {
         int rentalCarId = this.rentalCarDao.save(rentalCar).getRentalCarId();
 
         this.invoiceService.createAndAddInvoice(rentalCarId);
-*/
 
+*/
         return new SuccessResult("Rental Car Updated, id: " + updateRentalCarRequest.getRentalCarId());
+
     }
+
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
     public Result updateForCorporateCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
 /*
 
-        checkCommonValidationsForUpdateRent(updateRentalCarRequest);
+        checkIsExistsByRentalCarId(updateRentalCarRequest.getRentalCarId());
+        checkAllCommonValidation(updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate(),
+                updateRentalCarRequest.getRentedCityId(), updateRentalCarRequest.getDeliveredCityId(), updateRentalCarRequest.getCustomerId());
         this.corporateCustomerService.checkIfCorporateCustomerIdExists(updateRentalCarRequest.getCustomerId());
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(updateRentalCarRequest, RentalCar.class);
@@ -317,41 +275,30 @@ public class RentalCarManager implements RentalCarService {
     }
 
 
+
+    private void checkAllCommonValidation(int carId, LocalDate startDate, LocalDate finishDate, int rentedCityId, int deliveredCityId, int customerId) throws BusinessException {
+        this.carService.checkIsExistsByCarId(carId);
+        checkIfStartDateAfterToday(startDate);
+        checkIfStartDateBeforeFinishDate(startDate, finishDate);
+        checkIfCarAlreadyRentedForCreate(carId, startDate, finishDate);
+        this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(carId, startDate);
+        this.cityService.checkIfExistsByCityId(rentedCityId);
+        this.cityService.checkIfExistsByCityId(deliveredCityId);
+        this.customerService.checkIfCustomerIdExists(customerId);
+    }
+
     @Override
     public void checkAllValidationsForAddIndividualRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
-        checkAllCommonValidation(createRentalCarRequest);
+        checkAllCommonValidation(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate(),
+                createRentalCarRequest.getRentedCityCityId(), createRentalCarRequest.getDeliveredCityId(), createRentalCarRequest.getCustomerId());
         this.individualCustomerService.checkIfIndividualCustomerIdExists(createRentalCarRequest.getCustomerId());
     }
 
     @Override
     public void checkAllValidationsForAddCorporateRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
-        checkAllCommonValidation(createRentalCarRequest);
+        checkAllCommonValidation(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate(),
+                createRentalCarRequest.getRentedCityCityId(), createRentalCarRequest.getDeliveredCityId(), createRentalCarRequest.getCustomerId());
         this.corporateCustomerService.checkIfCorporateCustomerIdExists(createRentalCarRequest.getCustomerId());
-    }
-
-    private void checkAllCommonValidation(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
-        this.carService.checkIsExistsByCarId(createRentalCarRequest.getCarId());
-        checkIfStartDateAfterToday(createRentalCarRequest.getStartDate());
-        checkIfStartDateBeforeFinishDate(createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate());
-        checkIfCarAlreadyRentedForCreate(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate(), createRentalCarRequest.getFinishDate());
-        this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(createRentalCarRequest.getCarId(), createRentalCarRequest.getStartDate());
-        this.cityService.checkIfExistsByCityId(createRentalCarRequest.getRentedCityCityId());
-        this.cityService.checkIfExistsByCityId(createRentalCarRequest.getDeliveredCityId());
-        this.customerService.checkIfCustomerIdExists(createRentalCarRequest.getCustomerId());
-    }
-
-    private void checkCommonValidationsForUpdateRent(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
-
-        checkIsExistsByRentalCarId(updateRentalCarRequest.getRentalCarId());
-
-        this.carService.checkIsExistsByCarId(updateRentalCarRequest.getCarId());
-        checkIfStartDateAfterToday(updateRentalCarRequest.getStartDate());
-        checkIfStartDateBeforeFinishDate(updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate());
-        checkIfCarAlreadyRentedForUpdate(updateRentalCarRequest.getRentalCarId(), updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate());
-        this.carMaintenanceService.checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(updateRentalCarRequest.getCarId(), updateRentalCarRequest.getStartDate());
-        this.cityService.checkIfExistsByCityId(updateRentalCarRequest.getRentedCityId());
-        this.cityService.checkIfExistsByCityId(updateRentalCarRequest.getDeliveredCityId());
-        this.customerService.checkIfCustomerIdExists(updateRentalCarRequest.getCustomerId());
     }
 
     @Override
@@ -402,7 +349,6 @@ public class RentalCarManager implements RentalCarService {
 
     @Override
     public void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
-
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
 
             if(rentalCars != null) {
@@ -416,8 +362,7 @@ public class RentalCarManager implements RentalCarService {
 
     @Override
     public void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
-
-    List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
+        List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
         if(rentalCars != null) {
             for(RentalCar rentalCar : rentalCars){
                 if(rentalCar.getRentalCarId() == rentalCarId) continue;
@@ -428,15 +373,13 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
-
-    public void checkIfCarAlreadyRentedOnTheEnteredDate(RentalCar rentalCar, LocalDate enteredDate) throws BusinessException {
+    private void checkIfCarAlreadyRentedOnTheEnteredDate(RentalCar rentalCar, LocalDate enteredDate) throws BusinessException {
         if(rentalCar.getStartDate().isBefore(enteredDate) && (rentalCar.getFinishDate().isAfter(enteredDate))){
             throw new BusinessException("The car rented between entered dates");
         }
     }
 
-    @Override
-    public void checkIfCarAlreadyRentedBetweenStartAndFinishDates(RentalCar rentalCar,  LocalDate startDate, LocalDate finishDate) throws BusinessException {
+    private void checkIfCarAlreadyRentedBetweenStartAndFinishDates(RentalCar rentalCar,  LocalDate startDate, LocalDate finishDate) throws BusinessException {
 
         if((rentalCar.getStartDate().isAfter(startDate) && (rentalCar.getFinishDate().isBefore(finishDate))) ||
                 (rentalCar.getStartDate().equals(startDate) || (rentalCar.getFinishDate().equals(finishDate))))
@@ -444,7 +387,6 @@ public class RentalCarManager implements RentalCarService {
             throw new BusinessException("The car is already rented between start and finish date");
         }
     }
-
 
     //for maintenance(*)
     @Override
@@ -474,6 +416,7 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
+
     private void checkIfRentedKilometerIsNull(Integer rentedKilometer) throws BusinessException {
         if(rentedKilometer != null){
             throw new BusinessException("The rented kilometer is already exists, the car has already been rented");
@@ -492,7 +435,6 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
-
     @Override
     public void checkIsExistsByRentalCarId(int rentalCarId) throws BusinessException {
 
@@ -501,7 +443,6 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
-    @Override
     public void checkIsExistsByRentalCar_CarId(int carId) throws BusinessException {
         if(!this.rentalCarDao.existsByCar_CarId(carId)){
         throw new BusinessException("Car id not found in rental car list, carId: " + carId);
@@ -515,8 +456,7 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
-    @Override
-    public void checkIsExistsByRentedCity_CityId(int rentedCityId) throws BusinessException {
+    private void checkIsExistsByRentedCity_CityId(int rentedCityId) throws BusinessException {
         if(!this.rentalCarDao.existsByRentedCity_CityId(rentedCityId)){
         throw new BusinessException("City id not found in rental car list, rentedCityId: " + rentedCityId);
         }
@@ -543,6 +483,7 @@ public class RentalCarManager implements RentalCarService {
             throw new BusinessException("Customer id exists in rental car list, customerId: " + customerId);
         }
     }
+
     private void checkIfExistsRentalCarIdAndCarId(int rentalCarId, int carId) throws BusinessException {
         if(!this.rentalCarDao.existsByRentalCarIdAndCar_CarId(rentalCarId,carId)){
             throw new BusinessException("Rental car id and car id not found rental car table, rentalCarId: " + rentalCarId + ", carId: " + carId);
