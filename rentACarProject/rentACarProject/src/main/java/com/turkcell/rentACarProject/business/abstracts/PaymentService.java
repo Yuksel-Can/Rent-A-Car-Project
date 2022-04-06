@@ -22,6 +22,7 @@ public interface PaymentService {
 
     //--Ordered Additional
     Result makePaymentForOrderedAdditionalAdd(OrderedAdditionalAddModel orderedAdditionalAddModel) throws BusinessException;
+    Result makePaymentForOrderedAdditionalUpdate(OrderedAdditionalUpdateModel orderedAdditionalUpdateModel) throws BusinessException;
 
     DataResult<GetPaymentDto> getById(int paymentId) throws BusinessException;
     DataResult<List<PaymentListDto>> getAllPaymentByRentalCar_RentalCarId(int rentalCarId) throws BusinessException;
