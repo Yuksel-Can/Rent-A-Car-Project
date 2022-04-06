@@ -2,14 +2,17 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalAddModel;
 import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalUpdateModel;
-import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateCustomer;
-import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualCustomer;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateRentAdd;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateRentUpdate;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualRentAdd;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualRentUpdate;
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.gets.payment.GetPaymentDto;
 import com.turkcell.rentACarProject.business.dtos.lists.payment.PaymentListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateOrderedAdditionalRequest;
+import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
 import com.turkcell.rentACarProject.core.postServices.PostService;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
@@ -37,10 +40,11 @@ public class PaymentManager implements PaymentService {
     private final OrderedAdditionalService orderedAdditionalService;
     private final InvoiceService invoiceService;
     private final PostService postService;
+    private final IndividualCustomerService individualCustomerService;
+    private final CorporateCustomerService corporateCustomerService;
 
-    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, @Lazy CarService carService,
-                          @Lazy RentalCarService rentalCarService, @Lazy OrderedAdditionalService orderedAdditionalService,
-                          @Lazy InvoiceService invoiceService, @Lazy PostService postService) {
+    public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, @Lazy CarService carService, @Lazy RentalCarService rentalCarService, @Lazy OrderedAdditionalService orderedAdditionalService,
+                          @Lazy InvoiceService invoiceService, @Lazy PostService postService, @Lazy IndividualCustomerService individualCustomerService,@Lazy CorporateCustomerService corporateCustomerService) {
         this.paymentDao = paymentDao;
         this.carService = carService;
         this.modelMapperService = modelMapperService;
@@ -48,6 +52,8 @@ public class PaymentManager implements PaymentService {
         this.orderedAdditionalService = orderedAdditionalService;
         this.invoiceService = invoiceService;
         this.postService = postService;
+        this.individualCustomerService = individualCustomerService;
+        this.corporateCustomerService = corporateCustomerService;
     }
 
 
@@ -65,9 +71,9 @@ public class PaymentManager implements PaymentService {
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
-    public Result makePaymentForIndividualCustomer(MakePaymentForIndividualCustomer makePayment) throws BusinessException {
+    public Result makePaymentForIndividualRentAdd(MakePaymentForIndividualRentAdd makePayment) throws BusinessException {
 
-        checkAllValidationsForIndividual(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
+        checkAllValidationsForIndividualAdd(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
 
         double totalPrice = calculateTotalPrice(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
         makePayment.getCreatePaymentRequest().setTotalPrice(totalPrice);
@@ -91,9 +97,9 @@ public class PaymentManager implements PaymentService {
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
-    public Result makePaymentForCorporateCustomer(MakePaymentForCorporateCustomer makePayment) throws BusinessException {
+    public Result makePaymentForCorporateRentAdd(MakePaymentForCorporateRentAdd makePayment) throws BusinessException {
 
-        checkAllValidationsForCorporate(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
+        checkAllValidationsForCorporateAdd(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
 
         double totalPrice = calculateTotalPrice(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
         makePayment.getCreatePaymentRequest().setTotalPrice(totalPrice);
@@ -113,6 +119,16 @@ public class PaymentManager implements PaymentService {
         this.invoiceService.createAndAddInvoice(rentalCarId, paymentId);
 
         return new SuccessResult("Payment, Car Rental, Additional Service adding and Invoice creation successful");
+    }
+
+    @Override
+    public Result makePaymentForIndividualRentUpdate(MakePaymentForIndividualRentUpdate makePaymentForIndividualRentUpdate) throws BusinessException {
+       return null;
+    }
+
+    @Override
+    public Result makePaymentForCorporateRentUpdate(MakePaymentForCorporateRentUpdate makePaymentForCorporateRentUpdate) throws BusinessException {
+        return null;
     }
 
     @Override
@@ -207,14 +223,21 @@ public class PaymentManager implements PaymentService {
         }
     }
 
-    private void checkAllValidationsForIndividual(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
-        this.rentalCarService.checkAllValidationsForAddIndividualRent(createRentalCarRequest);
+    private void checkAllValidationsForIndividualAdd(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
+        this.rentalCarService.checkAllValidationsForIndividualRentAdd(createRentalCarRequest);
         this.orderedAdditionalService.checkAllValidationForAddOrderedAdditional(createOrderedAdditionalRequestList);
     }
 
-    private void checkAllValidationsForCorporate(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
-        this.rentalCarService.checkAllValidationsForAddCorporateRent(createRentalCarRequest);
+    private void checkAllValidationsForCorporateAdd(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
+        this.rentalCarService.checkAllValidationsForCorporateRentAdd(createRentalCarRequest);
         this.orderedAdditionalService.checkAllValidationForAddOrderedAdditional(createOrderedAdditionalRequestList);
+    }
+    private void checkAllValidationsForIndividualUpdate(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
+        this.rentalCarService.checkAllValidationsForIndividualRentUpdate(updateRentalCarRequest);
+    }
+
+    private void checkAllValidationsForCorporateUpdate(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
+        this.rentalCarService.checkAllValidationsForCorporateRentUpdate(updateRentalCarRequest);
     }
 
     private void checkAllValidationsForOrderedAdditionalAdd(int rentalCarId, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {

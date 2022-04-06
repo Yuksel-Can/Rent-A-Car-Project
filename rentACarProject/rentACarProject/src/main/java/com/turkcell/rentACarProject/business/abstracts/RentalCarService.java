@@ -63,10 +63,13 @@ public interface RentalCarService {
 
 //    void createAndAddInvoice(int rentalCarId) throws BusinessException;
 //    void checkAllValidationsForAddRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
-    void checkAllValidationsForAddIndividualRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
-    void checkAllValidationsForAddCorporateRent(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    void checkAllValidationsForIndividualRentAdd(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    void checkAllValidationsForCorporateRentAdd(CreateRentalCarRequest createRentalCarRequest) throws BusinessException;
+    void checkAllValidationsForIndividualRentUpdate(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
+    void checkAllValidationsForCorporateRentUpdate(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
 
-        double calculateRentalCarTotalDayPrice(LocalDate startDate, LocalDate finishDate, double dailyPrice);
+
+    double calculateRentalCarTotalDayPrice(LocalDate startDate, LocalDate finishDate, double dailyPrice);
     int calculateCarDeliveredToTheSamCity(int rentedCityId, int deliveredCityId);
     double calculateAndReturnRentPrice(LocalDate startDate, LocalDate finishDate, double carDailyPrice, int rentedCityId, int deliveredCityId);
 

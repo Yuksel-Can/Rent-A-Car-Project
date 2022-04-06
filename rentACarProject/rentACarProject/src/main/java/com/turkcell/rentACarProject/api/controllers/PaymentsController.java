@@ -2,12 +2,13 @@ package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalAddModel;
 import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalUpdateModel;
-import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateCustomer;
-import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualCustomer;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateRentAdd;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForCorporateRentUpdate;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualRentAdd;
+import com.turkcell.rentACarProject.api.models.rentalCar.MakePaymentForIndividualRentUpdate;
 import com.turkcell.rentACarProject.business.abstracts.PaymentService;
 import com.turkcell.rentACarProject.business.dtos.gets.payment.GetPaymentDto;
 import com.turkcell.rentACarProject.business.dtos.lists.payment.PaymentListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreatePaymentRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -33,14 +34,24 @@ public class PaymentsController {
         return this.paymentService.getAll();
     }
 
-    @PostMapping("/makePaymentForIndividualCustomer")
-    public Result makePaymentForIndividualCustomer(@RequestBody @Valid MakePaymentForIndividualCustomer makePaymentForIndividualCustomer) throws BusinessException {
-        return this.paymentService.makePaymentForIndividualCustomer(makePaymentForIndividualCustomer);
+    @PostMapping("/makePaymentForIndividualRentAdd")
+    public Result makePaymentForIndividualRentAdd(@RequestBody @Valid MakePaymentForIndividualRentAdd makePaymentForIndividualRentAdd) throws BusinessException {
+        return this.paymentService.makePaymentForIndividualRentAdd(makePaymentForIndividualRentAdd);
     }
 
-    @PostMapping("/makePaymentForCorporateCustomer")
-    public Result makePaymentForCorporateCustomer(@RequestBody @Valid MakePaymentForCorporateCustomer makePaymentForCorporateCustomer) throws BusinessException {
-        return this.paymentService.makePaymentForCorporateCustomer(makePaymentForCorporateCustomer);
+    @PostMapping("/makePaymentForCorporateRentAdd")
+    public Result makePaymentForCorporateRentAdd(@RequestBody @Valid MakePaymentForCorporateRentAdd makePaymentForCorporateRentAdd) throws BusinessException {
+        return this.paymentService.makePaymentForCorporateRentAdd(makePaymentForCorporateRentAdd);
+    }
+
+    @PutMapping("/makePaymentForIndividualRentUpdate")
+    public Result makePaymentForIndividualRentUpdate(@RequestBody @Valid MakePaymentForIndividualRentUpdate makePaymentForIndividualRentUpdate) throws BusinessException {
+        return this.paymentService.makePaymentForIndividualRentUpdate(makePaymentForIndividualRentUpdate);
+    }
+
+    @PutMapping("/makePaymentForCorporateRentUpdate")
+    public Result makePaymentForCorporateRentUpdate(@RequestBody @Valid MakePaymentForCorporateRentUpdate makePaymentForCorporateRentUpdate) throws BusinessException {
+        return this.paymentService.makePaymentForCorporateRentUpdate(makePaymentForCorporateRentUpdate);
     }
 
     @PostMapping("/makePaymentForOrderedAdditionalAdd")
