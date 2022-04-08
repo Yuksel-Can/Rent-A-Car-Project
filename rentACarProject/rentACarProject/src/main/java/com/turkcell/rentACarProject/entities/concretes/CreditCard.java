@@ -10,13 +10,13 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "payments")
-public class Payment {
+@Table(name = "credit_cards")
+public class CreditCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "payment_id")
-    private int paymentId;
+    @Column(name = "credit_card_id")
+    private int creditCardId;
 
     @Column(name = "card_number")
     private String cardNumber;
@@ -30,14 +30,8 @@ public class Payment {
     @Column(name = "card_expiration_date")
     private String cardExpirationDate;
 
-    @Column(name = "total_price")
-    private double totalPrice;
-
-    @ManyToOne()
-    @JoinColumn(name = "rental_car_id")
-    private RentalCar rentalCar;
-
-    @OneToOne(mappedBy = "payment")
-    private Invoice invoice;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
 }

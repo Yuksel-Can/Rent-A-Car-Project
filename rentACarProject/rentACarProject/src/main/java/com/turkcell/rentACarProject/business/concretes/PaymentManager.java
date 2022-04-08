@@ -13,7 +13,7 @@ import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditi
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
-import com.turkcell.rentACarProject.core.postServices.PostService;
+import com.turkcell.rentACarProject.core.posServices.PosService;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
@@ -23,6 +23,7 @@ import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.PaymentDao;
 import com.turkcell.rentACarProject.entities.concretes.OrderedAdditional;
 import com.turkcell.rentACarProject.entities.concretes.Payment;
+import com.turkcell.rentACarProject.entities.concretes.RentalCar;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,19 +40,19 @@ public class PaymentManager implements PaymentService {
     private final RentalCarService rentalCarService;
     private final OrderedAdditionalService orderedAdditionalService;
     private final InvoiceService invoiceService;
-    private final PostService postService;
+    private final PosService posService;
     private final IndividualCustomerService individualCustomerService;
     private final CorporateCustomerService corporateCustomerService;
 
     public PaymentManager(PaymentDao paymentDao, ModelMapperService modelMapperService, @Lazy CarService carService, @Lazy RentalCarService rentalCarService, @Lazy OrderedAdditionalService orderedAdditionalService,
-                          @Lazy InvoiceService invoiceService, @Lazy PostService postService, @Lazy IndividualCustomerService individualCustomerService,@Lazy CorporateCustomerService corporateCustomerService) {
+                          @Lazy InvoiceService invoiceService, @Lazy PosService posService, @Lazy IndividualCustomerService individualCustomerService, @Lazy CorporateCustomerService corporateCustomerService) {
         this.paymentDao = paymentDao;
         this.carService = carService;
         this.modelMapperService = modelMapperService;
         this.rentalCarService = rentalCarService;
         this.orderedAdditionalService = orderedAdditionalService;
         this.invoiceService = invoiceService;
-        this.postService = postService;
+        this.posService = posService;
         this.individualCustomerService = individualCustomerService;
         this.corporateCustomerService = corporateCustomerService;
     }
@@ -78,7 +79,7 @@ public class PaymentManager implements PaymentService {
         double totalPrice = calculateTotalPrice(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
         makePayment.getCreatePaymentRequest().setTotalPrice(totalPrice);
 
-        this.postService.payment(makePayment.getCreatePaymentRequest().getCardNumber(), makePayment.getCreatePaymentRequest().getCardOwner(),
+        this.posService.payment(makePayment.getCreatePaymentRequest().getCardNumber(), makePayment.getCreatePaymentRequest().getCardOwner(),
                                     makePayment.getCreatePaymentRequest().getCardCvv(), makePayment.getCreatePaymentRequest().getCardExpirationDate(), makePayment.getCreatePaymentRequest().getTotalPrice());
 
         int rentalCarId = this.rentalCarService.addForIndividualCustomer(makePayment.getCreateRentalCarRequest());
@@ -104,10 +105,10 @@ public class PaymentManager implements PaymentService {
         double totalPrice = calculateTotalPrice(makePayment.getCreateRentalCarRequest(), makePayment.getCreateOrderedAdditionalRequestList());
         makePayment.getCreatePaymentRequest().setTotalPrice(totalPrice);
 
-        this.postService.payment(makePayment.getCreatePaymentRequest().getCardNumber(), makePayment.getCreatePaymentRequest().getCardOwner(),
+        this.posService.payment(makePayment.getCreatePaymentRequest().getCardNumber(), makePayment.getCreatePaymentRequest().getCardOwner(),
                 makePayment.getCreatePaymentRequest().getCardCvv(), makePayment.getCreatePaymentRequest().getCardExpirationDate(), makePayment.getCreatePaymentRequest().getTotalPrice());
 
-        int rentalCarId = this.rentalCarService.addForIndividualCustomer(makePayment.getCreateRentalCarRequest());
+        int rentalCarId = this.rentalCarService.addForCorporateCustomer(makePayment.getCreateRentalCarRequest());
 
         makePayment.getCreatePaymentRequest().setRentalCarId(rentalCarId);
         Payment payment = this.modelMapperService.forRequest().map(makePayment.getCreatePaymentRequest(), Payment.class);
@@ -123,12 +124,62 @@ public class PaymentManager implements PaymentService {
 
     @Override
     public Result makePaymentForIndividualRentUpdate(MakePaymentForIndividualRentUpdate makePaymentForIndividualRentUpdate) throws BusinessException {
-       return null;
+
+        checkAllValidationsForIndividualUpdate(makePaymentForIndividualRentUpdate.getUpdateRentalCarRequest());
+
+        double totalPrice = calculatePriceDifferenceWithPreviousRentalCar(makePaymentForIndividualRentUpdate.getUpdateRentalCarRequest());
+        //todo: projedeki tek ikinci
+        if(totalPrice > 0){
+            this.posService.payment(makePaymentForIndividualRentUpdate.getCreatePaymentRequest().getCardNumber(), makePaymentForIndividualRentUpdate.getCreatePaymentRequest().getCardOwner(),
+                    makePaymentForIndividualRentUpdate.getCreatePaymentRequest().getCardCvv(), makePaymentForIndividualRentUpdate.getCreatePaymentRequest().getCardExpirationDate(), totalPrice);
+
+            makePaymentForIndividualRentUpdate.getCreatePaymentRequest().setRentalCarId(makePaymentForIndividualRentUpdate.getUpdateRentalCarRequest().getRentalCarId());
+            makePaymentForIndividualRentUpdate.getCreatePaymentRequest().setTotalPrice(totalPrice);
+            Payment payment = this.modelMapperService.forRequest().map(makePaymentForIndividualRentUpdate.getCreatePaymentRequest(), Payment.class);
+            payment.setPaymentId(0);
+
+            this.rentalCarService.updateForIndividualCustomer(makePaymentForIndividualRentUpdate.getUpdateRentalCarRequest());
+
+            int paymentId = this.paymentDao.save(payment).getPaymentId();
+
+            this.invoiceService.createAndAddInvoice(makePaymentForIndividualRentUpdate.getUpdateRentalCarRequest().getRentalCarId(), paymentId);
+
+            return new SuccessResult("Payment, Additional Service adding and Invoice creation successful for update");
+        }
+
+        this.rentalCarService.updateForIndividualCustomer(makePaymentForIndividualRentUpdate.getUpdateRentalCarRequest());
+
+        return new SuccessResult("Payment, Additional Service adding and Invoice creation successful for update");
     }
 
     @Override
     public Result makePaymentForCorporateRentUpdate(MakePaymentForCorporateRentUpdate makePaymentForCorporateRentUpdate) throws BusinessException {
-        return null;
+
+        checkAllValidationsForCorporateUpdate(makePaymentForCorporateRentUpdate.getUpdateRentalCarRequest());
+
+        double totalPrice = calculatePriceDifferenceWithPreviousRentalCar(makePaymentForCorporateRentUpdate.getUpdateRentalCarRequest());
+
+        if(totalPrice > 0){
+            this.posService.payment(makePaymentForCorporateRentUpdate.getCreatePaymentRequest().getCardNumber(), makePaymentForCorporateRentUpdate.getCreatePaymentRequest().getCardOwner(),
+                    makePaymentForCorporateRentUpdate.getCreatePaymentRequest().getCardCvv(), makePaymentForCorporateRentUpdate.getCreatePaymentRequest().getCardExpirationDate(), totalPrice);
+
+            makePaymentForCorporateRentUpdate.getCreatePaymentRequest().setRentalCarId(makePaymentForCorporateRentUpdate.getUpdateRentalCarRequest().getRentalCarId());
+            makePaymentForCorporateRentUpdate.getCreatePaymentRequest().setTotalPrice(totalPrice);
+            Payment payment = this.modelMapperService.forRequest().map(makePaymentForCorporateRentUpdate.getCreatePaymentRequest(), Payment.class);
+            payment.setPaymentId(0);
+
+            this.rentalCarService.updateForCorporateCustomer(makePaymentForCorporateRentUpdate.getUpdateRentalCarRequest());
+
+            int paymentId = this.paymentDao.save(payment).getPaymentId();
+
+            this.invoiceService.createAndAddInvoice(makePaymentForCorporateRentUpdate.getUpdateRentalCarRequest().getRentalCarId(), paymentId);
+
+            return new SuccessResult("Payment, Additional Service adding and Invoice creation successful for update");
+        }
+
+        this.rentalCarService.updateForCorporateCustomer(makePaymentForCorporateRentUpdate.getUpdateRentalCarRequest());
+
+        return new SuccessResult("Payment, Additional Service adding and Invoice creation successful for update");
     }
 
     @Override
@@ -142,7 +193,7 @@ public class PaymentManager implements PaymentService {
         orderedAdditionalAddModel.getCreatePaymentRequest().setTotalPrice(totalPrice);
         orderedAdditionalAddModel.getCreatePaymentRequest().setRentalCarId(orderedAdditionalAddModel.getRentalCarId());
 
-        this.postService.payment(orderedAdditionalAddModel.getCreatePaymentRequest().getCardNumber(), orderedAdditionalAddModel.getCreatePaymentRequest().getCardOwner(),
+        this.posService.payment(orderedAdditionalAddModel.getCreatePaymentRequest().getCardNumber(), orderedAdditionalAddModel.getCreatePaymentRequest().getCardOwner(),
                 orderedAdditionalAddModel.getCreatePaymentRequest().getCardCvv(), orderedAdditionalAddModel.getCreatePaymentRequest().getCardExpirationDate(), orderedAdditionalAddModel.getCreatePaymentRequest().getTotalPrice());
 
         Payment payment = this.modelMapperService.forRequest().map(orderedAdditionalAddModel.getCreatePaymentRequest(), Payment.class);
@@ -164,19 +215,19 @@ public class PaymentManager implements PaymentService {
         checkAllValidationsForOrderedAdditionalUpdate(orderedAdditionalUpdateModel.getUpdateOrderedAdditionalRequest());
 
         double totalPrice = calculatePriceDifferenceWithPreviousOrderedAdditional(orderedAdditionalUpdateModel.getUpdateOrderedAdditionalRequest());
-        //todo: projedeki tek if
+
         if(totalPrice > 0){
-            this.postService.payment(orderedAdditionalUpdateModel.getCreatePaymentRequest().getCardNumber(), orderedAdditionalUpdateModel.getCreatePaymentRequest().getCardOwner(),
-                    orderedAdditionalUpdateModel.getCreatePaymentRequest().getCardCvv(), orderedAdditionalUpdateModel.getCreatePaymentRequest().getCardExpirationDate(), orderedAdditionalUpdateModel.getCreatePaymentRequest().getTotalPrice());
+            this.posService.payment(orderedAdditionalUpdateModel.getCreatePaymentRequest().getCardNumber(), orderedAdditionalUpdateModel.getCreatePaymentRequest().getCardOwner(),
+                    orderedAdditionalUpdateModel.getCreatePaymentRequest().getCardCvv(), orderedAdditionalUpdateModel.getCreatePaymentRequest().getCardExpirationDate(), totalPrice);
 
             orderedAdditionalUpdateModel.getCreatePaymentRequest().setTotalPrice(totalPrice);
             orderedAdditionalUpdateModel.getCreatePaymentRequest().setRentalCarId(orderedAdditionalUpdateModel.getUpdateOrderedAdditionalRequest().getRentalCarId());
             Payment payment = this.modelMapperService.forRequest().map(orderedAdditionalUpdateModel.getCreatePaymentRequest(), Payment.class);
             payment.setPaymentId(0);
 
-            int paymentId = this.paymentDao.save(payment).getPaymentId();
-
             this.orderedAdditionalService.update(orderedAdditionalUpdateModel.getUpdateOrderedAdditionalRequest());
+
+            int paymentId = this.paymentDao.save(payment).getPaymentId();
 
             this.invoiceService.createAndAddInvoice(orderedAdditionalUpdateModel.getUpdateOrderedAdditionalRequest().getRentalCarId(), paymentId);
 
@@ -264,17 +315,32 @@ public class PaymentManager implements PaymentService {
         return priceOfRental + priceOfAdditionals;
     }
 
+    private double calculatePriceDifferenceWithPreviousRentalCar(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
+
+        RentalCar beforeRentalCar = this.rentalCarService.getById(updateRentalCarRequest.getRentalCarId());
+
+        double previousPrice = this.rentalCarService.calculateAndReturnRentPrice(beforeRentalCar.getStartDate(), beforeRentalCar.getFinishDate(), beforeRentalCar.getCar().getDailyPrice(),
+                                                                            beforeRentalCar.getRentedCity().getCityId(), beforeRentalCar.getDeliveredCity().getCityId());
+        double nextPrice = this.rentalCarService.calculateAndReturnRentPrice(updateRentalCarRequest.getStartDate(), updateRentalCarRequest.getFinishDate(),
+                this.carService.getDailyPriceByCarId(updateRentalCarRequest.getCarId()), updateRentalCarRequest.getRentedCityId(), updateRentalCarRequest.getDeliveredCityId());
+
+        if(nextPrice>previousPrice){
+            return nextPrice-previousPrice;
+        }
+        return 0;
+    }
+
     private double calculatePriceDifferenceWithPreviousOrderedAdditional(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
         OrderedAdditional orderedAdditional = this.orderedAdditionalService.getById(updateOrderedAdditionalRequest.getOrderedAdditionalId());
 
-        double beforePrice = this.orderedAdditionalService.getPriceCalculatorForAdditional(orderedAdditional.getAdditional().getAdditionalId(),
+        double previousPrice = this.orderedAdditionalService.getPriceCalculatorForAdditional(orderedAdditional.getAdditional().getAdditionalId(),
                 orderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(orderedAdditional.getRentalCar().getRentalCarId()));
 
-        double afterPrice = this.orderedAdditionalService.getPriceCalculatorForAdditional(updateOrderedAdditionalRequest.getAdditionalId(),
+        double nextPrice = this.orderedAdditionalService.getPriceCalculatorForAdditional(updateOrderedAdditionalRequest.getAdditionalId(),
                 updateOrderedAdditionalRequest.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(updateOrderedAdditionalRequest.getRentalCarId()));
 
-        if(afterPrice>beforePrice){
-            return afterPrice - beforePrice;
+        if(nextPrice>previousPrice){
+            return nextPrice - previousPrice;
         }
         return 0;
     }

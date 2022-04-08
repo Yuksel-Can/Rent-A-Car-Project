@@ -33,16 +33,6 @@ public class RentalCarsController {
         return this.rentalCarService.getAll();
     }
 
-    @PutMapping("/updateForIndividualCustomer")
-    public Result updateForIndividualCustomer(@RequestBody @Valid UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
-        return this.rentalCarService.updateForIndividualCustomer(updateRentalCarRequest);
-    }
-
-    @PutMapping("/updateForCorporateCustomer")
-    public Result updateForCorporateCustomer(@RequestBody @Valid UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
-        return this.rentalCarService.updateForCorporateCustomer(updateRentalCarRequest);
-    }
-
     @DeleteMapping("/delete")
     public Result delete(@RequestBody @Valid DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException {
         return this.rentalCarService.delete(deleteRentalCarRequest);

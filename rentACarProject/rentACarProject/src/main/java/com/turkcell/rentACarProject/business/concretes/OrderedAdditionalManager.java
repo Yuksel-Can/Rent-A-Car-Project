@@ -9,7 +9,7 @@ import com.turkcell.rentACarProject.business.dtos.OrderedAdditionalListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateOrderedAdditionalRequest;
-import com.turkcell.rentACarProject.core.postServices.PostService;
+import com.turkcell.rentACarProject.core.posServices.PosService;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
@@ -33,17 +33,17 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     private final AdditionalService additionalService;
     private final RentalCarService rentalCarService;
     private final InvoiceService invoiceService;
-    private final PostService postService;
+    private final PosService posService;
 
     @Autowired
     public OrderedAdditionalManager(OrderedAdditionalDao orderedAdditionalDao, ModelMapperService modelMapperService, AdditionalService additionalService,
-                                    RentalCarService rentalCarService, InvoiceService invoiceService, PostService postService) {
+                                    RentalCarService rentalCarService, InvoiceService invoiceService, PosService posService) {
         this.orderedAdditionalDao = orderedAdditionalDao;
         this.modelMapperService = modelMapperService;
         this.additionalService = additionalService;
         this.rentalCarService = rentalCarService;
         this.invoiceService = invoiceService;
-        this.postService = postService;
+        this.posService = posService;
     }
 
 

@@ -32,11 +32,6 @@ public class OrderedAdditionalsController {
         return this.orderedAdditionalService.getAll();
     }
 
-    @PutMapping("/update")
-    public Result update(@RequestBody @Valid UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest)throws BusinessException {
-        return this.orderedAdditionalService.update(updateOrderedAdditionalRequest);
-    }
-
     @DeleteMapping("/delete")
     public Result delete(@RequestBody @Valid DeleteOrderedAdditionalRequest deleteOrderedAdditionalRequest) throws  BusinessException {
         return this.orderedAdditionalService.delete(deleteOrderedAdditionalRequest);
