@@ -18,18 +18,6 @@ public class Payment {
     @Column(name = "payment_id")
     private int paymentId;
 
-    @Column(name = "card_number")
-    private String cardNumber;
-
-    @Column(name = "card_owner")
-    private String cardOwner;
-
-    @Column(name = "card_cvv")
-    private String cardCvv;
-
-    @Column(name = "card_expiration_date")
-    private String cardExpirationDate;
-
     @Column(name = "total_price")
     private double totalPrice;
 

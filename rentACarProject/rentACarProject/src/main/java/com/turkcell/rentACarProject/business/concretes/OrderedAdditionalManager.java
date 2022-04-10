@@ -9,7 +9,7 @@ import com.turkcell.rentACarProject.business.dtos.OrderedAdditionalListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.delete.DeleteOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateOrderedAdditionalRequest;
-import com.turkcell.rentACarProject.core.posServices.PosService;
+import com.turkcell.rentACarProject.business.adapters.posAdapters.PosService;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;

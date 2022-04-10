@@ -15,24 +15,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class CreatePaymentRequest {
 
-    @NotNull
-    @NotBlank
-    @Size(min = 16, max = 16)
-    private String cardNumber;
-
-    @NotNull
-    @NotBlank
-    private String cardOwner;
-
-    @NotNull
-    @NotBlank
-    @Size(min = 3,max = 3)
-    private String cardCvv;
-
-    @NotNull
-    @NotBlank
-    @Size(min = 4, max = 5)
-    private String cardExpirationDate;
+    //todo:burası düzelcek
 
     @JsonIgnore
     private double totalPrice;

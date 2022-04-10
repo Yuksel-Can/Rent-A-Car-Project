@@ -13,7 +13,7 @@ import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditi
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
-import com.turkcell.rentACarProject.core.posServices.PosService;
+import com.turkcell.rentACarProject.business.adapters.posAdapters.PosService;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
