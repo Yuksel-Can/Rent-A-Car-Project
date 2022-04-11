@@ -20,6 +20,7 @@ import com.turkcell.rentACarProject.entities.concretes.RentalCar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -36,12 +37,13 @@ public class InvoiceManager implements InvoiceService {
     private final CorporateCustomerService corporateCustomerService;
     private final RentalCarService rentalCarService;
     private final OrderedAdditionalService orderedAdditionalService;
+    private final PaymentService paymentService;
     private final ModelMapperService modelMapperService;
 
     @Autowired
     public InvoiceManager(InvoiceDao invoiceDao, CarService carService, CustomerService customerService,
                           IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService,
-                          RentalCarService rentalCarService, ModelMapperService modelMapperService, @Lazy OrderedAdditionalService orderedAdditionalService) {
+                          RentalCarService rentalCarService, ModelMapperService modelMapperService, @Lazy OrderedAdditionalService orderedAdditionalService, PaymentService paymentService) {
         this.invoiceDao = invoiceDao;
         this.carService = carService;
         this.customerService = customerService;
@@ -50,6 +52,7 @@ public class InvoiceManager implements InvoiceService {
         this.rentalCarService = rentalCarService;
         this.orderedAdditionalService = orderedAdditionalService;
         this.modelMapperService = modelMapperService;
+        this.paymentService = paymentService;
     }
 
     @Override
@@ -153,6 +156,19 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
+    public DataResult<GetInvoiceDto> getInvoiceByPayment_PaymentId(int paymentId) throws BusinessException {
+
+        checkIfExistsByPaymentId(paymentId);
+
+        Invoice invoice = this.invoiceDao.getInvoiceByPayment_PaymentId(paymentId);
+
+        GetInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetInvoiceDto.class);
+        manuelFieldSetter(invoice, result);
+
+        return new SuccessDataResult<>(result, "Invoice listed by paymentId, paymentId: " + paymentId);
+    }
+
+    @Override
     public DataResult<List<InvoiceListDto>> getAllByRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
 
         this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
@@ -206,6 +222,7 @@ public class InvoiceManager implements InvoiceService {
 
     @Override
     public void createAndAddInvoice(int rentalCarId, int paymentId) throws BusinessException {
+
         //todo:parametre olarak total price verildi dogru mu?
         RentalCar rentalCar = this.rentalCarService.getById(rentalCarId);
         //todo:bunları buradan sil
@@ -227,8 +244,6 @@ public class InvoiceManager implements InvoiceService {
         createInvoiceRequest.setRentalCarId(rentalCarId);
         createInvoiceRequest.setCustomerId(rentalCar.getCustomer().getCustomerId());
         createInvoiceRequest.setPaymentId(paymentId);
-
-        System.out.println("invoice verileri eklendi");
 
         add(createInvoiceRequest);
     }
@@ -252,6 +267,12 @@ public class InvoiceManager implements InvoiceService {
     private void checkIfInvoiceNoExists(String invoiceNo) throws BusinessException {
         if(!this.invoiceDao.existsByInvoiceNo(invoiceNo)){
             throw new BusinessException("Invoice no not exists, invoiceNo: " + invoiceNo);
+        }
+    }
+
+    private void checkIfExistsByPaymentId(int paymentId) throws BusinessException {
+        if(!this.invoiceDao.existsByPayment_PaymentId(paymentId)){
+            throw new BusinessException("Payment id not found in the invoice table, paymentId: " + paymentId);
         }
     }
 }

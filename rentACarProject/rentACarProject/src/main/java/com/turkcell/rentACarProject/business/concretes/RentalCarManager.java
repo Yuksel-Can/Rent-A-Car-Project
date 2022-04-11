@@ -66,7 +66,6 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    @Transactional(rollbackFor = BusinessException.class)
     public int addForIndividualCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarRequest, RentalCar.class);
@@ -79,7 +78,6 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    @Transactional(rollbackFor = BusinessException.class)
     public int addForCorporateCustomer(CreateRentalCarRequest createRentalCarRequest) throws BusinessException {
 
         RentalCar rentalCar = this.modelMapperService.forRequest().map(createRentalCarRequest, RentalCar.class);
@@ -92,7 +90,6 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    @Transactional(rollbackFor = BusinessException.class)
     public Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
 
         checkIsExistsByRentalCarId(updateRentalCarRequest.getRentalCarId());
@@ -107,7 +104,6 @@ public class RentalCarManager implements RentalCarService {
 
 
     @Override
-    @Transactional(rollbackFor = BusinessException.class)
     public Result updateForCorporateCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
 
         checkIsExistsByRentalCarId(updateRentalCarRequest.getRentalCarId());
@@ -137,7 +133,7 @@ public class RentalCarManager implements RentalCarService {
 
         checkIfExistsRentalCarIdAndCarId(rentalCarId,carId);
         RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
-        checkIfStartDateAfterToday(rentalCar.getStartDate());
+//        checkIfStartDateAfterToday(rentalCar.getStartDate());         //todo:birşey denemek için koyuldu yorum satırını sil
         checkIfRentedKilometerIsNull(rentalCar.getRentedKilometer());
 
         rentalCar.setRentedKilometer(rentalCar.getCar().getKilometer());
@@ -350,6 +346,12 @@ public class RentalCarManager implements RentalCarService {
             throw new BusinessException("finish date cannot be earlier than start date");
         }
     }
+    //todo:alttaki üsttekinin kopyası oldu
+    public void checkIfFirstDateBeforeSecondDate(LocalDate firstDate, LocalDate secondDate) throws BusinessException {
+        if(secondDate.isBefore(firstDate) || secondDate.equals(firstDate)){
+            throw new BusinessException("second date cannot be before first date or cannot equal");
+        }
+    }
 
     private void checkIfCarAlreadyRentedForCreate(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
@@ -371,6 +373,16 @@ public class RentalCarManager implements RentalCarService {
                 checkIfCarAlreadyRentedOnTheEnteredDate(rentalCar,startDate);
                 checkIfCarAlreadyRentedOnTheEnteredDate(rentalCar,finishDate);
                 checkIfCarAlreadyRentedBetweenStartAndFinishDates(rentalCar, startDate, finishDate);
+            }
+        }
+    }
+
+    @Override
+    public void checkIfCarAlreadyRentedForDeliveryDateUpdate(int carId, LocalDate enteredDate) throws BusinessException {
+        List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
+        if(rentalCars != null){
+            for(RentalCar rentalCar : rentalCars){
+                checkIfCarAlreadyRentedOnTheEnteredDate(rentalCar, enteredDate);
             }
         }
     }
@@ -424,13 +436,15 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
-    private void checkIfRentedKilometerIsNotNull(Integer rentedKilometer) throws BusinessException {
+    @Override
+    public void checkIfRentedKilometerIsNotNull(Integer rentedKilometer) throws BusinessException {
         if(rentedKilometer == null){
             throw new BusinessException("The car has not yet been delivered to the customer, the rented kilometer cannot be null");
         }
     }
 
-    private void checkIfDeliveredKilometerIsNull(Integer deliveredKilometer) throws BusinessException {
+    @Override
+    public void checkIfDeliveredKilometerIsNull(Integer deliveredKilometer) throws BusinessException {
         if(deliveredKilometer != null){
             throw new BusinessException("The delivered kilometer is already exists, the car has already been delivered, deliveredKilometer: " + deliveredKilometer);
         }

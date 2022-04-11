@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.api.models.rentalCar;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turkcell.rentACarProject.business.requests.create.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,9 +15,13 @@ import java.util.List;
 @NoArgsConstructor
 public class MakePaymentForIndividualRentAdd {
 
+    @Valid
+    @JsonIgnore
+    CreatePaymentRequest createPaymentRequest;
+
     @NotNull
     @Valid
-    CreatePaymentRequest createPaymentRequest;
+    CreateCreditCardRequest createCreditCardRequest;
 
     @NotNull
     @Valid

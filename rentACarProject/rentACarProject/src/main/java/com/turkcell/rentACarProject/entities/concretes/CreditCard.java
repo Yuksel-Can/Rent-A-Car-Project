@@ -3,6 +3,8 @@ package com.turkcell.rentACarProject.entities.concretes;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
 
@@ -31,6 +33,7 @@ public class CreditCard {
     private String cardExpirationDate;
 
     @ManyToOne
+    @Cascade(CascadeType.ALL)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 

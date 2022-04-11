@@ -1,5 +1,7 @@
 package com.turkcell.rentACarProject.api.models.rentalCar;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.turkcell.rentACarProject.business.requests.create.CreateCreditCardRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreatePaymentRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
@@ -15,9 +17,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class MakePaymentForIndividualRentUpdate {
 
+    @Valid
+    @JsonIgnore
+    CreatePaymentRequest createPaymentRequest;
+
     @NotNull
     @Valid
-    CreatePaymentRequest createPaymentRequest;
+    CreateCreditCardRequest createCreditCardRequest;
 
     @NotNull
     @Valid

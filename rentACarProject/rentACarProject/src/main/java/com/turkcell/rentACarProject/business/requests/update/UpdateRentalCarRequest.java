@@ -35,13 +35,14 @@ public class UpdateRentalCarRequest {
     @NotNull
     @Min(1)
     private int deliveredCityId;
-/*
+
 //todo:bunları kapattım doğruluğunu düşün
 
+    @JsonIgnore
     private Integer rentedKilometer;
 
+    @JsonIgnore
     private Integer deliveredKilometer;
-*/
 
     @NotNull
     @Min(1)

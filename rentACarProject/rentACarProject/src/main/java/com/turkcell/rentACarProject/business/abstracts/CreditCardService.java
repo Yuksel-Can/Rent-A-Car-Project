@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.abstracts;
 
+import com.turkcell.rentACarProject.business.concretes.CreditCardManager;
 import com.turkcell.rentACarProject.business.dtos.gets.GetCreditCardDto;
 import com.turkcell.rentACarProject.business.dtos.lists.CreditCardListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateCreditCardRequest;
@@ -17,5 +18,7 @@ public interface CreditCardService {
 
     DataResult<GetCreditCardDto> getById(int creditCardId) throws BusinessException;
     DataResult<List<CreditCardListDto>> getAllCreditCardByCustomer_CustomerId(int customerId) throws BusinessException;
+
+    void checkSaveInformationAndSaveCreditCard(CreateCreditCardRequest createCreditCardRequest, CreditCardManager.CardSaveInformation cardSaveInformation) throws BusinessException;
 
 }

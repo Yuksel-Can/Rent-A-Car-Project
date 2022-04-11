@@ -2,6 +2,7 @@ package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
 import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetIndividualCustomerInvoiceDto;
+import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetInvoiceDto;
 import com.turkcell.rentACarProject.business.dtos.lists.invoice.InvoiceListDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
@@ -46,6 +47,11 @@ public class InvoicesController {
     @GetMapping("/getCorporateCustomerInvoiceByInvoiceNo")
     public DataResult getCorporateCustomerInvoiceByInvoiceNo(@RequestParam String invoiceNo) throws BusinessException {
         return this.invoiceService.getCorporateCustomerInvoiceByInvoiceNo(invoiceNo);
+    }
+
+    @GetMapping("/getInvoiceByPayment_PaymentId")
+    public DataResult<GetInvoiceDto> getInvoiceByPayment_PaymentId(@RequestParam int paymentId) throws BusinessException {
+        return this.invoiceService.getInvoiceByPayment_PaymentId(paymentId);
     }
 
     @GetMapping("/getAllByRentalCar_RentalCarId")

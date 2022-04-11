@@ -11,16 +11,19 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class CreatePaymentRequest {
 
     //todo:burası düzelcek
 
+    //@NotNull
+   // @Min(1)
     @JsonIgnore
     private double totalPrice;
 
+    //@NotNull
+    //@Min(1)
     @JsonIgnore
     private int rentalCarId;
 
+    //todo:bir üstü jsonignore burası notnull bunu kontrol et
 }

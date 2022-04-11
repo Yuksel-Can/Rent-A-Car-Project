@@ -56,6 +56,13 @@ public interface RentalCarService {
     void checkIsNotExistsByRentedCity_CityId(int rentedCityId) throws BusinessException;
     void checkIsNotExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
 
+    void checkIfFirstDateBeforeSecondDate(LocalDate firstDate, LocalDate secondDate) throws BusinessException;
+    void checkIfCarAlreadyRentedForDeliveryDateUpdate(int carId, LocalDate enteredDate) throws BusinessException;
+
+    void checkIfRentedKilometerIsNotNull(Integer rentedKilometer) throws BusinessException;
+    void checkIfDeliveredKilometerIsNull(Integer deliveredKilometer) throws BusinessException;
+
+
     void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException;
     int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate);
     //todo:bunu teke indir

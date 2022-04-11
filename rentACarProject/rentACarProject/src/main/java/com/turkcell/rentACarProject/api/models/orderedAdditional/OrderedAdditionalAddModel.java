@@ -1,5 +1,7 @@
 package com.turkcell.rentACarProject.api.models.orderedAdditional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.turkcell.rentACarProject.business.requests.create.CreateCreditCardRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreatePaymentRequest;
 import lombok.AllArgsConstructor;
@@ -17,8 +19,12 @@ import java.util.List;
 public class OrderedAdditionalAddModel {
 
     @Valid
-    @NotNull
+    @JsonIgnore
     CreatePaymentRequest createPaymentRequest;
+
+    @NotNull
+    @Valid
+    CreateCreditCardRequest createCreditCardRequest;
 
     @NotNull
     @Valid

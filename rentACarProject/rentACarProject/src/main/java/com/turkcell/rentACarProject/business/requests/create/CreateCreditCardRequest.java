@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.requests.create;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,8 +34,9 @@ public class CreateCreditCardRequest {
     @Size(min = 4, max = 5)
     private String cardExpirationDate;
 
-    @NotNull
-    @Min(1)
+//    @NotNull
+//    @Min(1)
+    @JsonIgnore
     private int customerId;
 
 }

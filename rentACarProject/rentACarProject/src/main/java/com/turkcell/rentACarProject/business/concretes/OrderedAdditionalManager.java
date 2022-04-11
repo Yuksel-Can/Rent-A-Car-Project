@@ -20,7 +20,6 @@ import com.turkcell.rentACarProject.dataAccess.abstracts.OrderedAdditionalDao;
 import com.turkcell.rentACarProject.entities.concretes.OrderedAdditional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,7 +76,6 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    @Transactional(rollbackFor = BusinessException.class)
     public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
 
         checkIsExistsByOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
@@ -152,6 +150,13 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         }
 
         return new SuccessDataResult<>(result, "Ordered Additional Service of the Additional listed by AdditionalId: " + additionalId);
+    }
+    @Override
+    public void saveOrderedAdditional(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int rentalCarId) throws BusinessException {
+        for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
+            createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
+            add(createOrderedAdditionalRequest);
+        }
     }
 
     @Override

@@ -15,6 +15,7 @@ import com.turkcell.rentACarProject.dataAccess.abstracts.CreditCardDao;
 import com.turkcell.rentACarProject.entities.concretes.CreditCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +32,10 @@ public class CreditCardManager implements CreditCardService {
         this.creditCardDao = creditCardDao;
         this.customerService = customerService;
         this.modelMapperService = modelMapperService;
+    }
+
+    public static enum CardSaveInformation {
+        SAVE, DONT_SAVE;
     }
 
     @Override
@@ -50,6 +55,7 @@ public class CreditCardManager implements CreditCardService {
         this.customerService.checkIfCustomerIdExists(createCreditCardRequest.getCustomerId());
 
         CreditCard creditCard = this.modelMapperService.forRequest().map(createCreditCardRequest, CreditCard.class);
+        creditCard.setCustomer(this.customerService.getCustomerById(createCreditCardRequest.getCustomerId()));
 
         this.creditCardDao.save(creditCard);
 
@@ -90,6 +96,13 @@ public class CreditCardManager implements CreditCardService {
     private void checkIfExistsByCustomer_CustomerId(int customerId) throws BusinessException {
         if(!this.creditCardDao.existsByCustomer_CustomerId(customerId)){
             throw new BusinessException("Customer id not fount in the credit card table, customerId: " + customerId);
+        }
+    }
+
+    @Override
+    public void checkSaveInformationAndSaveCreditCard(CreateCreditCardRequest createCreditCardRequest, CreditCardManager.CardSaveInformation cardSaveInformation) throws BusinessException {
+        if(cardSaveInformation.equals(CreditCardManager.CardSaveInformation.SAVE)){
+            add(createCreditCardRequest);
         }
     }
 

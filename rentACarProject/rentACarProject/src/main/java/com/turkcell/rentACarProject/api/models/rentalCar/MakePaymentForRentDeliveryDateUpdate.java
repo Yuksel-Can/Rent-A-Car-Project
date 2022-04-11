@@ -2,24 +2,21 @@ package com.turkcell.rentACarProject.api.models.rentalCar;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turkcell.rentACarProject.business.requests.create.CreateCreditCardRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.create.CreatePaymentRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
+import com.turkcell.rentACarProject.business.requests.update.UpdateDeliveryDateRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MakePaymentForCorporateRentAdd {
+public class MakePaymentForRentDeliveryDateUpdate {
 
     @Valid
-    @JsonIgnore
     CreatePaymentRequest createPaymentRequest;
 
     @NotNull
@@ -28,9 +25,5 @@ public class MakePaymentForCorporateRentAdd {
 
     @NotNull
     @Valid
-    CreateRentalCarRequest createRentalCarRequest;
-
-    @Valid
-    List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList;
-
+    UpdateDeliveryDateRequest updateDeliveryDateRequest;
 }
