@@ -19,14 +19,14 @@ public class CarMaintenance {
 	@Column(name = "maintenance_id")
 	private int maintenanceId;
 	
-	@Column(name = "description")
+	@Column(name = "description", nullable = false)
 	private String description;
 	
 	@Column(name = "return_Date")
 	private LocalDate returnDate;
 
 	@ManyToOne()
-	@JoinColumn(name = "car_id")
+	@JoinColumn(name = "car_id", nullable = false)
 	private Car car;
 	
 }

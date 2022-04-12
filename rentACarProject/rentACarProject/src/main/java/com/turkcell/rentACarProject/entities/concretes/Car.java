@@ -20,24 +20,24 @@ public class Car {
 	@Column(name="car_id")
 	private int carId;
 	
-	@Column(name="daily_price")
+	@Column(name="daily_price",nullable = false)
 	private double dailyPrice;
 	
-	@Column(name="model_year")
+	@Column(name="model_year", length = 4, nullable = false)
 	private int modelYear;
 	
 	@Column(name="description")
 	private String description;
 
-	@Column(name = "kilometer")
+	@Column(name = "kilometer",nullable = false)
 	private int kilometer;
 	
 	@ManyToOne()
-	@JoinColumn(name="brand_id")
+	@JoinColumn(name="brand_id", nullable = false)
 	private Brand brand;
 	
 	@ManyToOne()
-	@JoinColumn(name="color_id")
+	@JoinColumn(name="color_id", nullable = false)
 	private Color color;
 
 	@OneToMany(mappedBy = "car")

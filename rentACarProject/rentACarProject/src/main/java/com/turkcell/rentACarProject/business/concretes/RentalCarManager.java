@@ -133,7 +133,7 @@ public class RentalCarManager implements RentalCarService {
 
         checkIfExistsRentalCarIdAndCarId(rentalCarId,carId);
         RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
-//        checkIfStartDateAfterToday(rentalCar.getStartDate());         //todo:birşey denemek için koyuldu yorum satırını sil
+        checkIfStartDateAfterToday(rentalCar.getStartDate());
         checkIfRentedKilometerIsNull(rentalCar.getRentedKilometer());
 
         rentalCar.setRentedKilometer(rentalCar.getCar().getKilometer());
@@ -171,7 +171,6 @@ public class RentalCarManager implements RentalCarService {
         GetRentalCarDto getRentalCarDto = this.modelMapperService.forDto().map(rentalCar, GetRentalCarDto.class);
 
         return new SuccessDataResult<>(getRentalCarDto, "Rental Car listed by rentalCarId: " + rentalCarId);
-
     }
 
     @Override
@@ -186,7 +185,6 @@ public class RentalCarManager implements RentalCarService {
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Rentals of the car listed by carId: " + carId);
-
     }
 
     @Override
@@ -200,7 +198,6 @@ public class RentalCarManager implements RentalCarService {
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Rentals of the car listed by rentedCityId: " + rentedCity);
-
     }
 
     @Override
@@ -316,11 +313,11 @@ public class RentalCarManager implements RentalCarService {
         return (int) ChronoUnit.DAYS.between(startDate, finishDate);
     }
 
+    @Override
     public int getTotalDaysForRental(int rentalCarId){
         RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
         return (int) ChronoUnit.DAYS.between(rentalCar.getStartDate(), rentalCar.getFinishDate());
     }
-
 
     @Override
     public int calculateCarDeliveredToTheSamCity(int rentedCityId, int deliveredCityId){
@@ -364,7 +361,7 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
-
+        //todo:bunlar teke nasıl düşer
     private void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
         if(rentalCars != null) {
@@ -387,12 +384,13 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
+    //todo:buraya parametre yanlış
     private void checkIfCarAlreadyRentedOnTheEnteredDate(RentalCar rentalCar, LocalDate enteredDate) throws BusinessException {
         if(rentalCar.getStartDate().isBefore(enteredDate) && (rentalCar.getFinishDate().isAfter(enteredDate))){
             throw new BusinessException("The car rented between entered dates");
         }
     }
-
+    //todo:buda(parametre)
     private void checkIfCarAlreadyRentedBetweenStartAndFinishDates(RentalCar rentalCar,  LocalDate startDate, LocalDate finishDate) throws BusinessException {
 
         if((rentalCar.getStartDate().isAfter(startDate) && (rentalCar.getFinishDate().isBefore(finishDate))) ||

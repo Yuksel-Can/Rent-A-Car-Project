@@ -20,9 +20,9 @@ public class CorporateCustomer extends Customer {
     @Column(name = "corporate_customer_id", insertable = false, updatable = false)
     private int corporateCustomerId;
 
-    @Column(name = "company_name")
+    @Column(name = "company_name", unique = true,nullable = false)
     private String companyName;
 
-    @Column(name = "tax_number")
+    @Column(name = "tax_number",unique = true, length = 10, nullable = false)
     private String taxNumber;
 }

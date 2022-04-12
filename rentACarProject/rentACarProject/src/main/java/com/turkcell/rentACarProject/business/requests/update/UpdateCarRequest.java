@@ -24,6 +24,7 @@ public class UpdateCarRequest {
 	@Min(1900)
 	private int modelYear;
 
+	@NotNull
 	@Min(0)
 	private int kilometer;
 	

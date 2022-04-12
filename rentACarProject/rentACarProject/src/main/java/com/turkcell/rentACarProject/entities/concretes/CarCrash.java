@@ -19,14 +19,14 @@ public class CarCrash {
     @Column(name = "car_crash_id")
     private int carCrashId;
 
-    @Column(name = "crash_date")
+    @Column(name = "crash_date", nullable = false)
     private LocalDate crashDate;
 
-    @Column(name = "crash_valuation")
+    @Column(name = "crash_valuation", nullable = false)
     private double crashValuation;
 
     @ManyToOne()
-    @JoinColumn(name = "car_id")
+    @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 
 }

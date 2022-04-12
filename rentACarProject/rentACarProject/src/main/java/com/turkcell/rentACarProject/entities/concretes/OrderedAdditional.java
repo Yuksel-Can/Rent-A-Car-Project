@@ -20,15 +20,15 @@ public class OrderedAdditional {
     @Column(name = "ordered_additional_id")
     private int orderedAdditionalId;
 
-    @Column(name = "ordered_additional_quantity")
+    @Column(name = "ordered_additional_quantity", nullable = false)
     private short orderedAdditionalQuantity;
 
     @ManyToOne
-    @JoinColumn(name = "additional_id")
+    @JoinColumn(name = "additional_id", nullable = false)
     private Additional additional;
 
     @ManyToOne
-    @JoinColumn(name = "rental_car_id")
+    @JoinColumn(name = "rental_car_id", nullable = false)
     private RentalCar rentalCar;
 
 }

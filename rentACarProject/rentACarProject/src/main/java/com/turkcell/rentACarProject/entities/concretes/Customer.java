@@ -25,7 +25,7 @@ public class Customer extends User {
 
     @JsonIgnore
     @CreationTimestamp
-    @Column(name = "registration_date")
+    @Column(name = "registration_date", updatable = false)
     private LocalDate registrationDate;
 
     @OneToMany(mappedBy = "customer")

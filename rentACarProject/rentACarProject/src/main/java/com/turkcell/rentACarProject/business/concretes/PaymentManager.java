@@ -151,7 +151,7 @@ public class PaymentManager implements PaymentService {
         checkAllValidationsForRentDeliveryDateUpdate(makePaymentModel.getUpdateDeliveryDateRequest());
 
         double totalPrice = calculateLateDeliveryPrice(makePaymentModel.getUpdateDeliveryDateRequest());
-        System.out.println("total:"+totalPrice);
+
         this.posService.payment(makePaymentModel.getCreateCreditCardRequest().getCardNumber(), makePaymentModel.getCreateCreditCardRequest().getCardOwner(),
                 makePaymentModel.getCreateCreditCardRequest().getCardCvv(), makePaymentModel.getCreateCreditCardRequest().getCardExpirationDate(), totalPrice);
 
@@ -276,7 +276,7 @@ public class PaymentManager implements PaymentService {
         makePaymentModel.getCreateCreditCardRequest().setCustomerId(rentalCar.getCustomer().getCustomerId());
         rentalCar.setFinishDate(makePaymentModel.getUpdateDeliveryDateRequest().getFinishDate());
 
-        UpdateRentalCarRequest request = this.modelMapperService.forDto().map(rentalCar, UpdateRentalCarRequest.class);                             //(?)
+        UpdateRentalCarRequest request = this.modelMapperService.forDto().map(rentalCar, UpdateRentalCarRequest.class);                             //(?) burada 2 kere çevirme olmuş
         request.setCustomerId(rentalCar.getCustomer().getCustomerId());
         Payment payment = this.modelMapperService.forRequest().map(makePaymentModel.getCreatePaymentRequest(), Payment.class);
         payment.setPaymentId(0);

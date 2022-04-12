@@ -25,35 +25,35 @@ public class RentalCar {
     @Column(name = "rental_car_id")
     private int rentalCarId;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
 
-    @Column(name = "finish_date")
+    @Column(name = "finish_date", nullable = false)
     private LocalDate finishDate;
 
     @ManyToOne
-    @JoinColumn(name = "car_id")
+    @JoinColumn(name = "car_id", nullable = false)
     private Car car;
 
     @ManyToOne()
-    @JoinColumn(name ="rented_city")
+    @JoinColumn(name ="rented_city", nullable = false)
     private City rentedCity;
 
     @ManyToOne()
-    @JoinColumn(name = "delivered_city")
+    @JoinColumn(name = "delivered_city", nullable = false)
     private City deliveredCity;
 
-    @Column(name = "rented_kilometer")
+    @Column(name = "rented_kilometer", nullable = false)
     private Integer rentedKilometer;
 
-    @Column(name = "delivered_kilometer")
+    @Column(name = "delivered_kilometer", nullable = false)
     private Integer deliveredKilometer;
 
     @OneToMany(mappedBy = "rentalCar")
     private List<OrderedAdditional> orderedAdditionals;
 
     @ManyToOne()
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
     @OneToMany(mappedBy = "rentalCar")

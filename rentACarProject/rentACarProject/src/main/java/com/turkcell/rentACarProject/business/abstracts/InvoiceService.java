@@ -5,8 +5,6 @@ import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetIndividualCust
 import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetInvoiceDto;
 import com.turkcell.rentACarProject.business.dtos.lists.invoice.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteInvoiceRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateInvoiceRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -19,8 +17,6 @@ public interface InvoiceService {
     DataResult<List<InvoiceListDto>> getAll();
 
     Result add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException;
-    Result update(UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException;
-
     void createAndAddInvoice(int rentalCarId, int paymentId) throws BusinessException;
 
     DataResult<GetIndividualCustomerInvoiceDto> getIndividualCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException;

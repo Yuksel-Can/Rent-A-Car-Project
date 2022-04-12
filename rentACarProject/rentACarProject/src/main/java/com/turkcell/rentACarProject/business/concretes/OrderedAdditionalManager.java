@@ -59,7 +59,6 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         }
 
         return new SuccessDataResult<>(result,"Ordered Additional Service listed");
-
     }
 
     @Override
@@ -97,9 +96,6 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         this.orderedAdditionalDao.deleteById(orderedAdditional.getOrderedAdditionalId());
 
-        //todo:buda hatalı çalışıyor
-//        calculateAndUpdateRentalCarTotalPriceForDelete(orderedAdditional);
-
         return new SuccessResult("Ordered Additional Service deleted");
     }
 
@@ -111,7 +107,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         OrderedAdditional orderedAdditional = this.orderedAdditionalDao.getById(orderedAdditionalId);
 
         GetOrderedAdditionalDto result = this.modelMapperService.forDto().map(orderedAdditional, GetOrderedAdditionalDto.class);
-        result.setRentalCarId(orderedAdditional.getRentalCar().getRentalCarId());   // (*)
+        result.setRentalCarId(orderedAdditional.getRentalCar().getRentalCarId());
 
         return new SuccessDataResult<>(result, "Ordered Additional Service listed by orderedAdditionalId: " + orderedAdditionalId);
     }
@@ -151,6 +147,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         return new SuccessDataResult<>(result, "Ordered Additional Service of the Additional listed by AdditionalId: " + additionalId);
     }
+
     @Override
     public void saveOrderedAdditional(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int rentalCarId) throws BusinessException {
         for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
@@ -174,8 +171,6 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         return totalPrice;
     }
 
-    //todo:tekrarlayan metod var buraları sil düzenle
-
     @Override
     public double calculateTotalPriceForOrderedAdditionals(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws BusinessException {
         //buda yollanan listeye bakıyor
@@ -189,21 +184,24 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public OrderedAdditional getById(int orderedAdditionalId){
-        return this.orderedAdditionalDao.getById(orderedAdditionalId);
-    }
-
-    @Override
     public double getPriceCalculatorForAdditional(int additionalId,double orderedAdditionalQuantity, int totalDays) throws BusinessException {
-
         double dailyPrice = this.additionalService.getByAdditionalId(additionalId).getData().getAdditionalDailyPrice();
         return dailyPrice * orderedAdditionalQuantity * totalDays;
     }
 
     @Override
+    public OrderedAdditional getById(int orderedAdditionalId){
+        return this.orderedAdditionalDao.getById(orderedAdditionalId);
+    }
+
+    @Override
     public void checkAllValidationForAddOrderedAdditional(int additionalId, int orderedAdditionalQuantity) throws BusinessException {
         this.additionalService.checkIfExistsByAdditionalId(additionalId);
-        checkIfTheAdditionalQuantityOrderedIsValid(additionalId, orderedAdditionalQuantity);
+
+        int maxUnitsPerRental = this.additionalService.getByAdditionalId(additionalId).getData().getMaxUnitsPerRental();
+        if(orderedAdditionalQuantity > maxUnitsPerRental || orderedAdditionalQuantity < 1){
+            throw new BusinessException("For this additional service, the Minimum quantity can be 1, the maximum quantity is: " + maxUnitsPerRental);
+        }
     }
 
     @Override
@@ -215,7 +213,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
     @Override
     public void checkIsOnlyOneOrderedAdditionalByAdditionalIdAndRentalCarIdForUpdate(int additionalId, int rentalCarId) throws BusinessException {
-        if(this.orderedAdditionalDao.getAllByAdditional_AdditionalIdAndRentalCar_RentalCarId(additionalId, rentalCarId).size() > 1){
+        if(this.orderedAdditionalDao.getAllByAdditional_AdditionalIdAndRentalCar_RentalCarId(additionalId, rentalCarId).size() >= 1){   //todo:buraya = koydum kontrol et
             throw new BusinessException("This Ordered is already exists");
         }
     }
@@ -252,59 +250,5 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
             throw new BusinessException("there is no ordered additional service for this additional");
         }
     }
-
-    private void checkIfTheAdditionalQuantityOrderedIsValid( int additionalId, int orderedAdditionalQuantity) throws BusinessException {
-        int maxUnitsPerRental = this.additionalService.getByAdditionalId(additionalId).getData().getMaxUnitsPerRental();
-        if(orderedAdditionalQuantity > maxUnitsPerRental || orderedAdditionalQuantity < 1){
-            throw new BusinessException("For this additional service, the Minimum quantity can be 1, the maximum quantity is: " + maxUnitsPerRental);
-        }
-    }
-
-
-
-//todo:bu metod da hatalı çalışıyor
-
-//    private void calculateAndUpdateRentalCarTotalPriceForUpdate(OrderedAdditional beforeOrderedAdditional, OrderedAdditional afterOrderedAdditional) throws BusinessException {
-//
-//        RentalCar rentalCar = this.rentalCarService.getById(beforeOrderedAdditional.getRentalCar().getRentalCarId());
-//
-////        double beforeTotalPrice = getPriceCalculatorForAdditional(beforeOrderedAdditional, rentalCar);
-////        double afterTotalPrice = getPriceCalculatorForAdditional(afterOrderedAdditional, rentalCar);
-//        double beforeTotalPrice = getPriceCalculatorForAdditional(beforeOrderedAdditional.getAdditional().getAdditionalId()
-//                , beforeOrderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate()
-//                , rentalCar.getFinishDate()));
-//        double afterTotalPrice = getPriceCalculatorForAdditional(afterOrderedAdditional.getAdditional().getAdditionalId()
-//                , afterOrderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate()
-//                , rentalCar.getFinishDate()));
-//
-//        double previousTotalPrice = rentalCar.getRentalCarTotalPrice();
-//
-//        if(beforeTotalPrice>afterTotalPrice){
-//            rentalCar.setRentalCarTotalPrice(previousTotalPrice-(beforeTotalPrice-afterTotalPrice));
-//        }else{
-//            rentalCar.setRentalCarTotalPrice(previousTotalPrice+(afterTotalPrice-beforeTotalPrice));
-//        }
-//
-//        this.rentalCarService.saveChangesRentalCar(rentalCar);
-//
-//    }
-
-
-//todo:bu metoda bakılacak hatalı çalışıyor
-
-//    private void calculateAndUpdateRentalCarTotalPriceForDelete(OrderedAdditional orderedAdditional) throws BusinessException {
-//
-//        RentalCar rentalCar = this.rentalCarService.getById(orderedAdditional.getRentalCar().getRentalCarId());
-//
-//        //double total = getPriceCalculatorForAdditional(orderedAdditional, rentalCar);
-//        double total = getPriceCalculatorForAdditional(orderedAdditional.getAdditional().getAdditionalId()
-//                , orderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate()
-//                , rentalCar.getFinishDate()));
-//        double previousTotalPrice = rentalCar.getRentalCarTotalPrice();
-//
-//        rentalCar.setRentalCarTotalPrice(previousTotalPrice-total);
-//        this.rentalCarService.saveChangesRentalCar(rentalCar);
-//
-//    }
 
 }

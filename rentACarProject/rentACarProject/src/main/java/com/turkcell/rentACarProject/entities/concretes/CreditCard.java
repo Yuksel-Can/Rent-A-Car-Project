@@ -20,21 +20,21 @@ public class CreditCard {
     @Column(name = "credit_card_id")
     private int creditCardId;
 
-    @Column(name = "card_number")
+    @Column(name = "card_number", unique = true, length = 16, nullable = false)
     private String cardNumber;
 
-    @Column(name = "card_owner")
+    @Column(name = "card_owner", nullable = false)
     private String cardOwner;
 
-    @Column(name = "card_cvv")
+    @Column(name = "card_cvv", length = 3, nullable = false)
     private String cardCvv;
 
-    @Column(name = "card_expiration_date")
+    @Column(name = "card_expiration_date",nullable = false)
     private String cardExpirationDate;
 
     @ManyToOne
     @Cascade(CascadeType.ALL)
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
 }

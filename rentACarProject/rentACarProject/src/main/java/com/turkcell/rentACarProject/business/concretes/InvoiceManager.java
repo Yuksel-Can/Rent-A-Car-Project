@@ -6,7 +6,6 @@ import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetIndividualCust
 import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetInvoiceDto;
 import com.turkcell.rentACarProject.business.dtos.lists.invoice.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.create.CreateInvoiceRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateInvoiceRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.generate.GenerateRandomCode;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
@@ -15,12 +14,13 @@ import com.turkcell.rentACarProject.core.utilities.result.Result;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.InvoiceDao;
+import com.turkcell.rentACarProject.entities.concretes.CorporateCustomer;
+import com.turkcell.rentACarProject.entities.concretes.IndividualCustomer;
 import com.turkcell.rentACarProject.entities.concretes.Invoice;
 import com.turkcell.rentACarProject.entities.concretes.RentalCar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -79,21 +79,8 @@ public class InvoiceManager implements InvoiceService {
 
         this.invoiceDao.save(invoice);
 
-        System.out.println("invoice eklendi,customerid: " + invoice.getCustomer().getCustomerId());
 
         return new SuccessResult("Invoice added");
-    }
-
-    @Override
-    public Result update(UpdateInvoiceRequest updateInvoiceRequest) throws BusinessException {
-        //todo:burada update olacakmı
-        checkIfInvoiceIdExists(updateInvoiceRequest.getInvoiceId());
-
-        Invoice invoice = this.modelMapperService.forRequest().map(updateInvoiceRequest, Invoice.class);
-
-        //this.invoiceDao.save(invoice);
-
-        return new SuccessResult("Invoice updated, invoiceId: " + updateInvoiceRequest.getInvoiceId());
     }
 
     @Override
@@ -104,6 +91,11 @@ public class InvoiceManager implements InvoiceService {
         this.individualCustomerService.checkIfIndividualCustomerIdExists(invoice.getRentalCar().getCustomer().getCustomerId());
 
         GetIndividualCustomerInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetIndividualCustomerInvoiceDto.class);
+
+        IndividualCustomer individualCustomer = this.individualCustomerService.getIndividualCustomerById(invoice.getCustomer().getCustomerId());
+        result.setFirstName(individualCustomer.getFirstName());
+        result.setLastName(individualCustomer.getLastName());
+        result.setNationalIdentity(individualCustomer.getNationalIdentity());
         manuelFieldSetter(invoice, result);
 
         return new SuccessDataResult<>(result, "Individual Customer Invoice getted by individual invoice id, invoiceId: " + invoiceId);
@@ -115,10 +107,12 @@ public class InvoiceManager implements InvoiceService {
         checkIfInvoiceIdExists(invoiceId);
 
         Invoice invoice = this.invoiceDao.getById(invoiceId);
-
         this.corporateCustomerService.checkIfCorporateCustomerIdExists(invoice.getRentalCar().getCustomer().getCustomerId());
 
         GetCorporateCustomerInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetCorporateCustomerInvoiceDto.class);
+        CorporateCustomer corporateCustomer = this.corporateCustomerService.getCorporateCustomerById(invoice.getCustomer().getCustomerId());
+        result.setCompanyName(corporateCustomer.getCompanyName());
+        result.setTaxNumber(corporateCustomer.getTaxNumber());
         manuelFieldSetter(invoice, result);
 
         return new SuccessDataResult<>(result, "Corporate Customer Invoice getted by corporate invoice id, invoiceId " + invoiceId);
@@ -130,10 +124,13 @@ public class InvoiceManager implements InvoiceService {
         checkIfInvoiceNoExists(invoiceNo);
 
         Invoice invoice = this.invoiceDao.getInvoiceByInvoiceNo(invoiceNo);
-
         this.individualCustomerService.checkIfIndividualCustomerIdExists(invoice.getRentalCar().getCustomer().getCustomerId());
 
         GetIndividualCustomerInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetIndividualCustomerInvoiceDto.class);
+        IndividualCustomer individualCustomer = this.individualCustomerService.getIndividualCustomerById(invoice.getCustomer().getCustomerId());
+        result.setFirstName(individualCustomer.getFirstName());
+        result.setLastName(individualCustomer.getLastName());
+        result.setNationalIdentity(individualCustomer.getNationalIdentity());
         manuelFieldSetter(invoice, result);
 
         return new SuccessDataResult<>(result, "Individual Customer Invoice getted by individual invoice no, invoiceNo: " + invoiceNo);
@@ -149,6 +146,9 @@ public class InvoiceManager implements InvoiceService {
         this.corporateCustomerService.checkIfCorporateCustomerIdExists(invoice.getRentalCar().getCustomer().getCustomerId());
 
         GetCorporateCustomerInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetCorporateCustomerInvoiceDto.class);
+        CorporateCustomer corporateCustomer = this.corporateCustomerService.getCorporateCustomerById(invoice.getCustomer().getCustomerId());
+        result.setCompanyName(corporateCustomer.getCompanyName());
+        result.setTaxNumber(corporateCustomer.getTaxNumber());
         manuelFieldSetter(invoice, result);
 
         return new SuccessDataResult<>(result, "Corporate Customer Invoice getted by corporate invoice no, invoiceNo: " + invoiceNo);
@@ -211,11 +211,11 @@ public class InvoiceManager implements InvoiceService {
         result.setCustomerId(invoice.getRentalCar().getCustomer().getCustomerId());
     }
 
-    private void manuelFieldSetter(List<Invoice> invoices, List<InvoiceListDto> invoiceListDtos){
+    private void manuelFieldSetter(List<Invoice> invoices, List<InvoiceListDto> invoiceListDtoList){
 
         for(int i=0; i<invoices.size();i++){
-            invoiceListDtos.get(i).setRentalCarId(invoices.get(i).getRentalCar().getRentalCarId());
-            invoiceListDtos.get(i).setCustomerId(invoices.get(i).getRentalCar().getCustomer().getCustomerId());
+            invoiceListDtoList.get(i).setRentalCarId(invoices.get(i).getRentalCar().getRentalCarId());
+            invoiceListDtoList.get(i).setCustomerId(invoices.get(i).getRentalCar().getCustomer().getCustomerId());
         }
 
     }

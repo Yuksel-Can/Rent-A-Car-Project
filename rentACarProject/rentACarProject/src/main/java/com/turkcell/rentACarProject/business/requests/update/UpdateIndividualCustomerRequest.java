@@ -23,7 +23,7 @@ public class UpdateIndividualCustomerRequest extends UpdateCustomerRequest {
 
     @NotNull
     @NotBlank
-    @Size(min = 11, max = 11)
+    @Pattern(regexp = "^[0-9]{11}", message = "not number") //todo:açıklama düzelt
     private String nationalIdentity;
 
 }

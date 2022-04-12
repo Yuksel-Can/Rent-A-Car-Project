@@ -17,13 +17,13 @@ public class IndividualCustomer extends Customer{
     @Column(name = "individual_customer_id", insertable = false, updatable = false)
     private int individualCustomerId;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "national_identity")
+    @Column(name = "national_identity", unique = true, length = 11, nullable = false)
     private String nationalIdentity;
 
 }

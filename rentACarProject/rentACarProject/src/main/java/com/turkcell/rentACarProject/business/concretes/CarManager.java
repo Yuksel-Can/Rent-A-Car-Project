@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.concretes;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,20 +29,22 @@ import com.turkcell.rentACarProject.entities.concretes.Car;
 @Service
 public class CarManager implements CarService{
 
-	private CarDao carDao;
-	private ModelMapperService modelMapperService;
-	private BrandService brandService;
-	private ColorService colorService;
-	private RentalCarService rentalCarService;
-	private CarCrashService carCrashService;
+	private final CarDao carDao;
+	private final ModelMapperService modelMapperService;
+	private final BrandService brandService;
+	private final ColorService colorService;
+	private final RentalCarService rentalCarService;
+	private final CarMaintenanceService carMaintenanceService;
+	private final CarCrashService carCrashService;
 	
 	@Autowired
 	public  CarManager(CarDao carDao, ModelMapperService modelMapperService, @Lazy BrandService brandService, @Lazy ColorService colorService,
-					   RentalCarService rentalCarService, @Lazy CarCrashService carCrashService) {
+					   RentalCarService rentalCarService, @Lazy CarMaintenanceService carMaintenanceService, @Lazy CarCrashService carCrashService) {
 		this.carDao = carDao;
 		this.brandService = brandService;
 		this.colorService = colorService;
 		this.rentalCarService = rentalCarService;
+		this.carMaintenanceService = carMaintenanceService;
 		this.carCrashService = carCrashService;
 		this.modelMapperService = modelMapperService;
 
@@ -62,11 +65,10 @@ public class CarManager implements CarService{
 	@Override
 	public Result add(CreateCarRequest createCarRequest)  throws BusinessException {
 
-
-
 		this.brandService.checkIsExistsByBrandId(createCarRequest.getBrandId());
 		this.colorService.checkIsExistsByColorId(createCarRequest.getColorId());
-		
+		checkIsModelYearBeforeThisYear(createCarRequest.getModelYear());
+
 		Car car = this.modelMapperService.forRequest().map(createCarRequest, Car.class);
 
 		this.carDao.save(car);
@@ -81,33 +83,34 @@ public class CarManager implements CarService{
 		checkIsExistsByCarId(updateCarRequest.getCarId());
 		this.brandService.checkIsExistsByBrandId(updateCarRequest.getBrandId());
 		this.colorService.checkIsExistsByColorId(updateCarRequest.getColorId());
-		
+		checkIsModelYearBeforeThisYear(updateCarRequest.getModelYear());
+
 		Car car = this.modelMapperService.forRequest().map(updateCarRequest, Car.class);
 
 		this.carDao.save(car);
 
 		return new SuccessResult("Car updated, id: " + updateCarRequest.getCarId());
-		
+
 	}
 
 	@Override
 	public Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException {
-		
+
 		checkIsExistsByCarId(deleteCarRequest.getCarId());
 		this.rentalCarService.checkIsNotExistsByRentalCar_CarId(deleteCarRequest.getCarId());
+		this.carMaintenanceService.checkIsExistsByCarMaintenance_CarId(deleteCarRequest.getCarId());
 		this.carCrashService.checkIfNotExistsCarCrashByCar_CarId(deleteCarRequest.getCarId());
 
 		this.carDao.deleteById(deleteCarRequest.getCarId());
 
 		return new SuccessResult("Car deleted, carId: " + deleteCarRequest.getCarId());
-		
+
 	}
 
 	@Override
 	public void updateKilometer(int carId, int kilometer) throws BusinessException {
 
 		checkIsExistsByCarId(carId);
-		//gelen kilometre öncekinden yüksekmi
 		Car car = this.carDao.getById(carId);
 		checkIfReturnKilometerValid(car.getKilometer(), kilometer);
 
@@ -125,7 +128,7 @@ public class CarManager implements CarService{
 
 		GetCarDto carDto = this.modelMapperService.forDto().map(car, GetCarDto.class);
 
-		return new SuccessDataResult<GetCarDto>(carDto, "Car listed");
+		return new SuccessDataResult<>(carDto, "Car listed");
 
 	}
 
@@ -165,7 +168,7 @@ public class CarManager implements CarService{
 		List<CarListByDailyPrice> response = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByDailyPrice.class))
 					.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<CarListByDailyPrice>>(response, "Less than Car listed");
+		return new SuccessDataResult<>(response, "Less than Car listed");
 
 	}
 
@@ -178,11 +181,10 @@ public class CarManager implements CarService{
 		Pageable pageable = PageRequest.of(pageNo-1, pageSize);
 		List<Car> cars = this.carDao.findAll(pageable).getContent();
 
-		List<CarPagedDto> carPagedDtos = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarPagedDto.class))
+		List<CarPagedDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarPagedDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<CarPagedDto>>(carPagedDtos, "All cars paged");
-
+		return new SuccessDataResult<>(result, "All cars paged");
 	}
 
 	@Override
@@ -192,14 +194,21 @@ public class CarManager implements CarService{
 
 		List<Car> cars = this.carDao.findAll(sortList);
 
-		List<CarSortedDto> carSortedDtos = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarSortedDto.class))
+		List<CarSortedDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarSortedDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<CarSortedDto>>(carSortedDtos, "All cars sorted");
-
+		return new SuccessDataResult<>(result, "All cars sorted");
 	}
 
+
 	/**/
+
+	private void checkIsModelYearBeforeThisYear(int modelYear) throws BusinessException {
+		if(modelYear > LocalDate.now().getYear()){
+			throw new BusinessException("The model year may be this year or previous years.");
+		}
+
+	}
 
 	private void checkIfReturnKilometerValid(int beforeKilometer, int afterKilometer) throws BusinessException {
 		if(beforeKilometer> afterKilometer){
@@ -209,7 +218,6 @@ public class CarManager implements CarService{
 
 	@Override
 	public void checkIsExistsByCarId(int carId) throws BusinessException {
-
 		if(!this.carDao.existsByCarId(carId)) {
 			throw new BusinessException("Car id not exists");
 		}

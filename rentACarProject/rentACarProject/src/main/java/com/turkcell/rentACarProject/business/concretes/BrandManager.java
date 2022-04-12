@@ -25,9 +25,9 @@ import com.turkcell.rentACarProject.entities.concretes.Brand;
 @Service
 public class BrandManager implements BrandService {
 
-	private BrandDao brandDao;
-	private CarService carService;
-	private ModelMapperService modelMapperService;
+	private final BrandDao brandDao;
+	private final CarService carService;
+	private final ModelMapperService modelMapperService;
 
 	@Autowired
 	public BrandManager(BrandDao brandDao, ModelMapperService modelMapperService, CarService carService) {
@@ -44,8 +44,7 @@ public class BrandManager implements BrandService {
 		List<BrandListDto> result = brands.stream().map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<BrandListDto>>(result, "Brand listed");
-		
+		return new SuccessDataResult<>(result, "Brand listed");
 	}
 
 	@Override
@@ -58,7 +57,6 @@ public class BrandManager implements BrandService {
 		this.brandDao.save(brand);
 
 		return new SuccessResult("Brand added");
-
 	}
 
 	@Override
@@ -72,7 +70,6 @@ public class BrandManager implements BrandService {
 		this.brandDao.save(brand);
 
 		return new SuccessResult("Brand updated");
-		
 	}
 
 	@Override
@@ -84,7 +81,6 @@ public class BrandManager implements BrandService {
 		this.brandDao.deleteById(deleteBrandRequest.getBrandId());
 
 		return new SuccessResult("Brand deleted");
-		
 	}
 
 	@Override
@@ -96,14 +92,12 @@ public class BrandManager implements BrandService {
 
 		GetBrandDto getBrandDto = this.modelMapperService.forDto().map(brand, GetBrandDto.class);
 
-		return new SuccessDataResult<GetBrandDto>(getBrandDto, "Brand listed");
-		
+		return new SuccessDataResult<>(getBrandDto, "Brand listed");
 	}
 	
 	/**/
 	
 	public void checkIsExistsByBrandId(int id) throws BusinessException {
-
 		if(!this.brandDao.existsByBrandId(id)) {
 			throw new BusinessException("Brand id not exists");
 		}
@@ -111,7 +105,6 @@ public class BrandManager implements BrandService {
 	}
 
 	public void checkIsNotExistByBrandName(String name) throws BusinessException {
-
 		if(this.brandDao.existsByBrandName(name)) {
 			throw new BusinessException("Brand name already exists");
 		}

@@ -17,7 +17,6 @@ public class ZiraatBankPosAdapter implements PosService {
         if(!ziraatBankPosService.makePayment(cardNumber, cardOwner, cardCvv, cardExpirationDate, totalPrice)){
             throw new BusinessException("payment failed, ziraat");
         }
-        System.out.println("Payment Successful");
         return true;
     }
 }

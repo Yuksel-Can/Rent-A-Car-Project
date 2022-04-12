@@ -23,6 +23,7 @@ public class CreateCarRequest {
 	private String description;
 
 	@Min(0)
+	@NotNull
 	private int kilometer;
 
 	@NotNull

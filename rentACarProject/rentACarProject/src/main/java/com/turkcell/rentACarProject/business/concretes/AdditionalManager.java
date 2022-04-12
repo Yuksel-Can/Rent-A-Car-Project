@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
 @Service
 public class AdditionalManager implements AdditionalService {
 
-    private AdditionalDao additionalDao;
-    private OrderedAdditionalService orderedAdditionalService;
-    private ModelMapperService modelMapperService;
+    private final AdditionalDao additionalDao;
+    private final OrderedAdditionalService orderedAdditionalService;
+    private final ModelMapperService modelMapperService;
 
     @Autowired
     public AdditionalManager(AdditionalDao additionalDao, ModelMapperService modelMapperService, @Lazy OrderedAdditionalService orderedAdditionalService) {
@@ -40,9 +40,9 @@ public class AdditionalManager implements AdditionalService {
     @Override
     public DataResult<List<AdditionalListDto>> getAll() {
 
-        List<Additional> additionals = this.additionalDao.findAll();
+        List<Additional> additionalList = this.additionalDao.findAll();
 
-        List<AdditionalListDto> result = additionals.stream().map(additional -> this.modelMapperService.forDto().map(additional, AdditionalListDto.class))
+        List<AdditionalListDto> result = additionalList.stream().map(additional -> this.modelMapperService.forDto().map(additional, AdditionalListDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Additional Services listed");
@@ -97,7 +97,7 @@ public class AdditionalManager implements AdditionalService {
 
         GetAdditionalDto result = this.modelMapperService.forDto().map(addition, GetAdditionalDto.class);
 
-        return new SuccessDataResult<>(result, "Additional Service getted by id: " + additionalId);
+        return new SuccessDataResult<>(result, "Additional Service get by id: " + additionalId);
 
     }
 
@@ -113,8 +113,5 @@ public class AdditionalManager implements AdditionalService {
             throw new BusinessException("Additional Service name already exists, name: " + additionalName);
         }
     }
-
-
-
 
 }

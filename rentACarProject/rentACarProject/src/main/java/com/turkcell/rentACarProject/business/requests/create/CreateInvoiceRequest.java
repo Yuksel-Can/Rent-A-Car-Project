@@ -7,10 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.sql.Date;
 import java.time.LocalDate;
 
@@ -20,7 +17,7 @@ import java.time.LocalDate;
 public class CreateInvoiceRequest {
 
     @JsonIgnore
-    @Size(min = 16, max = 16)
+    @Pattern(regexp = "^[0-9]{16}", message = "not number") //todo:açıklama düzelt
     private String invoiceNo;
 
     @JsonIgnore

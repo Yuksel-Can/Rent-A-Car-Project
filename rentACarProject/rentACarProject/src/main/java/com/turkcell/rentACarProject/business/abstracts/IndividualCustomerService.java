@@ -8,6 +8,7 @@ import com.turkcell.rentACarProject.business.requests.update.UpdateIndividualCus
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
+import com.turkcell.rentACarProject.entities.concretes.IndividualCustomer;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public interface IndividualCustomerService {
     Result delete(DeleteIndividualCustomerRequest deleteIndividualCustomerRequest) throws BusinessException;
 
     DataResult<GetIndividualCustomerDto> getById(int individualCustomerId) throws BusinessException;
+    IndividualCustomer getIndividualCustomerById(int individualCustomerId);
 
     boolean checkIfIndividualCustomerIdExists(int individualCustomerId) throws BusinessException;
 }

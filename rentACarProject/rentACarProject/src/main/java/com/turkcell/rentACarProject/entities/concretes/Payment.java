@@ -18,11 +18,11 @@ public class Payment {
     @Column(name = "payment_id")
     private int paymentId;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price", updatable = false, nullable = false)
     private double totalPrice;
 
     @ManyToOne()
-    @JoinColumn(name = "rental_car_id")
+    @JoinColumn(name = "rental_car_id", updatable = false, nullable = false)
     private RentalCar rentalCar;
 
     @OneToOne(mappedBy = "payment")

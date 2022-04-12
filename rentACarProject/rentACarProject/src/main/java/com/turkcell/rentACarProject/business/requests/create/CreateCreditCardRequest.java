@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +14,7 @@ public class CreateCreditCardRequest {
 
     @NotNull
     @NotBlank
-    @Size(min = 16, max = 16)
+    @Pattern(regexp = "^[0-9]{16}", message = "not number") //todo:açıklama düzelt
     private String cardNumber;
 
     @NotNull
@@ -26,7 +23,7 @@ public class CreateCreditCardRequest {
 
     @NotNull
     @NotBlank
-    @Size(min = 3,max = 3)
+    @Pattern(regexp = "^[0-9]{3}", message = "not number") //todo:açıklama düzelt
     private String cardCvv;
 
     @NotNull
@@ -34,8 +31,9 @@ public class CreateCreditCardRequest {
     @Size(min = 4, max = 5)
     private String cardExpirationDate;
 
-//    @NotNull
-//    @Min(1)
+
+    @NotNull
+    @Min(1)
     @JsonIgnore
     private int customerId;
 

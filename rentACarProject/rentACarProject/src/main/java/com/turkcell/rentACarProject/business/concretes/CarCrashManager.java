@@ -14,7 +14,6 @@ import com.turkcell.rentACarProject.core.utilities.result.Result;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.CarCrashDao;
-import com.turkcell.rentACarProject.entities.concretes.Car;
 import com.turkcell.rentACarProject.entities.concretes.CarCrash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +25,9 @@ import java.util.stream.Collectors;
 @Service
 public class CarCrashManager implements CarCrashService {
 
-    private CarCrashDao carCrashDao;
-    private CarService carService;
-    private ModelMapperService modelMapperService;
+    private final CarCrashDao carCrashDao;
+    private final CarService carService;
+    private final ModelMapperService modelMapperService;
 
     @Autowired
     public CarCrashManager(CarCrashDao carCrashDao, CarService carService, ModelMapperService modelMapperService) {

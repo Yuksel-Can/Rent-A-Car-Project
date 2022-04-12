@@ -25,9 +25,9 @@ import com.turkcell.rentACarProject.entities.concretes.Color;
 @Service
 public class ColorManager implements ColorService{
 	
-	private ColorDao colorDao;
-	private CarService carService;
-	private ModelMapperService modelMapperService;
+	private final ColorDao colorDao;
+	private final CarService carService;
+	private final ModelMapperService modelMapperService;
 	
 	@Autowired
 	public ColorManager(ColorDao colorDao, ModelMapperService modelMapperService, CarService carService) {
@@ -44,7 +44,7 @@ public class ColorManager implements ColorService{
 		List<ColorListDto> result = colors.stream().map(color -> this.modelMapperService.forDto().map(color, ColorListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<List<ColorListDto>>(result, "Color listed");
+		return new SuccessDataResult<>(result, "Color listed");
 		
 	}
 
@@ -96,14 +96,13 @@ public class ColorManager implements ColorService{
 
 		GetColorDto getColorDto = this.modelMapperService.forDto().map(color, GetColorDto.class);
 
-		return new SuccessDataResult<GetColorDto>(getColorDto, "Color listed");
+		return new SuccessDataResult<>(getColorDto, "Color listed");
 		
 	}
 	
 	/**/
 	
 	public void checkIsExistsByColorId(int brandId) throws BusinessException {
-
 		if(!this.colorDao.existsByColorId(brandId)) {
 			throw new BusinessException("Color id not exists");
 		}

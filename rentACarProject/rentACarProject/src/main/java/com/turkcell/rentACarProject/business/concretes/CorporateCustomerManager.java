@@ -1,7 +1,6 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CorporateCustomerService;
-import com.turkcell.rentACarProject.business.abstracts.CustomerService;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.abstracts.UserService;
 import com.turkcell.rentACarProject.business.dtos.gets.corporateCustomer.GetCorporateCustomerDto;
@@ -26,16 +25,14 @@ import java.util.stream.Collectors;
 @Service
 public class CorporateCustomerManager implements CorporateCustomerService {
 
-    private CorporateCustomerDao corporateCustomerDao;
-    private CustomerService customerService;
-    private RentalCarService rentalCarService;
-    private UserService userService;
-    private ModelMapperService modelMapperService;
+    private final CorporateCustomerDao corporateCustomerDao;
+    private final RentalCarService rentalCarService;
+    private final UserService userService;
+    private final ModelMapperService modelMapperService;
 
     @Autowired
-    public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService, CustomerService customerService, RentalCarService rentalCarService, UserService userService) {
+    public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService, RentalCarService rentalCarService, UserService userService) {
         this.corporateCustomerDao = corporateCustomerDao;
-        this.customerService = customerService;
         this.rentalCarService = rentalCarService;
         this.userService = userService;
         this.modelMapperService = modelMapperService;
@@ -106,6 +103,10 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
     }
 
+    @Override
+    public CorporateCustomer getCorporateCustomerById(int corporateCustomerId){
+        return this.corporateCustomerDao.getById(corporateCustomerId);
+    }
     @Override
     public void checkIfCorporateCustomerIdExists(int corporateCustomerId) throws BusinessException {
         if(!this.corporateCustomerDao.existsByCorporateCustomerId(corporateCustomerId)){

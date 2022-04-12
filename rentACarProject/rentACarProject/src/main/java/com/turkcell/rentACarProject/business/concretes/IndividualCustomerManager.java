@@ -105,6 +105,10 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
     }
 
+    @Override
+    public IndividualCustomer getIndividualCustomerById(int individualCustomerId){
+        return this.individualCustomerDao.getById(individualCustomerId);
+    }
 
     @Override
     public boolean checkIfIndividualCustomerIdExists(int individualCustomerId) throws BusinessException {

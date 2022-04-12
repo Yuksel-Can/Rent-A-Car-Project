@@ -1,19 +1,12 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CustomerService;
-import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
-import com.turkcell.rentACarProject.business.abstracts.UserService;
 import com.turkcell.rentACarProject.business.dtos.CustomerListDto;
 import com.turkcell.rentACarProject.business.dtos.GetCustomerDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateCustomerRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteCustomerRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateCustomerRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
-import com.turkcell.rentACarProject.core.utilities.result.Result;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
-import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.CustomerDao;
 import com.turkcell.rentACarProject.entities.concretes.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +18,12 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerManager implements CustomerService {
 
-    private CustomerDao customerDao;
-    private UserService userService;
-    private RentalCarService rentalCarService;
-    private ModelMapperService modelMapperService;
+    private final CustomerDao customerDao;
+    private final ModelMapperService modelMapperService;
 
     @Autowired
-    public CustomerManager(CustomerDao customerDao, ModelMapperService modelMapperService, UserService userService, RentalCarService rentalCarService) {
+    public CustomerManager(CustomerDao customerDao, ModelMapperService modelMapperService) {
         this.customerDao = customerDao;
-        this.userService = userService;
-        this.rentalCarService = rentalCarService;
         this.modelMapperService = modelMapperService;
     }
 
@@ -45,7 +34,7 @@ public class CustomerManager implements CustomerService {
         List<Customer> customers = this.customerDao.findAll();
 
         List<CustomerListDto> result = customers.stream().map(customer -> this.modelMapperService.forDto().map(customer, CustomerListDto.class))
-                .collect(Collectors.toList());;
+                .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Customer listed");
 

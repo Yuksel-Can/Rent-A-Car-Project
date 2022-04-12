@@ -15,7 +15,6 @@ import com.turkcell.rentACarProject.dataAccess.abstracts.CreditCardDao;
 import com.turkcell.rentACarProject.entities.concretes.CreditCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,9 +22,9 @@ import java.util.stream.Collectors;
 @Service
 public class CreditCardManager implements CreditCardService {
 
-    private CreditCardDao creditCardDao;
-    private CustomerService customerService;
-    private ModelMapperService modelMapperService;
+    private final CreditCardDao creditCardDao;
+    private final CustomerService customerService;
+    private final ModelMapperService modelMapperService;
 
     @Autowired
     public CreditCardManager(CreditCardDao creditCardDao, ModelMapperService modelMapperService, CustomerService customerService) {
@@ -87,6 +86,13 @@ public class CreditCardManager implements CreditCardService {
         return new SuccessDataResult<>(result, "Credit card getted by customer id, customerId: " + customerId);
     }
 
+    @Override
+    public void checkSaveInformationAndSaveCreditCard(CreateCreditCardRequest createCreditCardRequest, CreditCardManager.CardSaveInformation cardSaveInformation) throws BusinessException {
+        if(cardSaveInformation.equals(CreditCardManager.CardSaveInformation.SAVE)){
+            add(createCreditCardRequest);
+        }
+    }
+
     private void checkIfExistsById(int creditCardId) throws BusinessException {
         if(!this.creditCardDao.existsByCreditCardId(creditCardId)){
             throw new BusinessException("Credit card not found, creditCardId: " + creditCardId);
@@ -96,13 +102,6 @@ public class CreditCardManager implements CreditCardService {
     private void checkIfExistsByCustomer_CustomerId(int customerId) throws BusinessException {
         if(!this.creditCardDao.existsByCustomer_CustomerId(customerId)){
             throw new BusinessException("Customer id not fount in the credit card table, customerId: " + customerId);
-        }
-    }
-
-    @Override
-    public void checkSaveInformationAndSaveCreditCard(CreateCreditCardRequest createCreditCardRequest, CreditCardManager.CardSaveInformation cardSaveInformation) throws BusinessException {
-        if(cardSaveInformation.equals(CreditCardManager.CardSaveInformation.SAVE)){
-            add(createCreditCardRequest);
         }
     }
 
