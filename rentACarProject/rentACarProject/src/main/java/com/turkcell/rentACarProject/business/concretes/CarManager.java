@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
-import com.turkcell.rentACarProject.business.dtos.*;
+import com.turkcell.rentACarProject.business.dtos.carDtos.gets.GetCarDto;
+import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarListByDailyPrice;
+import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarListDto;
+import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarPagedDto;
+import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarSortedDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
@@ -13,9 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.turkcell.rentACarProject.business.requests.create.CreateCarRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteCarRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateCarRequest;
+import com.turkcell.rentACarProject.business.requests.carRequests.CreateCarRequest;
+import com.turkcell.rentACarProject.business.requests.carRequests.DeleteCarRequest;
+import com.turkcell.rentACarProject.business.requests.carRequests.UpdateCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;

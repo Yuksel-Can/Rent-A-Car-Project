@@ -1,8 +1,8 @@
 package com.turkcell.rentACarProject.api.models.rentalCar;
 
 
-import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalForExtraRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
+import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.CreateOrderedAdditionalForExtraRequest;
+import com.turkcell.rentACarProject.business.requests.rentalCarRequests.CreateRentalCarRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

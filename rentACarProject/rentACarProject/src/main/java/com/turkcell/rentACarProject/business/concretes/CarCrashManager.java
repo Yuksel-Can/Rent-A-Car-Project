@@ -2,11 +2,11 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CarCrashService;
 import com.turkcell.rentACarProject.business.abstracts.CarService;
-import com.turkcell.rentACarProject.business.dtos.gets.carCrash.GetCarCrashDto;
-import com.turkcell.rentACarProject.business.dtos.lists.carCrash.CarCrashListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateCarCrashRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteCarCrashRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateCarCrashRequest;
+import com.turkcell.rentACarProject.business.dtos.carCrashDtos.gets.GetCarCrashDto;
+import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListDto;
+import com.turkcell.rentACarProject.business.requests.carCrashRequests.CreateCarCrashRequest;
+import com.turkcell.rentACarProject.business.requests.carCrashRequests.DeleteCarCrashRequest;
+import com.turkcell.rentACarProject.business.requests.carCrashRequests.UpdateCarCrashRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;

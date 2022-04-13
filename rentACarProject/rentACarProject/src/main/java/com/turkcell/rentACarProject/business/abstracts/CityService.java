@@ -1,7 +1,7 @@
 package com.turkcell.rentACarProject.business.abstracts;
 
-import com.turkcell.rentACarProject.business.dtos.CityListDto;
-import com.turkcell.rentACarProject.business.dtos.GetCityDto;
+import com.turkcell.rentACarProject.business.dtos.cityDtos.lists.CityListDto;
+import com.turkcell.rentACarProject.business.dtos.cityDtos.gets.GetCityDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 

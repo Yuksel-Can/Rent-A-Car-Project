@@ -2,11 +2,11 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.AdditionalService;
 import com.turkcell.rentACarProject.business.abstracts.OrderedAdditionalService;
-import com.turkcell.rentACarProject.business.dtos.AdditionalListDto;
-import com.turkcell.rentACarProject.business.dtos.GetAdditionalDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateAdditionalRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteAdditionalRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateAdditionalRequest;
+import com.turkcell.rentACarProject.business.dtos.additionalDtos.lists.AdditionalListDto;
+import com.turkcell.rentACarProject.business.dtos.additionalDtos.gets.GetAdditionalDto;
+import com.turkcell.rentACarProject.business.requests.additionalRequests.CreateAdditionalRequest;
+import com.turkcell.rentACarProject.business.requests.additionalRequests.DeleteAdditionalRequest;
+import com.turkcell.rentACarProject.business.requests.additionalRequests.UpdateAdditionalRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;

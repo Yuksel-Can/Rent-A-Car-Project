@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.turkcell.rentACarProject.business.abstracts.ColorService;
-import com.turkcell.rentACarProject.business.dtos.ColorListDto;
-import com.turkcell.rentACarProject.business.dtos.GetColorDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateColorRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteColorRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateColorRequest;
+import com.turkcell.rentACarProject.business.dtos.colorDtos.lists.ColorListDto;
+import com.turkcell.rentACarProject.business.dtos.colorDtos.gets.GetColorDto;
+import com.turkcell.rentACarProject.business.requests.colorRequests.CreateColorRequest;
+import com.turkcell.rentACarProject.business.requests.colorRequests.DeleteColorRequest;
+import com.turkcell.rentACarProject.business.requests.colorRequests.UpdateColorRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;

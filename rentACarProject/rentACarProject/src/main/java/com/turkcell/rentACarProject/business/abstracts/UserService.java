@@ -1,13 +1,9 @@
 package com.turkcell.rentACarProject.business.abstracts;
 
-import com.turkcell.rentACarProject.business.dtos.GetUserDto;
-import com.turkcell.rentACarProject.business.dtos.UserListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateUserRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteUserRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateUserRequest;
+import com.turkcell.rentACarProject.business.dtos.userDtos.gets.GetUserDto;
+import com.turkcell.rentACarProject.business.dtos.userDtos.lists.UserListDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
-import com.turkcell.rentACarProject.core.utilities.result.Result;
 
 import java.util.List;
 

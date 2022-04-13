@@ -1,11 +1,11 @@
 package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.IndividualCustomerService;
-import com.turkcell.rentACarProject.business.dtos.GetIndividualCustomerDto;
-import com.turkcell.rentACarProject.business.dtos.IndividualCustomerListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateIndividualCustomerRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteIndividualCustomerRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateIndividualCustomerRequest;
+import com.turkcell.rentACarProject.business.dtos.individualCustomerDtos.gets.GetIndividualCustomerDto;
+import com.turkcell.rentACarProject.business.dtos.individualCustomerDtos.lists.IndividualCustomerListDto;
+import com.turkcell.rentACarProject.business.requests.individualCustomerRequests.CreateIndividualCustomerRequest;
+import com.turkcell.rentACarProject.business.requests.individualCustomerRequests.DeleteIndividualCustomerRequest;
+import com.turkcell.rentACarProject.business.requests.individualCustomerRequests.UpdateIndividualCustomerRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;

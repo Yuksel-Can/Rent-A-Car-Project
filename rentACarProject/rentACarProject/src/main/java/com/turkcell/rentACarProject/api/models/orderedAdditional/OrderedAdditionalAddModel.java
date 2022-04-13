@@ -1,9 +1,9 @@
 package com.turkcell.rentACarProject.api.models.orderedAdditional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turkcell.rentACarProject.business.requests.create.CreateCreditCardRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreatePaymentRequest;
+import com.turkcell.rentACarProject.business.requests.creditCardRequests.CreateCreditCardRequest;
+import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.CreateOrderedAdditionalRequest;
+import com.turkcell.rentACarProject.business.requests.paymentRequests.CreatePaymentRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

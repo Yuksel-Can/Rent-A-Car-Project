@@ -1,10 +1,10 @@
 package com.turkcell.rentACarProject.business.abstracts;
 
-import com.turkcell.rentACarProject.business.dtos.GetOrderedAdditionalDto;
-import com.turkcell.rentACarProject.business.dtos.OrderedAdditionalListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateOrderedAdditionalRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteOrderedAdditionalRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateOrderedAdditionalRequest;
+import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.gets.GetOrderedAdditionalDto;
+import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.lists.OrderedAdditionalListDto;
+import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.CreateOrderedAdditionalRequest;
+import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.DeleteOrderedAdditionalRequest;
+import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.UpdateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;

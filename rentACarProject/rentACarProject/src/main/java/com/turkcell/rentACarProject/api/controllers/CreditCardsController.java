@@ -1,8 +1,8 @@
 package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.CreditCardService;
-import com.turkcell.rentACarProject.business.dtos.gets.GetCreditCardDto;
-import com.turkcell.rentACarProject.business.dtos.lists.CreditCardListDto;
+import com.turkcell.rentACarProject.business.dtos.creditCardDtos.gets.GetCreditCardDto;
+import com.turkcell.rentACarProject.business.dtos.creditCardDtos.lists.CreditCardListDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import org.springframework.beans.factory.annotation.Autowired;

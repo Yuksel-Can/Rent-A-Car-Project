@@ -4,8 +4,8 @@ import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAddition
 import com.turkcell.rentACarProject.api.models.orderedAdditional.OrderedAdditionalUpdateModel;
 import com.turkcell.rentACarProject.api.models.rentalCar.*;
 import com.turkcell.rentACarProject.business.concretes.CreditCardManager;
-import com.turkcell.rentACarProject.business.dtos.gets.payment.GetPaymentDto;
-import com.turkcell.rentACarProject.business.dtos.lists.payment.PaymentListDto;
+import com.turkcell.rentACarProject.business.dtos.paymentDtos.gets.GetPaymentDto;
+import com.turkcell.rentACarProject.business.dtos.paymentDtos.lists.PaymentListDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;

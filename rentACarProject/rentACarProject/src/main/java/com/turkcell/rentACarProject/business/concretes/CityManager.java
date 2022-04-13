@@ -1,8 +1,8 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CityService;
-import com.turkcell.rentACarProject.business.dtos.CityListDto;
-import com.turkcell.rentACarProject.business.dtos.GetCityDto;
+import com.turkcell.rentACarProject.business.dtos.cityDtos.lists.CityListDto;
+import com.turkcell.rentACarProject.business.dtos.cityDtos.gets.GetCityDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;

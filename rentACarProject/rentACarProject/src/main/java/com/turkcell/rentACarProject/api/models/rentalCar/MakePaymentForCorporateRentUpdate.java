@@ -1,10 +1,9 @@
 package com.turkcell.rentACarProject.api.models.rentalCar;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turkcell.rentACarProject.business.requests.create.CreateCreditCardRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreatePaymentRequest;
-import com.turkcell.rentACarProject.business.requests.create.CreateRentalCarRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateRentalCarRequest;
+import com.turkcell.rentACarProject.business.requests.creditCardRequests.CreateCreditCardRequest;
+import com.turkcell.rentACarProject.business.requests.paymentRequests.CreatePaymentRequest;
+import com.turkcell.rentACarProject.business.requests.rentalCarRequests.UpdateRentalCarRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

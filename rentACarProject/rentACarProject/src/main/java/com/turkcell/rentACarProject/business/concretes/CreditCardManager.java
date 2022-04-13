@@ -2,9 +2,9 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CreditCardService;
 import com.turkcell.rentACarProject.business.abstracts.CustomerService;
-import com.turkcell.rentACarProject.business.dtos.gets.GetCreditCardDto;
-import com.turkcell.rentACarProject.business.dtos.lists.CreditCardListDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateCreditCardRequest;
+import com.turkcell.rentACarProject.business.dtos.creditCardDtos.gets.GetCreditCardDto;
+import com.turkcell.rentACarProject.business.dtos.creditCardDtos.lists.CreditCardListDto;
+import com.turkcell.rentACarProject.business.requests.creditCardRequests.CreateCreditCardRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;

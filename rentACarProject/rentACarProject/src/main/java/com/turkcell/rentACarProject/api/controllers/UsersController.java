@@ -1,8 +1,8 @@
 package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.UserService;
-import com.turkcell.rentACarProject.business.dtos.GetUserDto;
-import com.turkcell.rentACarProject.business.dtos.UserListDto;
+import com.turkcell.rentACarProject.business.dtos.userDtos.gets.GetUserDto;
+import com.turkcell.rentACarProject.business.dtos.userDtos.lists.UserListDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import org.springframework.beans.factory.annotation.Autowired;

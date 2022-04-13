@@ -1,9 +1,9 @@
 package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
-import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetIndividualCustomerInvoiceDto;
-import com.turkcell.rentACarProject.business.dtos.gets.invoice.GetInvoiceDto;
-import com.turkcell.rentACarProject.business.dtos.lists.invoice.InvoiceListDto;
+import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.GetIndividualCustomerInvoiceDto;
+import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.GetInvoiceDto;
+import com.turkcell.rentACarProject.business.dtos.invoiceDtos.lists.InvoiceListDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import org.springframework.beans.factory.annotation.Autowired;

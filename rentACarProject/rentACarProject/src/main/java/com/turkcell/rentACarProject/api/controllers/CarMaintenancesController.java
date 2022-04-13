@@ -1,11 +1,11 @@
 package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.CarMaintenanceService;
-import com.turkcell.rentACarProject.business.dtos.CarMaintenanceListDto;
-import com.turkcell.rentACarProject.business.dtos.GetCarMaintenanceDto;
-import com.turkcell.rentACarProject.business.requests.create.CreateCarMaintenanceRequest;
-import com.turkcell.rentACarProject.business.requests.delete.DeleteCarMaintenanceRequest;
-import com.turkcell.rentACarProject.business.requests.update.UpdateCarMaintenanceRequest;
+import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListDto;
+import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.gets.GetCarMaintenanceDto;
+import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.CreateCarMaintenanceRequest;
+import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.DeleteCarMaintenanceRequest;
+import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.UpdateCarMaintenanceRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
