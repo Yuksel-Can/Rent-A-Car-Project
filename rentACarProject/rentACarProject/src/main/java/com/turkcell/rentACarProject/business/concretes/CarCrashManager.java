@@ -3,6 +3,7 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.CarCrashService;
 import com.turkcell.rentACarProject.business.abstracts.CarService;
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.gets.GetCarCrashDto;
+import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListByCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListDto;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.CreateCarCrashRequest;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.DeleteCarCrashRequest;
@@ -102,14 +103,14 @@ public class CarCrashManager implements CarCrashService {
     }
 
     @Override
-    public DataResult<List<CarCrashListDto>> getCarCrashByCar_CarId(int carId) throws BusinessException {
+    public DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(int carId) throws BusinessException {
 
         checkIfExistsCarCrashByCar_CarId(carId);
 
         List<CarCrash> carCrashes = this.carCrashDao.getAllByCar_CarId(carId);
 
-        List<CarCrashListDto> result = carCrashes.stream().map(carCrash -> this.modelMapperService.forDto()
-                .map(carCrash, CarCrashListDto.class)).collect(Collectors.toList());
+        List<CarCrashListByCarIdDto> result = carCrashes.stream().map(carCrash -> this.modelMapperService.forDto()
+                .map(carCrash, CarCrashListByCarIdDto.class)).collect(Collectors.toList());
         for(int i=0;i<carCrashes.size();i++){
             result.get(i).setCarId(carCrashes.get(i).getCar().getCarId());
         }

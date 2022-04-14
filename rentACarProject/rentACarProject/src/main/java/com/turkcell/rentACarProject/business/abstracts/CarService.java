@@ -3,10 +3,7 @@ package com.turkcell.rentACarProject.business.abstracts;
 import java.util.List;
 
 import com.turkcell.rentACarProject.business.dtos.carDtos.gets.GetCarDto;
-import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarListByDailyPrice;
-import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarListDto;
-import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarPagedDto;
-import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarSortedDto;
+import com.turkcell.rentACarProject.business.dtos.carDtos.lists.*;
 import com.turkcell.rentACarProject.business.requests.carRequests.CreateCarRequest;
 import com.turkcell.rentACarProject.business.requests.carRequests.DeleteCarRequest;
 import com.turkcell.rentACarProject.business.requests.carRequests.UpdateCarRequest;
@@ -24,12 +21,12 @@ public interface CarService {
 
 	void updateKilometer(int carId, int kilometer) throws BusinessException;
 
-	DataResult<List<CarListByDailyPrice>> findByDailyPriceLessThenEqual(double dailyPrice);
+	DataResult<List<CarListByDailyPriceDto>> findByDailyPriceLessThenEqual(double dailyPrice);
 	DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize);
 	DataResult<List<CarSortedDto>> getAllSortedCar(int sort);
 	DataResult<GetCarDto> getById(int id) throws BusinessException;
-	DataResult<List<CarListDto>> getAllByCar_BrandId(int brandId) throws BusinessException;
-	DataResult<List<CarListDto>> getAllByCar_ColorId(int colorId) throws BusinessException;
+	DataResult<List<CarListByBrandIdDto>> getAllByCar_BrandId(int brandId) throws BusinessException;
+	DataResult<List<CarListByColorIdDto>> getAllByCar_ColorId(int colorId) throws BusinessException;
 
 	void checkIsExistsByCarId(int carId) throws  BusinessException;
 	void checkIsNotExistsByCar_BrandId(int brandId) throws BusinessException;

@@ -2,6 +2,8 @@ package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.OrderedAdditionalService;
 import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.gets.GetOrderedAdditionalDto;
+import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.lists.OrderedAdditionalListByAdditionalIdDto;
+import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.lists.OrderedAdditionalListByRentalCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.lists.OrderedAdditionalListDto;
 import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.DeleteOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -41,12 +43,12 @@ public class OrderedAdditionalsController {
     }
 
     @GetMapping("/getByOrderedAdditional_RentalCarId")
-    public DataResult<List<OrderedAdditionalListDto>> getByOrderedAdditional_RentalCarId(@RequestParam int rentalCarId) throws BusinessException {
+    public DataResult<List<OrderedAdditionalListByRentalCarIdDto>> getByOrderedAdditional_RentalCarId(@RequestParam int rentalCarId) throws BusinessException {
         return this.orderedAdditionalService.getByOrderedAdditional_RentalCarId(rentalCarId);
     }
 
     @GetMapping("/getByOrderedAdditional_AdditionalId")
-    public DataResult<List<OrderedAdditionalListDto>> getByOrderedAdditional_AdditionalId(@RequestParam int additionalId) throws BusinessException {
+    public DataResult<List<OrderedAdditionalListByAdditionalIdDto>> getByOrderedAdditional_AdditionalId(@RequestParam int additionalId) throws BusinessException {
         return this.orderedAdditionalService.getByOrderedAdditional_AdditionalId(additionalId);
     }
 

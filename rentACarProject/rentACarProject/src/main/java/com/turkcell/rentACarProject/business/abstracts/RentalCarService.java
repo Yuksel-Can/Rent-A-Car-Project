@@ -1,8 +1,8 @@
 package com.turkcell.rentACarProject.business.abstracts;
 
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarDto;
-import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.RentalCarListDto;
-import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatus;
+import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.*;
+import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatusDto;
 import com.turkcell.rentACarProject.business.requests.rentalCarRequests.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.rentalCarRequests.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.rentalCarRequests.UpdateRentalCarRequest;
@@ -24,18 +24,17 @@ public interface RentalCarService {
     Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result updateForCorporateCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
-    DataResult<GetRentalCarStatus> deliverTheCar(int rentalCarId, int carId) throws BusinessException;
-    DataResult<GetRentalCarStatus> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException;
+    DataResult<GetRentalCarStatusDto> deliverTheCar(int rentalCarId, int carId) throws BusinessException;
+    DataResult<GetRentalCarStatusDto> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException;
 
     DataResult<GetRentalCarDto> getByRentalCarId(int rentalCarId) throws BusinessException;
     RentalCar getById(int rentalCarId) throws BusinessException;
-    DataResult<List<RentalCarListDto>> getAllByRentalCar_CarId(int carId) throws BusinessException;
-    DataResult<List<RentalCarListDto>> getAllByRentedCity_CityId(int rentedCity) throws BusinessException;
-    DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(int deliveredCity) throws BusinessException;
-    DataResult<List<RentalCarListDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException;
-    DataResult<List<RentalCarListDto>> getAllByIndividualCustomer_IndividualCustomerId(int individualCustomerId) throws BusinessException;
-
-    DataResult<List<RentalCarListDto>> getAllByCorporateCustomer_CorporateCustomerId(int corporateCustomerId) throws BusinessException;
+    DataResult<List<RentalCarListByCarIdDto>> getAllByRentalCar_CarId(int carId) throws BusinessException;
+    DataResult<List<RentalCarListByRentedCityIdDto>> getAllByRentedCity_CityId(int rentedCity) throws BusinessException;
+    DataResult<List<RentalCarListByDeliveredCityIdDto>> getAllByDeliveredCity_CityId(int deliveredCity) throws BusinessException;
+    DataResult<List<RentalCarListByCustomerIdDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException;
+    DataResult<List<RentalCarListByIndividualCustomerIdDto>> getAllByIndividualCustomer_IndividualCustomerId(int individualCustomerId) throws BusinessException;
+    DataResult<List<RentalCarListByCorporateCustomerIdDto>> getAllByCorporateCustomer_CorporateCustomerId(int corporateCustomerId) throws BusinessException;
 
     //for maintenance
     void checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException;

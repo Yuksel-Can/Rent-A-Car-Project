@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.abstracts;
 
+import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListByCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListDto;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.gets.GetCarMaintenanceDto;
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.CreateCarMaintenanceRequest;
@@ -21,7 +22,7 @@ public interface CarMaintenanceService {
 	Result delete(DeleteCarMaintenanceRequest carMaintenanceRequest) throws BusinessException;
 
 	DataResult<GetCarMaintenanceDto> getByCarMaintenanceId(int carMaintenanceId) throws BusinessException;
-	DataResult<List<CarMaintenanceListDto>> getAllByCarMaintenance_CarId(int carId) throws BusinessException;
+	DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(int carId) throws BusinessException;
 
 	void checkIfNotReturnDateBeforeToday(LocalDate returnDate) throws BusinessException;
 	void checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(int carId, LocalDate enteredDate) throws BusinessException;

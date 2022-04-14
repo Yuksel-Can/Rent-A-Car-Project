@@ -1,9 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
-import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.GetCorporateCustomerInvoiceDto;
-import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.GetIndividualCustomerInvoiceDto;
-import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.GetInvoiceDto;
+import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.*;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.lists.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.invoiceRequests.CreateInvoiceRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
@@ -84,13 +82,13 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetIndividualCustomerInvoiceDto> getIndividualCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException {
+    public DataResult<GetIndividualCustomerInvoiceByInvoiceIdDto> getIndividualCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException {
 
         checkIfInvoiceIdExists(invoiceId);
         Invoice invoice = this.invoiceDao.getById(invoiceId);
         this.individualCustomerService.checkIfIndividualCustomerIdExists(invoice.getRentalCar().getCustomer().getCustomerId());
 
-        GetIndividualCustomerInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetIndividualCustomerInvoiceDto.class);
+        GetIndividualCustomerInvoiceByInvoiceIdDto result = this.modelMapperService.forDto().map(invoice, GetIndividualCustomerInvoiceByInvoiceIdDto.class);
 
         IndividualCustomer individualCustomer = this.individualCustomerService.getIndividualCustomerById(invoice.getCustomer().getCustomerId());
         result.setFirstName(individualCustomer.getFirstName());
@@ -102,14 +100,14 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetCorporateCustomerInvoiceDto> getCorporateCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException {
+    public DataResult<GetCorporateCustomerInvoiceByInvoiceIdDto> getCorporateCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException {
 
         checkIfInvoiceIdExists(invoiceId);
 
         Invoice invoice = this.invoiceDao.getById(invoiceId);
         this.corporateCustomerService.checkIfCorporateCustomerIdExists(invoice.getRentalCar().getCustomer().getCustomerId());
 
-        GetCorporateCustomerInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetCorporateCustomerInvoiceDto.class);
+        GetCorporateCustomerInvoiceByInvoiceIdDto result = this.modelMapperService.forDto().map(invoice, GetCorporateCustomerInvoiceByInvoiceIdDto.class);
         CorporateCustomer corporateCustomer = this.corporateCustomerService.getCorporateCustomerById(invoice.getCustomer().getCustomerId());
         result.setCompanyName(corporateCustomer.getCompanyName());
         result.setTaxNumber(corporateCustomer.getTaxNumber());
@@ -119,14 +117,14 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetIndividualCustomerInvoiceDto> getIndividualCustomerInvoiceByInvoiceNo(String invoiceNo) throws BusinessException {
+    public DataResult<GetIndividualCustomerInvoiceByInvoiceNoDto> getIndividualCustomerInvoiceByInvoiceNo(String invoiceNo) throws BusinessException {
 
         checkIfInvoiceNoExists(invoiceNo);
 
         Invoice invoice = this.invoiceDao.getInvoiceByInvoiceNo(invoiceNo);
         this.individualCustomerService.checkIfIndividualCustomerIdExists(invoice.getRentalCar().getCustomer().getCustomerId());
 
-        GetIndividualCustomerInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetIndividualCustomerInvoiceDto.class);
+        GetIndividualCustomerInvoiceByInvoiceNoDto result = this.modelMapperService.forDto().map(invoice, GetIndividualCustomerInvoiceByInvoiceNoDto.class);
         IndividualCustomer individualCustomer = this.individualCustomerService.getIndividualCustomerById(invoice.getCustomer().getCustomerId());
         result.setFirstName(individualCustomer.getFirstName());
         result.setLastName(individualCustomer.getLastName());
@@ -137,7 +135,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetCorporateCustomerInvoiceDto> getCorporateCustomerInvoiceByInvoiceNo(String invoiceNo) throws BusinessException {
+    public DataResult<GetCorporateCustomerInvoiceByInvoiceNoDto> getCorporateCustomerInvoiceByInvoiceNo(String invoiceNo) throws BusinessException {
 
         checkIfInvoiceNoExists(invoiceNo);
 
@@ -145,7 +143,7 @@ public class InvoiceManager implements InvoiceService {
 
         this.corporateCustomerService.checkIfCorporateCustomerIdExists(invoice.getRentalCar().getCustomer().getCustomerId());
 
-        GetCorporateCustomerInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetCorporateCustomerInvoiceDto.class);
+        GetCorporateCustomerInvoiceByInvoiceNoDto result = this.modelMapperService.forDto().map(invoice, GetCorporateCustomerInvoiceByInvoiceNoDto.class);
         CorporateCustomer corporateCustomer = this.corporateCustomerService.getCorporateCustomerById(invoice.getCustomer().getCustomerId());
         result.setCompanyName(corporateCustomer.getCompanyName());
         result.setTaxNumber(corporateCustomer.getTaxNumber());

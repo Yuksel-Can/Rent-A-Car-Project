@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.CarMaintenanceService;
+import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListByCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListDto;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.gets.GetCarMaintenanceDto;
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.CreateCarMaintenanceRequest;
@@ -53,7 +54,7 @@ public class CarMaintenancesController {
     }
 
     @GetMapping("/getAllByCarMaintenance_CarId")
-    public DataResult<List<CarMaintenanceListDto>> getAllByCarMaintenance_CarId(@RequestParam int carId) throws BusinessException {
+    public DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(@RequestParam int carId) throws BusinessException {
         return this.carMaintenanceService.getAllByCarMaintenance_CarId(carId);
     }
 

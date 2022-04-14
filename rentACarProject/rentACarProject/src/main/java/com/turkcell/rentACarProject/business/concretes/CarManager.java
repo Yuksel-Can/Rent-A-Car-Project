@@ -6,10 +6,7 @@ import java.util.stream.Collectors;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.carDtos.gets.GetCarDto;
-import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarListByDailyPrice;
-import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarListDto;
-import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarPagedDto;
-import com.turkcell.rentACarProject.business.dtos.carDtos.lists.CarSortedDto;
+import com.turkcell.rentACarProject.business.dtos.carDtos.lists.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
@@ -137,14 +134,14 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public DataResult<List<CarListDto>> getAllByCar_BrandId(int brandId) throws BusinessException {
+	public DataResult<List<CarListByBrandIdDto>> getAllByCar_BrandId(int brandId) throws BusinessException {
 
 		this.brandService.checkIsExistsByBrandId(brandId);
 		checkIsExistsByCar_BrandId(brandId);
 
 		List<Car> cars = this.carDao.getAllByBrand_BrandId(brandId);
 
-		List<CarListDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class))
+		List<CarListByBrandIdDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByBrandIdDto.class))
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<>(result, "Cars listed by brandId: " + brandId);
@@ -152,24 +149,24 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public DataResult<List<CarListDto>> getAllByCar_ColorId(int colorId) throws BusinessException {
+	public DataResult<List<CarListByColorIdDto>> getAllByCar_ColorId(int colorId) throws BusinessException {
 
 		this.colorService.checkIsExistsByColorId(colorId);
 		checkIsExistsByCar_ColorId(colorId);
 
 		List<Car> cars = this.carDao.getAllByColor_ColorId(colorId);
 
-		List<CarListDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class))
+		List<CarListByColorIdDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByColorIdDto.class))
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<>(result, "Cars listed by colorId: " + colorId);
 	}
 
 	@Override
-	public DataResult<List<CarListByDailyPrice>> findByDailyPriceLessThenEqual(double dailyPrice) {
+	public DataResult<List<CarListByDailyPriceDto>> findByDailyPriceLessThenEqual(double dailyPrice) {
 
 		List<Car> cars = this.carDao.findByDailyPriceLessThanEqual(dailyPrice);
-		List<CarListByDailyPrice> response = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByDailyPrice.class))
+		List<CarListByDailyPriceDto> response = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByDailyPriceDto.class))
 					.collect(Collectors.toList());
 
 		return new SuccessDataResult<>(response, "Less than Car listed");

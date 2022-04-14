@@ -2,6 +2,7 @@ package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.CarCrashService;
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.gets.GetCarCrashDto;
+import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListByCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListDto;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.CreateCarCrashRequest;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.DeleteCarCrashRequest;
@@ -53,7 +54,7 @@ public class CarCrashesController {
     }
 
     @GetMapping("/getCarCrashByCar_CarId")
-    public DataResult<List<CarCrashListDto>> getCarCrashByCar_CarId(@RequestParam int carId) throws BusinessException {
+    public DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(@RequestParam int carId) throws BusinessException {
         return this.carCrashService.getCarCrashByCar_CarId(carId);
     }
 }

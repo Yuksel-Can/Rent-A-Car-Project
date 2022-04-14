@@ -2,8 +2,8 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarDto;
-import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.RentalCarListDto;
-import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatus;
+import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.*;
+import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatusDto;
 import com.turkcell.rentACarProject.business.requests.rentalCarRequests.CreateRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.rentalCarRequests.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.business.requests.rentalCarRequests.UpdateRentalCarRequest;
@@ -128,7 +128,7 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    public DataResult<GetRentalCarStatus> deliverTheCar(int rentalCarId, int carId) throws BusinessException {
+    public DataResult<GetRentalCarStatusDto> deliverTheCar(int rentalCarId, int carId) throws BusinessException {
 
         checkIfExistsRentalCarIdAndCarId(rentalCarId,carId);
         RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
@@ -138,13 +138,13 @@ public class RentalCarManager implements RentalCarService {
         rentalCar.setRentedKilometer(rentalCar.getCar().getKilometer());
         this.rentalCarDao.save(rentalCar);
 
-        GetRentalCarStatus result = this.modelMapperService.forDto().map(rentalCar,GetRentalCarStatus.class);
+        GetRentalCarStatusDto result = this.modelMapperService.forDto().map(rentalCar, GetRentalCarStatusDto.class);
 
         return new SuccessDataResult<>(result,"The car was delivered");
     }
 
     @Override
-    public DataResult<GetRentalCarStatus> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException {
+    public DataResult<GetRentalCarStatusDto> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException {
 
         checkIfExistsRentalCarIdAndCarId(rentalCarId,carId);
         RentalCar rentalCar = this.rentalCarDao.getById(rentalCarId);
@@ -155,7 +155,7 @@ public class RentalCarManager implements RentalCarService {
         rentalCar.setDeliveredKilometer(rentalCar.getCar().getKilometer());
         this.rentalCarDao.save(rentalCar);
 
-        GetRentalCarStatus result = this.modelMapperService.forDto().map(rentalCar, GetRentalCarStatus.class);
+        GetRentalCarStatusDto result = this.modelMapperService.forDto().map(rentalCar, GetRentalCarStatusDto.class);
 
         return new SuccessDataResult<>(result, "The car received");
     }
@@ -173,75 +173,75 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    public DataResult<List<RentalCarListDto>> getAllByRentalCar_CarId(int carId) throws BusinessException {
+    public DataResult<List<RentalCarListByCarIdDto>> getAllByRentalCar_CarId(int carId) throws BusinessException {
 
         checkIsExistsByRentalCar_CarId(carId);
         this.carService.checkIsExistsByCarId(carId);
 
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
 
-        List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+        List<RentalCarListByCarIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByCarIdDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Rentals of the car listed by carId: " + carId);
     }
 
     @Override
-    public DataResult<List<RentalCarListDto>> getAllByRentedCity_CityId(int rentedCity) throws BusinessException {
+    public DataResult<List<RentalCarListByRentedCityIdDto>> getAllByRentedCity_CityId(int rentedCity) throws BusinessException {
 
         this.cityService.checkIfExistsByCityId(rentedCity);
         checkIsExistsByRentedCity_CityId(rentedCity);
 
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByRentedCity_CityId(rentedCity);
-        List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+        List<RentalCarListByRentedCityIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByRentedCityIdDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Rentals of the car listed by rentedCityId: " + rentedCity);
     }
 
     @Override
-    public DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(int deliveredCity) throws BusinessException {
+    public DataResult<List<RentalCarListByDeliveredCityIdDto>> getAllByDeliveredCity_CityId(int deliveredCity) throws BusinessException {
 
         this.cityService.checkIfExistsByCityId(deliveredCity);
 
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByDeliveredCity_CityId(deliveredCity);
-        List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+        List<RentalCarListByDeliveredCityIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByDeliveredCityIdDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Rentals of the car listed by deliveredCity: " + deliveredCity);
     }
 
     @Override
-    public DataResult<List<RentalCarListDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException {
+    public DataResult<List<RentalCarListByCustomerIdDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException {
 
         this.customerService.checkIfCustomerIdExists(customerId);
 
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCustomer_CustomerId(customerId);
-        List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+        List<RentalCarListByCustomerIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByCustomerIdDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Rental of the car listed by customerId, customerId: " + customerId);
     }
 
     @Override
-    public DataResult<List<RentalCarListDto>> getAllByIndividualCustomer_IndividualCustomerId(int individualCustomerId) throws BusinessException {
+    public DataResult<List<RentalCarListByIndividualCustomerIdDto>> getAllByIndividualCustomer_IndividualCustomerId(int individualCustomerId) throws BusinessException {
 
         this.individualCustomerService.checkIfIndividualCustomerIdExists(individualCustomerId);
 
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCustomer_CustomerId(individualCustomerId);
-        List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+        List<RentalCarListByIndividualCustomerIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByIndividualCustomerIdDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Rental of the car listed by individualCustomerId, individualCustomerId: " + individualCustomerId);
     }
 
     @Override
-    public DataResult<List<RentalCarListDto>> getAllByCorporateCustomer_CorporateCustomerId(int corporateCustomerId) throws BusinessException {
+    public DataResult<List<RentalCarListByCorporateCustomerIdDto>> getAllByCorporateCustomer_CorporateCustomerId(int corporateCustomerId) throws BusinessException {
 
         this.corporateCustomerService.checkIfCorporateCustomerIdExists(corporateCustomerId);
 
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCustomer_CustomerId(corporateCustomerId);
-        List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
+        List<RentalCarListByCorporateCustomerIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByCorporateCustomerIdDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Rental of the car listed by corporateCustomerId, corporateCustomerId: " + corporateCustomerId);

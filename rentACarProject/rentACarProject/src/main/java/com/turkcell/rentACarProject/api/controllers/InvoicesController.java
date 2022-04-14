@@ -1,8 +1,7 @@
 package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
-import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.GetIndividualCustomerInvoiceDto;
-import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.GetInvoiceDto;
+import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.*;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.lists.InvoiceListDto;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
@@ -30,22 +29,22 @@ public class InvoicesController {
     }
 
     @GetMapping("/getIndividualCustomerInvoiceByInvoiceId")
-    public DataResult<GetIndividualCustomerInvoiceDto> getIndividualCustomerInvoiceByInvoiceId(@RequestParam int invoiceId) throws BusinessException {
+    public DataResult<GetIndividualCustomerInvoiceByInvoiceIdDto> getIndividualCustomerInvoiceByInvoiceId(@RequestParam int invoiceId) throws BusinessException {
         return this.invoiceService.getIndividualCustomerInvoiceByInvoiceId(invoiceId);
     }
 
     @GetMapping("/getCorporateCustomerInvoiceByInvoiceId")
-    public DataResult getCorporateCustomerInvoiceByInvoiceId(@RequestParam int invoiceId) throws BusinessException {
+    public DataResult<GetCorporateCustomerInvoiceByInvoiceIdDto> getCorporateCustomerInvoiceByInvoiceId(@RequestParam int invoiceId) throws BusinessException {
         return this.invoiceService.getCorporateCustomerInvoiceByInvoiceId(invoiceId);
     }
 
     @GetMapping("/getIndividualCustomerInvoiceByInvoiceNo")
-    public DataResult getIndividualCustomerInvoiceByInvoiceNo(@RequestParam String invoiceNo) throws BusinessException {
+    public DataResult<GetIndividualCustomerInvoiceByInvoiceNoDto> getIndividualCustomerInvoiceByInvoiceNo(@RequestParam String invoiceNo) throws BusinessException {
         return this.invoiceService.getIndividualCustomerInvoiceByInvoiceNo(invoiceNo);
     }
 
     @GetMapping("/getCorporateCustomerInvoiceByInvoiceNo")
-    public DataResult getCorporateCustomerInvoiceByInvoiceNo(@RequestParam String invoiceNo) throws BusinessException {
+    public DataResult<GetCorporateCustomerInvoiceByInvoiceNoDto> getCorporateCustomerInvoiceByInvoiceNo(@RequestParam String invoiceNo) throws BusinessException {
         return this.invoiceService.getCorporateCustomerInvoiceByInvoiceNo(invoiceNo);
     }
 

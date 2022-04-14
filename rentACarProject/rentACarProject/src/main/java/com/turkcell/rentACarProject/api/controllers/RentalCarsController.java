@@ -2,8 +2,8 @@ package com.turkcell.rentACarProject.api.controllers;
 
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarDto;
-import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.RentalCarListDto;
-import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatus;
+import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.*;
+import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatusDto;
 import com.turkcell.rentACarProject.business.requests.rentalCarRequests.DeleteRentalCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
@@ -37,12 +37,12 @@ public class RentalCarsController {
     }
 
     @PutMapping("/deliverTheCar")
-    public DataResult<GetRentalCarStatus> deliverTheCar(@RequestParam int rentalCarId, @RequestParam int carId) throws BusinessException{
+    public DataResult<GetRentalCarStatusDto> deliverTheCar(@RequestParam int rentalCarId, @RequestParam int carId) throws BusinessException{
         return this.rentalCarService.deliverTheCar(rentalCarId, carId);
     }
 
     @PutMapping("/receiveTheCar")
-    public DataResult<GetRentalCarStatus> receiveTheCar(@RequestParam int rentalCarId, @RequestParam int carId, int deliveredKilometer) throws BusinessException {
+    public DataResult<GetRentalCarStatusDto> receiveTheCar(@RequestParam int rentalCarId, @RequestParam int carId, int deliveredKilometer) throws BusinessException {
         return this.rentalCarService.receiveTheCar(rentalCarId, carId, deliveredKilometer);
     }
 
@@ -52,32 +52,32 @@ public class RentalCarsController {
     }
 
     @GetMapping("/getByRentalCar_CarId")
-    public DataResult<List<RentalCarListDto>> getAllByRentalCar_CarId(@RequestParam int carId) throws BusinessException {
+    public DataResult<List<RentalCarListByCarIdDto>> getAllByRentalCar_CarId(@RequestParam int carId) throws BusinessException {
         return this.rentalCarService.getAllByRentalCar_CarId(carId);
     }
 
     @GetMapping("/getByRentedCity_CityId")
-    public DataResult<List<RentalCarListDto>> getAllByRentedCity_CityId(@RequestParam int rentedCityId) throws BusinessException {
+    public DataResult<List<RentalCarListByRentedCityIdDto>> getAllByRentedCity_CityId(@RequestParam int rentedCityId) throws BusinessException {
         return this.rentalCarService.getAllByRentedCity_CityId(rentedCityId);
     }
 
     @GetMapping("/getByDeliveredCity_CityId")
-    public DataResult<List<RentalCarListDto>> getAllByDeliveredCity_CityId(@RequestParam int deliveredCityId) throws BusinessException {
+    public DataResult<List<RentalCarListByDeliveredCityIdDto>> getAllByDeliveredCity_CityId(@RequestParam int deliveredCityId) throws BusinessException {
         return this.rentalCarService.getAllByDeliveredCity_CityId(deliveredCityId);
     }
 
     @GetMapping("/getByCustomer_CustomerId")
-    public DataResult<List<RentalCarListDto>> getAllByCustomer_CustomerId(@RequestParam int customerId) throws BusinessException {
+    public DataResult<List<RentalCarListByCustomerIdDto>> getAllByCustomer_CustomerId(@RequestParam int customerId) throws BusinessException {
         return this.rentalCarService.getAllByCustomer_CustomerId(customerId);
     }
 
     @GetMapping("/getByIndividualCustomer_IndividualCustomerId")
-    public DataResult<List<RentalCarListDto>> getAllByIndividualCustomer_IndividualCustomerId(@RequestParam int individualCustomerId) throws BusinessException {
+    public DataResult<List<RentalCarListByIndividualCustomerIdDto>> getAllByIndividualCustomer_IndividualCustomerId(@RequestParam int individualCustomerId) throws BusinessException {
         return this.rentalCarService.getAllByIndividualCustomer_IndividualCustomerId(individualCustomerId);
     }
 
     @GetMapping("/getByCorporateCustomer_CorporateCustomerId")
-    public DataResult<List<RentalCarListDto>> getAllByCorporateCustomer_CorporateCustomerId(@RequestParam int corporateCustomerId) throws BusinessException {
+    public DataResult<List<RentalCarListByCorporateCustomerIdDto>> getAllByCorporateCustomer_CorporateCustomerId(@RequestParam int corporateCustomerId) throws BusinessException {
         return this.rentalCarService.getAllByCorporateCustomer_CorporateCustomerId(corporateCustomerId);
     }
 

@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.abstracts;
 
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.gets.GetCarCrashDto;
+import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListByCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListDto;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.CreateCarCrashRequest;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.DeleteCarCrashRequest;
@@ -20,7 +21,7 @@ public interface CarCrashService {
     Result delete(DeleteCarCrashRequest deleteCarCrashRequest) throws BusinessException;
 
     DataResult<GetCarCrashDto> getById(int carCrashId) throws BusinessException;
-    DataResult<List<CarCrashListDto>> getCarCrashByCar_CarId(int carId) throws BusinessException;
+    DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(int carId) throws BusinessException;
 
     void checkIfNotExistsCarCrashByCar_CarId(int carId) throws BusinessException;
 

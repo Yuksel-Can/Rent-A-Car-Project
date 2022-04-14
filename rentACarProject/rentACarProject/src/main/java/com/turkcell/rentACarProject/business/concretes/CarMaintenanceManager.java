@@ -3,6 +3,7 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACarProject.business.abstracts.CarService;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
+import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListByCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListDto;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.gets.GetCarMaintenanceDto;
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.CreateCarMaintenanceRequest;
@@ -111,13 +112,13 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public DataResult<List<CarMaintenanceListDto>> getAllByCarMaintenance_CarId(int carId) throws BusinessException {
+    public DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(int carId) throws BusinessException {
 
         checkIsExistsByCarMaintenance_CarId(carId);
 
         List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findAllByCar_CarId(carId);
 
-        List<CarMaintenanceListDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
+        List<CarMaintenanceListByCarIdDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListByCarIdDto.class))
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Car maintenances are listed by car id: " + carId);
