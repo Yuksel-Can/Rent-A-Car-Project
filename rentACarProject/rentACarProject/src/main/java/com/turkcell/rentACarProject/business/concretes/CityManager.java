@@ -48,7 +48,6 @@ public class CityManager implements CityService {
         GetCityDto result = this.modelMapperService.forDto().map(city, GetCityDto.class);
 
         return new SuccessDataResult<>(result, "City listed by cityId: " + cityId);
-
     }
 
     public void checkIfExistsByCityId(int cityId) throws BusinessException {

@@ -3,12 +3,14 @@ package com.turkcell.rentACarProject.api.controllers;
 import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.*;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.lists.InvoiceListDto;
+import com.turkcell.rentACarProject.business.requests.invoiceRequests.InvoiceGetDateBetweenRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
@@ -64,8 +66,8 @@ public class InvoicesController {
     }
 
     @GetMapping("/getDateBetween")
-    public DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate){
-        return this.invoiceService.findByInvoiceDateBetween(startDate, endDate);
+    public DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(@RequestBody @Valid InvoiceGetDateBetweenRequest invoiceGetDateBetweenRequest){
+        return this.invoiceService.findByInvoiceDateBetween(invoiceGetDateBetweenRequest);
     }
 }
 

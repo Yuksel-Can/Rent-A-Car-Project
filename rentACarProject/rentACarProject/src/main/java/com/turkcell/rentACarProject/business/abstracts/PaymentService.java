@@ -32,5 +32,6 @@ public interface PaymentService {
     DataResult<List<PaymentListDto>> getAllPaymentByRentalCar_RentalCarId(int rentalCarId) throws BusinessException;
 
     void checkIfExistsByPaymentId(int paymentId) throws BusinessException;
+    void checkIfNotExistsRentalCar_RentalCarId(int rentalCarId) throws BusinessException;
 
 }

@@ -165,7 +165,7 @@ public class PaymentManager implements PaymentService {
 
         checkAllValidationsForOrderedAdditionalAdd(orderedAdditionalAddModel.getRentalCarId(), orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList());
 
-        double totalPrice = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList(),
+        double totalPrice = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionalList(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList(),
                                                                                     this.rentalCarService.getTotalDaysForRental(orderedAdditionalAddModel.getRentalCarId()));
 
         this.posService.payment(orderedAdditionalAddModel.getCreateCreditCardRequest().getCardNumber(), orderedAdditionalAddModel.getCreateCreditCardRequest().getCardOwner(),
@@ -340,7 +340,7 @@ public class PaymentManager implements PaymentService {
     @Override
     public DataResult<List<PaymentListDto>> getAllPaymentByRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
 
-        checkIfExistsByRentalCar_RentalCarId(rentalCarId);
+        this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
 
         List<Payment> payments = this.paymentDao.getAllByRentalCar_RentalCarId(rentalCarId);
 
@@ -353,12 +353,12 @@ public class PaymentManager implements PaymentService {
 
     private void checkAllValidationsForIndividualAdd(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
         this.rentalCarService.checkAllValidationsForIndividualRentAdd(createRentalCarRequest);
-        this.orderedAdditionalService.checkAllValidationForAddOrderedAdditional(createOrderedAdditionalRequestList);
+        this.orderedAdditionalService.checkAllValidationForAddOrderedAdditionalList(createOrderedAdditionalRequestList);
     }
 
     private void checkAllValidationsForCorporateAdd(CreateRentalCarRequest createRentalCarRequest, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
         this.rentalCarService.checkAllValidationsForCorporateRentAdd(createRentalCarRequest);
-        this.orderedAdditionalService.checkAllValidationForAddOrderedAdditional(createOrderedAdditionalRequestList);
+        this.orderedAdditionalService.checkAllValidationForAddOrderedAdditionalList(createOrderedAdditionalRequestList);
     }
     private void checkAllValidationsForIndividualUpdate(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException {
         this.rentalCarService.checkAllValidationsForIndividualRentUpdate(updateRentalCarRequest);
@@ -370,7 +370,7 @@ public class PaymentManager implements PaymentService {
 
     private void checkAllValidationsForOrderedAdditionalAdd(int rentalCarId, List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList) throws BusinessException {
         this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
-        this.orderedAdditionalService.checkAllValidationForAddOrderedAdditional(createOrderedAdditionalRequestList);
+        this.orderedAdditionalService.checkAllValidationForAddOrderedAdditionalList(createOrderedAdditionalRequestList);
     }
 
     private void checkAllValidationsForOrderedAdditionalUpdate(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
@@ -399,7 +399,7 @@ public class PaymentManager implements PaymentService {
         int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCarRequest.getStartDate(), rentalCarRequest.getFinishDate());
         double priceOfRental = this.rentalCarService.calculateAndReturnRentPrice(rentalCarRequest.getStartDate(), rentalCarRequest.getFinishDate(),
                 this.carService.getDailyPriceByCarId(rentalCarRequest.getCarId()), rentalCarRequest.getRentedCityCityId(), rentalCarRequest.getDeliveredCityId());
-        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(orderedAdditionalRequestList,totalDays);
+        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionalList(orderedAdditionalRequestList,totalDays);
 
         return priceOfRental + priceOfAdditionals;
     }
@@ -410,7 +410,7 @@ public class PaymentManager implements PaymentService {
 
         double priceOfRental = this.rentalCarService.calculateRentalCarTotalDayPrice(rentalCar.getFinishDate(), updateDeliveryDateRequest.getFinishDate(),
                 this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
-        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(rentalCar.getRentalCarId(), totalDays);
+        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionalListByRentalCarId(rentalCar.getRentalCarId(), totalDays);
 
         return priceOfRental + priceOfAdditionals;
     }
@@ -451,10 +451,10 @@ public class PaymentManager implements PaymentService {
             throw new BusinessException("Payment not found, paymentId: " + paymentId);
         }
     }
-
-    private void checkIfExistsByRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
-        if(!this.paymentDao.existsByRentalCar_RentalCarId(rentalCarId)){
-            throw new BusinessException("Payment not found by rental car id, rentalCarId: " + rentalCarId);
+    @Override
+    public void checkIfNotExistsRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
+        if(this.paymentDao.existsByRentalCar_RentalCarId(rentalCarId)){
+            throw new BusinessException("RentalCar already exists in the payment table, rentalCarId: " + rentalCarId);
         }
     }
 

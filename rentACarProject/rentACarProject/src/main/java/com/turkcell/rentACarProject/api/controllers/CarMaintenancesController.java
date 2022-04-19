@@ -50,7 +50,7 @@ public class CarMaintenancesController {
 
     @GetMapping("/getByCarMaintenanceId")
     public DataResult<GetCarMaintenanceDto> getByCarMaintenanceId(@RequestParam int carMaintenanceId) throws BusinessException {
-        return this.carMaintenanceService.getByCarMaintenanceId(carMaintenanceId);
+        return this.carMaintenanceService.getById(carMaintenanceId);
     }
 
     @GetMapping("/getAllByCarMaintenance_CarId")

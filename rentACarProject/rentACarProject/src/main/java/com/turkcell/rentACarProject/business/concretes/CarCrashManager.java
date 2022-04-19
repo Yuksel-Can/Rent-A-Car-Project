@@ -105,7 +105,7 @@ public class CarCrashManager implements CarCrashService {
     @Override
     public DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(int carId) throws BusinessException {
 
-        checkIfExistsCarCrashByCar_CarId(carId);
+        this.carService.checkIsExistsByCarId(carId);
 
         List<CarCrash> carCrashes = this.carCrashDao.getAllByCar_CarId(carId);
 
@@ -127,12 +127,6 @@ public class CarCrashManager implements CarCrashService {
     private void checkIfCrashDateBeforeToday(LocalDate crashDate) throws BusinessException {
         if(crashDate.isAfter(LocalDate.now())){
             throw new BusinessException("Crash date cannot be after today, crashDate: " + crashDate);
-        }
-    }
-
-    private void checkIfExistsCarCrashByCar_CarId(int carId) throws BusinessException {
-        if(!this.carCrashDao.existsByCar_CarId(carId)){
-            throw new BusinessException("Car id not found in the Car Crash table, carId: " + carId);
         }
     }
 

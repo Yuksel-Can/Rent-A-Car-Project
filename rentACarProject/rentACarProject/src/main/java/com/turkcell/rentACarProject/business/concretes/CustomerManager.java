@@ -37,7 +37,6 @@ public class CustomerManager implements CustomerService {
                 .collect(Collectors.toList());
 
         return new SuccessDataResult<>(result, "Customer listed");
-
     }
 
     @Override
@@ -50,7 +49,6 @@ public class CustomerManager implements CustomerService {
         GetCustomerDto result = this.modelMapperService.forDto().map(customer, GetCustomerDto.class);
 
         return new SuccessDataResult<>(result, "Customer listed");
-
     }
 
     @Override
@@ -64,4 +62,5 @@ public class CustomerManager implements CustomerService {
     public Customer getCustomerById(int customerId){
         return this.customerDao.getById(customerId);
     }
+
 }

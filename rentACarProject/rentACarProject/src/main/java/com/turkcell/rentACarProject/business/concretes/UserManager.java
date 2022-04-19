@@ -59,8 +59,6 @@ public class UserManager implements UserService {
         if(!this.userDao.existsByUserId(userId)){
           throw new BusinessException("User id not exists, userId: " + userId);
         }
-
-
         return true;
     }
 

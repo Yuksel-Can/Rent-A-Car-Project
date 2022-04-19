@@ -21,4 +21,6 @@ public interface CreditCardService {
 
     void checkSaveInformationAndSaveCreditCard(CreateCreditCardRequest createCreditCardRequest, CreditCardManager.CardSaveInformation cardSaveInformation) throws BusinessException;
 
+    void checkIfNotExistsByCustomer_CustomerId(int customerId) throws BusinessException;
+
 }

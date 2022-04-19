@@ -5,6 +5,7 @@ import com.turkcell.rentACarProject.entities.abstracts.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ import java.util.List;
 public class Customer extends User {
 
     @Column(name = "customer_id", insertable = false, updatable = false)
+//    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     private int customerId;
 
     @JsonIgnore

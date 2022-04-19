@@ -56,8 +56,10 @@ public class CreditCardManager implements CreditCardService {
         CreditCard creditCard = this.modelMapperService.forRequest().map(createCreditCardRequest, CreditCard.class);
         creditCard.setCustomer(this.customerService.getCustomerById(createCreditCardRequest.getCustomerId()));
 
-        this.creditCardDao.save(creditCard);
+        if(checkIfNotExistsByCardNumber(creditCard.getCardNumber())){
+            this.creditCardDao.save(creditCard);
 
+        }
         return new SuccessResult("Credit Card added");
     }
 
@@ -76,7 +78,7 @@ public class CreditCardManager implements CreditCardService {
     @Override
     public DataResult<List<CreditCardListDto>> getAllCreditCardByCustomer_CustomerId(int customerId) throws BusinessException {
 
-        checkIfExistsByCustomer_CustomerId(customerId);
+        this.customerService.checkIfCustomerIdExists(customerId);
 
         List<CreditCard> creditCardList = this.creditCardDao.getAllByCustomer_CustomerId(customerId);
 
@@ -93,16 +95,25 @@ public class CreditCardManager implements CreditCardService {
         }
     }
 
+    private boolean checkIfNotExistsByCardNumber(String cardNumber) {
+        if(this.creditCardDao.existsByCardNumber(cardNumber)){
+            return false;
+        }
+        return true;
+    }
+
     private void checkIfExistsById(int creditCardId) throws BusinessException {
         if(!this.creditCardDao.existsByCreditCardId(creditCardId)){
             throw new BusinessException("Credit card not found, creditCardId: " + creditCardId);
         }
     }
 
-    private void checkIfExistsByCustomer_CustomerId(int customerId) throws BusinessException {
-        if(!this.creditCardDao.existsByCustomer_CustomerId(customerId)){
-            throw new BusinessException("Customer id not fount in the credit card table, customerId: " + customerId);
+    @Override
+    public void checkIfNotExistsByCustomer_CustomerId(int customerId) throws BusinessException {
+        if(this.creditCardDao.existsByCustomer_CustomerId(customerId)){
+            throw new BusinessException("Credit card already exists, creditCardId: " + customerId);
         }
     }
+
 
 }

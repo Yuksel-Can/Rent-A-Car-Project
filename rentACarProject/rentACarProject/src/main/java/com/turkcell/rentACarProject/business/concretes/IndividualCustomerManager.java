@@ -1,8 +1,6 @@
 package com.turkcell.rentACarProject.business.concretes;
 
-import com.turkcell.rentACarProject.business.abstracts.IndividualCustomerService;
-import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
-import com.turkcell.rentACarProject.business.abstracts.UserService;
+import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.individualCustomerDtos.gets.GetIndividualCustomerDto;
 import com.turkcell.rentACarProject.business.dtos.individualCustomerDtos.lists.IndividualCustomerListDto;
 import com.turkcell.rentACarProject.business.requests.individualCustomerRequests.CreateIndividualCustomerRequest;
@@ -17,6 +15,7 @@ import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.IndividualCustomerDao;
 import com.turkcell.rentACarProject.entities.concretes.IndividualCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,14 +27,19 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     private final IndividualCustomerDao individualCustomerDao;
     private final UserService userService;
     private final RentalCarService rentalCarService;
+    private final InvoiceService invoiceService;
+    private final CreditCardService creditCardService;
     private final ModelMapperService modelMapperService;
 
     @Autowired
-    public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao, ModelMapperService modelMapperService, UserService userService, RentalCarService rentalCarService) {
+    public IndividualCustomerManager(IndividualCustomerDao individualCustomerDao, ModelMapperService modelMapperService, UserService userService,
+                                     RentalCarService rentalCarService, InvoiceService invoiceService, @Lazy CreditCardService creditCardService) {
         this.individualCustomerDao = individualCustomerDao;
         this.userService = userService;
         this.rentalCarService = rentalCarService;
         this.modelMapperService = modelMapperService;
+        this.invoiceService = invoiceService;
+        this.creditCardService = creditCardService;
     }
 
 
@@ -85,6 +89,8 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         checkIfIndividualCustomerIdExists(deleteIndividualCustomerRequest.getUserId());
         this.rentalCarService.checkIfRentalCar_CustomerIdNotExists(deleteIndividualCustomerRequest.getUserId());
+        this.creditCardService.checkIfNotExistsByCustomer_CustomerId(deleteIndividualCustomerRequest.getUserId());
+        this.invoiceService.checkIfNotExistsByCustomer_CustomerId(deleteIndividualCustomerRequest.getUserId());
 
         this.individualCustomerDao.deleteById(deleteIndividualCustomerRequest.getUserId());
 

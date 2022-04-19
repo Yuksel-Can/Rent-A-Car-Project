@@ -1,7 +1,6 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.AdditionalService;
-import com.turkcell.rentACarProject.business.abstracts.InvoiceService;
 import com.turkcell.rentACarProject.business.abstracts.OrderedAdditionalService;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
 import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.gets.GetOrderedAdditionalDto;
@@ -11,7 +10,6 @@ import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.lists.Or
 import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.DeleteOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.UpdateOrderedAdditionalRequest;
-import com.turkcell.rentACarProject.business.adapters.posAdapters.PosService;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
@@ -33,18 +31,14 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     private final ModelMapperService modelMapperService;
     private final AdditionalService additionalService;
     private final RentalCarService rentalCarService;
-    private final InvoiceService invoiceService;
-    private final PosService posService;
 
     @Autowired
     public OrderedAdditionalManager(OrderedAdditionalDao orderedAdditionalDao, ModelMapperService modelMapperService, AdditionalService additionalService,
-                                    RentalCarService rentalCarService, InvoiceService invoiceService, PosService posService) {
+                                    RentalCarService rentalCarService) {
         this.orderedAdditionalDao = orderedAdditionalDao;
         this.modelMapperService = modelMapperService;
         this.additionalService = additionalService;
         this.rentalCarService = rentalCarService;
-        this.invoiceService = invoiceService;
-        this.posService = posService;
     }
 
 
@@ -109,7 +103,9 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         OrderedAdditional orderedAdditional = this.orderedAdditionalDao.getById(orderedAdditionalId);
 
         GetOrderedAdditionalDto result = this.modelMapperService.forDto().map(orderedAdditional, GetOrderedAdditionalDto.class);
-        result.setRentalCarId(orderedAdditional.getRentalCar().getRentalCarId());
+        if(result != null) {
+            result.setRentalCarId(orderedAdditional.getRentalCar().getRentalCarId());
+        }
 
         return new SuccessDataResult<>(result, "Ordered Additional Service listed by orderedAdditionalId: " + orderedAdditionalId);
     }
@@ -118,17 +114,17 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     public DataResult<List<OrderedAdditionalListByRentalCarIdDto>> getByOrderedAdditional_RentalCarId(int rentalCarId) throws BusinessException {
 
         this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
-        checkIsExistsByRentalCarId(rentalCarId);
 
-        List<OrderedAdditional> orderedAdditionals = this.orderedAdditionalDao.getAllByRentalCar_RentalCarId(rentalCarId);
+        List<OrderedAdditional> orderedAdditionalList = this.orderedAdditionalDao.getAllByRentalCar_RentalCarId(rentalCarId);
 
-        List<OrderedAdditionalListByRentalCarIdDto> result = orderedAdditionals.stream().map(orderedAdditional -> this.modelMapperService
+        List<OrderedAdditionalListByRentalCarIdDto> result = orderedAdditionalList.stream().map(orderedAdditional -> this.modelMapperService
                 .forDto().map(orderedAdditional, OrderedAdditionalListByRentalCarIdDto.class)).collect(Collectors.toList());
 
-        for(int i = 0; i < result.size(); i++){
-            result.get(i).setRentalCarId(orderedAdditionals.get(i).getRentalCar().getRentalCarId());
+        if(result != null){
+            for(int i = 0; i < result.size(); i++) {
+                result.get(i).setRentalCarId(orderedAdditionalList.get(i).getRentalCar().getRentalCarId());
+            }
         }
-
         return new SuccessDataResult<>(result, "Ordered Additional Service of the Rented Car listed by RentalCarId: " + rentalCarId);
     }
 
@@ -136,17 +132,17 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     public DataResult<List<OrderedAdditionalListByAdditionalIdDto>> getByOrderedAdditional_AdditionalId(int additionalId) throws BusinessException {
 
         this.additionalService.checkIfExistsByAdditionalId(additionalId);
-        checkIsExistsByAdditionalId(additionalId);
 
-        List<OrderedAdditional> orderedAdditionals = this.orderedAdditionalDao.getAllByAdditional_AdditionalId(additionalId);
+        List<OrderedAdditional> orderedAdditionalList = this.orderedAdditionalDao.getAllByAdditional_AdditionalId(additionalId);
 
-        List<OrderedAdditionalListByAdditionalIdDto> result = orderedAdditionals.stream().map(orderedAdditional -> this.modelMapperService
+        List<OrderedAdditionalListByAdditionalIdDto> result = orderedAdditionalList.stream().map(orderedAdditional -> this.modelMapperService
                 .forDto().map(orderedAdditional, OrderedAdditionalListByAdditionalIdDto.class)).collect(Collectors.toList());
 
-        for(int i = 0; i < result.size(); i++){
-            result.get(i).setRentalCarId(orderedAdditionals.get(i).getRentalCar().getRentalCarId());
+        if(result != null){
+            for(int i = 0; i < result.size(); i++){
+                result.get(i).setRentalCarId(orderedAdditionalList.get(i).getRentalCar().getRentalCarId());
+            }
         }
-
         return new SuccessDataResult<>(result, "Ordered Additional Service of the Additional listed by AdditionalId: " + additionalId);
     }
 
@@ -159,7 +155,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public double calculateTotalPriceForOrderedAdditionals(int rentalCarId, int totalDays) throws BusinessException {
+    public double calculateTotalPriceForOrderedAdditionalListByRentalCarId(int rentalCarId, int totalDays) throws BusinessException {
         //bu ekli olanlara bakarak hesaplıyor
         List<OrderedAdditional> orderedAdditionalList = this.orderedAdditionalDao.getAllByRentalCar_RentalCarId(rentalCarId);
 
@@ -174,7 +170,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public double calculateTotalPriceForOrderedAdditionals(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws BusinessException {
+    public double calculateTotalPriceForOrderedAdditionalList(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws BusinessException {
         //buda yollanan listeye bakıyor
         double totalPrice = 0;
         if(createOrderedAdditionalRequestList != null){
@@ -206,8 +202,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         }
     }
 
-    @Override
-    public void checkAllValidationForAddOrderedAdditional(List<CreateOrderedAdditionalRequest> orderedAdditionalRequestList) throws BusinessException {
+    public void checkAllValidationForAddOrderedAdditionalList(List<CreateOrderedAdditionalRequest> orderedAdditionalRequestList) throws BusinessException {
         for (CreateOrderedAdditionalRequest orderedAdditionalRequest : orderedAdditionalRequestList){
             checkAllValidationForAddOrderedAdditional(orderedAdditionalRequest.getAdditionalId(), orderedAdditionalRequest.getOrderedAdditionalQuantity());
         }
@@ -215,7 +210,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
     @Override
     public void checkIsOnlyOneOrderedAdditionalByAdditionalIdAndRentalCarIdForUpdate(int additionalId, int rentalCarId) throws BusinessException {
-        if(this.orderedAdditionalDao.getAllByAdditional_AdditionalIdAndRentalCar_RentalCarId(additionalId, rentalCarId).size() >= 1){   //todo:buraya = koydum kontrol et
+        if(this.orderedAdditionalDao.getAllByAdditional_AdditionalIdAndRentalCar_RentalCarId(additionalId, rentalCarId).size() > 1){
             throw new BusinessException("This Ordered is already exists");
         }
     }
@@ -224,12 +219,6 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     public void checkIsExistsByOrderedAdditionalId(int orderedAdditionalId) throws BusinessException {
         if(!this.orderedAdditionalDao.existsByOrderedAdditionalId(orderedAdditionalId)){
             throw new BusinessException("Ordered Additional id not exists");
-        }
-    }
-
-    private void checkIsExistsByRentalCarId(int rentalCarId) throws BusinessException {
-        if(!this.orderedAdditionalDao.existsByRentalCar_RentalCarId(rentalCarId)){
-            throw new BusinessException("There is a car rental, but there is no ordered additional service for this car rental");
         }
     }
 
@@ -244,12 +233,6 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     public void checkIsNotExistsByOrderedAdditional_AdditionalId(int additionalId) throws BusinessException {
         if(this.orderedAdditionalDao.existsByAdditional_AdditionalId(additionalId)){
             throw new BusinessException("Additional Id is available in the ordered additional table, additionalId: " + additionalId);
-        }
-    }
-
-    private void checkIsExistsByAdditionalId(int additionalId) throws BusinessException {
-        if(!this.orderedAdditionalDao.existsByAdditional_AdditionalId(additionalId)){
-            throw new BusinessException("there is no ordered additional service for this additional");
         }
     }
 

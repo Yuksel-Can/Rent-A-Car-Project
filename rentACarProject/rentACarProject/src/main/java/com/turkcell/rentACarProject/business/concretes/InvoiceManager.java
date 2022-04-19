@@ -4,6 +4,7 @@ import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.*;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.lists.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.invoiceRequests.CreateInvoiceRequest;
+import com.turkcell.rentACarProject.business.requests.invoiceRequests.InvoiceGetDateBetweenRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.generate.GenerateRandomCode;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
@@ -21,7 +22,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +40,7 @@ public class InvoiceManager implements InvoiceService {
 
     @Autowired
     public InvoiceManager(InvoiceDao invoiceDao, CarService carService, CustomerService customerService,
-                          IndividualCustomerService individualCustomerService, CorporateCustomerService corporateCustomerService,
+                          @Lazy IndividualCustomerService individualCustomerService, @Lazy CorporateCustomerService corporateCustomerService,
                           RentalCarService rentalCarService, ModelMapperService modelMapperService, @Lazy OrderedAdditionalService orderedAdditionalService, PaymentService paymentService) {
         this.invoiceDao = invoiceDao;
         this.carService = carService;
@@ -156,6 +156,7 @@ public class InvoiceManager implements InvoiceService {
     @Override
     public DataResult<GetInvoiceDto> getInvoiceByPayment_PaymentId(int paymentId) throws BusinessException {
 
+        this.paymentService.checkIfExistsByPaymentId(paymentId);
         checkIfExistsByPaymentId(paymentId);
 
         Invoice invoice = this.invoiceDao.getInvoiceByPayment_PaymentId(paymentId);
@@ -193,9 +194,9 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(Date startDate, Date endDate) {
+    public DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(InvoiceGetDateBetweenRequest invoiceGetDateBetweenRequest) {
 
-        List<Invoice> invoices = this.invoiceDao.getByCreationDateBetween(startDate, endDate);
+        List<Invoice> invoices = this.invoiceDao.getByCreationDateBetween(invoiceGetDateBetweenRequest.getStartDate(), invoiceGetDateBetweenRequest.getEndDate());
 
         List<InvoiceListDto> result = invoices.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
         manuelFieldSetter(invoices, result);
@@ -210,12 +211,10 @@ public class InvoiceManager implements InvoiceService {
     }
 
     private void manuelFieldSetter(List<Invoice> invoices, List<InvoiceListDto> invoiceListDtoList){
-
         for(int i=0; i<invoices.size();i++){
             invoiceListDtoList.get(i).setRentalCarId(invoices.get(i).getRentalCar().getRentalCarId());
             invoiceListDtoList.get(i).setCustomerId(invoices.get(i).getRentalCar().getCustomer().getCustomerId());
         }
-
     }
 
     @Override
@@ -228,7 +227,7 @@ public class InvoiceManager implements InvoiceService {
         int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate());
         double priceOfDays = this.rentalCarService.calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
         double priceOfDiffCity = this.rentalCarService.calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(), rentalCar.getDeliveredCity().getCityId());
-        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionals(rentalCar.getRentalCarId(), totalDays);      //todo:bu kayıtlı additionalları hesaplıyor
+        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionalListByRentalCarId(rentalCar.getRentalCarId(), totalDays);      //todo:bu kayıtlı additionalları hesaplıyor
         double totalPrice = priceOfDays + priceOfDiffCity + priceOfAdditionals;
 
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
@@ -271,6 +270,20 @@ public class InvoiceManager implements InvoiceService {
     private void checkIfExistsByPaymentId(int paymentId) throws BusinessException {
         if(!this.invoiceDao.existsByPayment_PaymentId(paymentId)){
             throw new BusinessException("Payment id not found in the invoice table, paymentId: " + paymentId);
+        }
+    }
+
+    @Override
+    public void checkIfNotExistsByCustomer_CustomerId(int customerId) throws BusinessException {
+        if(this.invoiceDao.existsByCustomer_CustomerId(customerId)){
+            throw new BusinessException("Customer id already exists in the invoice table, customerId: " + customerId);
+        }
+    }
+
+    @Override
+    public void checkIfNotExistsByRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
+        if(this.invoiceDao.existsByRentalCar_RentalCarId(rentalCarId)){
+            throw new BusinessException("Rental car already exists in the invoice table, rentalCarId: " + rentalCarId);
         }
     }
 }

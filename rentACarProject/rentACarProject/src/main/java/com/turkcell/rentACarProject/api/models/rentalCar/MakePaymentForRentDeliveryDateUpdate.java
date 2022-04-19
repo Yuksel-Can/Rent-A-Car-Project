@@ -25,4 +25,5 @@ public class MakePaymentForRentDeliveryDateUpdate {
     @NotNull
     @Valid
     UpdateDeliveryDateRequest updateDeliveryDateRequest;
+    
 }

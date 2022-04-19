@@ -5,6 +5,8 @@ import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCa
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.*;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatusDto;
 import com.turkcell.rentACarProject.business.requests.rentalCarRequests.DeleteRentalCarRequest;
+import com.turkcell.rentACarProject.business.requests.rentalCarRequests.DeliverTheCarRequest;
+import com.turkcell.rentACarProject.business.requests.rentalCarRequests.ReceiveTheCarRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -18,7 +20,7 @@ import java.util.List;
 @RequestMapping("/api/rentalcars")
 public class RentalCarsController {
 
-    private RentalCarService rentalCarService;
+    private final RentalCarService rentalCarService;
 
     @Autowired
     public RentalCarsController(RentalCarService rentalCarService) {
@@ -37,13 +39,13 @@ public class RentalCarsController {
     }
 
     @PutMapping("/deliverTheCar")
-    public DataResult<GetRentalCarStatusDto> deliverTheCar(@RequestParam int rentalCarId, @RequestParam int carId) throws BusinessException{
-        return this.rentalCarService.deliverTheCar(rentalCarId, carId);
+    public DataResult<GetRentalCarStatusDto> deliverTheCar(@RequestBody @Valid DeliverTheCarRequest deliverTheCarRequest) throws BusinessException{
+        return this.rentalCarService.deliverTheCar(deliverTheCarRequest);
     }
 
     @PutMapping("/receiveTheCar")
-    public DataResult<GetRentalCarStatusDto> receiveTheCar(@RequestParam int rentalCarId, @RequestParam int carId, int deliveredKilometer) throws BusinessException {
-        return this.rentalCarService.receiveTheCar(rentalCarId, carId, deliveredKilometer);
+    public DataResult<GetRentalCarStatusDto> receiveTheCar(@RequestBody @Valid ReceiveTheCarRequest receiveTheCarRequest) throws BusinessException {
+        return this.rentalCarService.receiveTheCar(receiveTheCarRequest);
     }
 
     @GetMapping("/getById")

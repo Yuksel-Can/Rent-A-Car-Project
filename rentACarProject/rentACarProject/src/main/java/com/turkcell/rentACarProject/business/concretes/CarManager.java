@@ -137,7 +137,6 @@ public class CarManager implements CarService{
 	public DataResult<List<CarListByBrandIdDto>> getAllByCar_BrandId(int brandId) throws BusinessException {
 
 		this.brandService.checkIsExistsByBrandId(brandId);
-		checkIsExistsByCar_BrandId(brandId);
 
 		List<Car> cars = this.carDao.getAllByBrand_BrandId(brandId);
 
@@ -152,7 +151,6 @@ public class CarManager implements CarService{
 	public DataResult<List<CarListByColorIdDto>> getAllByCar_ColorId(int colorId) throws BusinessException {
 
 		this.colorService.checkIsExistsByColorId(colorId);
-		checkIsExistsByCar_ColorId(colorId);
 
 		List<Car> cars = this.carDao.getAllByColor_ColorId(colorId);
 
@@ -166,11 +164,11 @@ public class CarManager implements CarService{
 	public DataResult<List<CarListByDailyPriceDto>> findByDailyPriceLessThenEqual(double dailyPrice) {
 
 		List<Car> cars = this.carDao.findByDailyPriceLessThanEqual(dailyPrice);
+
 		List<CarListByDailyPriceDto> response = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByDailyPriceDto.class))
 					.collect(Collectors.toList());
 
 		return new SuccessDataResult<>(response, "Less than Car listed");
-
 	}
 
 	@Override
@@ -221,20 +219,6 @@ public class CarManager implements CarService{
 	public void checkIsExistsByCarId(int carId) throws BusinessException {
 		if(!this.carDao.existsByCarId(carId)) {
 			throw new BusinessException("Car id not exists");
-		}
-	}
-
-	public void checkIsExistsByCar_BrandId(int brandId) throws BusinessException {
-
-		if(!this.carDao.existsByBrand_BrandId(brandId)) {
-			throw new BusinessException("There is no car in this brandId: " + brandId);
-		}
-	}
-
-	public void checkIsExistsByCar_ColorId(int colorId) throws BusinessException {
-
-		if(!this.carDao.existsByColor_ColorId(colorId)) {
-			throw new BusinessException("There is no car in this colorId: " + colorId);
 		}
 	}
 

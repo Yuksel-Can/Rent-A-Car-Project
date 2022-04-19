@@ -3,6 +3,7 @@ package com.turkcell.rentACarProject.business.abstracts;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.*;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.lists.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.invoiceRequests.CreateInvoiceRequest;
+import com.turkcell.rentACarProject.business.requests.invoiceRequests.InvoiceGetDateBetweenRequest;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -26,5 +27,9 @@ public interface InvoiceService {
     DataResult<GetInvoiceDto> getInvoiceByPayment_PaymentId(int paymentId) throws BusinessException;
     DataResult<List<InvoiceListDto>> getAllByRentalCar_RentalCarId(int rentalCarId) throws BusinessException;
     DataResult<List<InvoiceListDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException;
-    DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(Date startDate, Date endDate);
+    DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(InvoiceGetDateBetweenRequest invoiceGetDateBetweenRequest);
+
+    void checkIfNotExistsByCustomer_CustomerId(int customerId) throws BusinessException;
+    void checkIfNotExistsByRentalCar_RentalCarId(int rentalCarId) throws BusinessException;
+
 }

@@ -45,7 +45,6 @@ public class ColorManager implements ColorService{
 				.collect(Collectors.toList());
 
 		return new SuccessDataResult<>(result, "Color listed");
-		
 	}
 
 	@Override
@@ -58,7 +57,6 @@ public class ColorManager implements ColorService{
 		this.colorDao.save(color);
 
 		return new SuccessResult("Color added");
-		
 	}
 
 	@Override
@@ -72,7 +70,6 @@ public class ColorManager implements ColorService{
 		this.colorDao.save(color);
 
 		return new SuccessResult("Color updated");
-
 	}
 
 	@Override
@@ -84,7 +81,6 @@ public class ColorManager implements ColorService{
 		this.colorDao.deleteById(deleteColorRequest.getColorId());
 
 		return new SuccessResult("Color deleted");
-			
 	}
 
 	@Override
@@ -97,10 +93,7 @@ public class ColorManager implements ColorService{
 		GetColorDto getColorDto = this.modelMapperService.forDto().map(color, GetColorDto.class);
 
 		return new SuccessDataResult<>(getColorDto, "Color listed");
-		
 	}
-	
-	/**/
 	
 	public void checkIsExistsByColorId(int brandId) throws BusinessException {
 		if(!this.colorDao.existsByColorId(brandId)) {

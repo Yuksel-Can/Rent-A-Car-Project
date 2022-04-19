@@ -3,9 +3,7 @@ package com.turkcell.rentACarProject.business.abstracts;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.*;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatusDto;
-import com.turkcell.rentACarProject.business.requests.rentalCarRequests.CreateRentalCarRequest;
-import com.turkcell.rentACarProject.business.requests.rentalCarRequests.DeleteRentalCarRequest;
-import com.turkcell.rentACarProject.business.requests.rentalCarRequests.UpdateRentalCarRequest;
+import com.turkcell.rentACarProject.business.requests.rentalCarRequests.*;
 import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -24,8 +22,8 @@ public interface RentalCarService {
     Result updateForIndividualCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result updateForCorporateCustomer(UpdateRentalCarRequest updateRentalCarRequest) throws BusinessException;
     Result delete(DeleteRentalCarRequest deleteRentalCarRequest) throws BusinessException;
-    DataResult<GetRentalCarStatusDto> deliverTheCar(int rentalCarId, int carId) throws BusinessException;
-    DataResult<GetRentalCarStatusDto> receiveTheCar(int rentalCarId, int carId, int deliveredKilometer) throws BusinessException;
+    DataResult<GetRentalCarStatusDto> deliverTheCar(DeliverTheCarRequest deliverTheCarRequest) throws BusinessException;
+    DataResult<GetRentalCarStatusDto> receiveTheCar(ReceiveTheCarRequest receiveTheCarRequest) throws BusinessException;
 
     DataResult<GetRentalCarDto> getByRentalCarId(int rentalCarId) throws BusinessException;
     RentalCar getById(int rentalCarId) throws BusinessException;
@@ -42,8 +40,6 @@ public interface RentalCarService {
     void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException;
     void checkIsExistsByRentalCarId(int rentalCarId) throws BusinessException;
     void checkIsNotExistsByRentalCar_CarId(int carId) throws BusinessException;
-    void checkIsNotExistsByRentedCity_CityId(int rentedCityId) throws BusinessException;
-    void checkIsNotExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException;
 
     void checkIfFirstDateBeforeSecondDate(LocalDate firstDate, LocalDate secondDate) throws BusinessException;
     void checkIfCarAlreadyRentedForDeliveryDateUpdate(int carId, LocalDate enteredDate) throws BusinessException;

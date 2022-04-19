@@ -101,7 +101,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public DataResult<GetCarMaintenanceDto> getByCarMaintenanceId(int carMaintenanceId) throws BusinessException {
+    public DataResult<GetCarMaintenanceDto> getById(int carMaintenanceId) throws BusinessException {
 
         checkIsExistsByCarMaintenanceId(carMaintenanceId);
 
@@ -114,7 +114,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     @Override
     public DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(int carId) throws BusinessException {
 
-        checkIsExistsByCarMaintenance_CarId(carId);
+        this.carService.checkIsExistsByCarId(carId);
 
         List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findAllByCar_CarId(carId);
 
@@ -141,7 +141,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         if(carMaintenances != null){
             for (CarMaintenance carMaintenance : carMaintenances){
                 if (carMaintenance.getReturnDate()==null){
-                    if(carMaintenance.getReturnDate().now().plusDays(14).isAfter(enteredDate)){
+                    if(carMaintenance.getReturnDate().now().plusDays(14).isAfter(enteredDate)){         //todo:bu çalışmıyor olabilir, carMaintenance.getReturnDate() kısmını sil LocalDate.now() koy
                         throw new BusinessException("The car is in maintenance on the entered date");
                     }
                 }else if(carMaintenance.getReturnDate().isAfter(enteredDate)){

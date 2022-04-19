@@ -1,8 +1,6 @@
 package com.turkcell.rentACarProject.business.concretes;
 
-import com.turkcell.rentACarProject.business.abstracts.CorporateCustomerService;
-import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
-import com.turkcell.rentACarProject.business.abstracts.UserService;
+import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.corporateCustomerDtos.gets.GetCorporateCustomerDto;
 import com.turkcell.rentACarProject.business.dtos.corporateCustomerDtos.lists.CorporateCustomerListDto;
 import com.turkcell.rentACarProject.business.requests.corporateCustomerRequests.CreateCorporateCustomerRequest;
@@ -17,6 +15,7 @@ import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.CorporateCustomerDao;
 import com.turkcell.rentACarProject.entities.concretes.CorporateCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,14 +27,19 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     private final CorporateCustomerDao corporateCustomerDao;
     private final RentalCarService rentalCarService;
     private final UserService userService;
+    private final InvoiceService invoiceService;
+    private final CreditCardService creditCardService;
     private final ModelMapperService modelMapperService;
 
     @Autowired
-    public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService, RentalCarService rentalCarService, UserService userService) {
+    public CorporateCustomerManager(CorporateCustomerDao corporateCustomerDao, ModelMapperService modelMapperService,
+                                    RentalCarService rentalCarService, UserService userService, InvoiceService invoiceService, @Lazy CreditCardService creditCardService) {
         this.corporateCustomerDao = corporateCustomerDao;
         this.rentalCarService = rentalCarService;
         this.userService = userService;
         this.modelMapperService = modelMapperService;
+        this.invoiceService = invoiceService;
+        this.creditCardService = creditCardService;
     }
 
     @Override
@@ -83,6 +87,8 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         checkIfCorporateCustomerIdExists(deleteCorporateCustomerRequest.getUserId());
         this.rentalCarService.checkIfRentalCar_CustomerIdNotExists(deleteCorporateCustomerRequest.getUserId());
+        this.creditCardService.checkIfNotExistsByCustomer_CustomerId(deleteCorporateCustomerRequest.getUserId());
+        this.invoiceService.checkIfNotExistsByCustomer_CustomerId(deleteCorporateCustomerRequest.getUserId());
 
         this.corporateCustomerDao.deleteById(deleteCorporateCustomerRequest.getUserId());
 
