@@ -24,9 +24,7 @@ public interface CarMaintenanceService {
 	DataResult<GetCarMaintenanceDto> getById(int carMaintenanceId) throws BusinessException;
 	DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(int carId) throws BusinessException;
 
-	void checkIfNotReturnDateBeforeToday(LocalDate returnDate) throws BusinessException;
 	void checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(int carId, LocalDate enteredDate) throws BusinessException;
-	void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws BusinessException;
-	void checkIsExistsByCarMaintenance_CarId(int carId) throws BusinessException;
+	void checkIsExistsByCar_CarId(int carId) throws BusinessException;
 
 }

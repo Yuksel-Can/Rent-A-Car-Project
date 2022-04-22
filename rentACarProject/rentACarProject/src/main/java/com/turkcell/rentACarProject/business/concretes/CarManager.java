@@ -99,7 +99,7 @@ public class CarManager implements CarService{
 
 		checkIsExistsByCarId(deleteCarRequest.getCarId());
 		this.rentalCarService.checkIsNotExistsByRentalCar_CarId(deleteCarRequest.getCarId());
-		this.carMaintenanceService.checkIsExistsByCarMaintenance_CarId(deleteCarRequest.getCarId());
+		this.carMaintenanceService.checkIsExistsByCar_CarId(deleteCarRequest.getCarId());
 		this.carCrashService.checkIfNotExistsCarCrashByCar_CarId(deleteCarRequest.getCarId());
 
 		this.carDao.deleteById(deleteCarRequest.getCarId());

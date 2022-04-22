@@ -45,13 +45,13 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     @Override
     public DataResult<List<OrderedAdditionalListDto>> getAll() {
 
-        List<OrderedAdditional> orderedAdditionals = this.orderedAdditionalDao.findAll();
+        List<OrderedAdditional> orderedAdditionalList = this.orderedAdditionalDao.findAll();
 
-        List<OrderedAdditionalListDto> result = orderedAdditionals.stream().map(orderedAdditional -> this.modelMapperService.forDto()
+        List<OrderedAdditionalListDto> result = orderedAdditionalList.stream().map(orderedAdditional -> this.modelMapperService.forDto()
                 .map(orderedAdditional, OrderedAdditionalListDto.class)).collect(Collectors.toList());
 
         for(int i = 0; i < result.size(); i++){
-            result.get(i).setRentalCarId(orderedAdditionals.get(i).getRentalCar().getRentalCarId());
+            result.get(i).setRentalCarId(orderedAdditionalList.get(i).getRentalCar().getRentalCarId());
         }
 
         return new SuccessDataResult<>(result,"Ordered Additional Service listed");
@@ -120,7 +120,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         List<OrderedAdditionalListByRentalCarIdDto> result = orderedAdditionalList.stream().map(orderedAdditional -> this.modelMapperService
                 .forDto().map(orderedAdditional, OrderedAdditionalListByRentalCarIdDto.class)).collect(Collectors.toList());
 
-        if(result != null){
+        if(result.size() != 0){ //todo:result != null mı olmalı .size()!=0 mı - Bunu dene
             for(int i = 0; i < result.size(); i++) {
                 result.get(i).setRentalCarId(orderedAdditionalList.get(i).getRentalCar().getRentalCarId());
             }
@@ -138,7 +138,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         List<OrderedAdditionalListByAdditionalIdDto> result = orderedAdditionalList.stream().map(orderedAdditional -> this.modelMapperService
                 .forDto().map(orderedAdditional, OrderedAdditionalListByAdditionalIdDto.class)).collect(Collectors.toList());
 
-        if(result != null){
+        if(result.size() != 0){
             for(int i = 0; i < result.size(); i++){
                 result.get(i).setRentalCarId(orderedAdditionalList.get(i).getRentalCar().getRentalCarId());
             }
@@ -147,7 +147,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public void saveOrderedAdditional(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int rentalCarId) throws BusinessException {
+    public void saveOrderedAdditionalList(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int rentalCarId) throws BusinessException {
         for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
             createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
             add(createOrderedAdditionalRequest);
@@ -155,34 +155,32 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public double calculateTotalPriceForOrderedAdditionalListByRentalCarId(int rentalCarId, int totalDays) throws BusinessException {
-        //bu ekli olanlara bakarak hesaplıyor
-        List<OrderedAdditional> orderedAdditionalList = this.orderedAdditionalDao.getAllByRentalCar_RentalCarId(rentalCarId);
+    public double getPriceCalculatorForOrderedAdditionalListByRentalCarId(int rentalCarId, int totalDays) throws BusinessException {
 
+        List<OrderedAdditional> orderedAdditionalList = this.orderedAdditionalDao.getAllByRentalCar_RentalCarId(rentalCarId);
         double totalPrice = 0;
         if(orderedAdditionalList != null){
             for (OrderedAdditional orderedAdditional : orderedAdditionalList){
-                totalPrice += getPriceCalculatorForAdditional(orderedAdditional.getAdditional().getAdditionalId(), orderedAdditional.getOrderedAdditionalQuantity(), totalDays);
-
+                totalPrice += getPriceCalculatorForOrderedAdditional(orderedAdditional.getAdditional().getAdditionalId(), orderedAdditional.getOrderedAdditionalQuantity(), totalDays);
             }
         }
         return totalPrice;
     }
 
     @Override
-    public double calculateTotalPriceForOrderedAdditionalList(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws BusinessException {
-        //buda yollanan listeye bakıyor
+    public double getPriceCalculatorForOrderedAdditionalList(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws BusinessException {
+
         double totalPrice = 0;
         if(createOrderedAdditionalRequestList != null){
             for(CreateOrderedAdditionalRequest orderedAdditionalList : createOrderedAdditionalRequestList) {
-                totalPrice += getPriceCalculatorForAdditional(orderedAdditionalList.getAdditionalId(),orderedAdditionalList.getOrderedAdditionalQuantity(), totalDays);
+                totalPrice += getPriceCalculatorForOrderedAdditional(orderedAdditionalList.getAdditionalId(),orderedAdditionalList.getOrderedAdditionalQuantity(), totalDays);
             }
         }
         return totalPrice;
     }
 
     @Override
-    public double getPriceCalculatorForAdditional(int additionalId,double orderedAdditionalQuantity, int totalDays) throws BusinessException {
+    public double getPriceCalculatorForOrderedAdditional(int additionalId, double orderedAdditionalQuantity, int totalDays) throws BusinessException {
         double dailyPrice = this.additionalService.getByAdditionalId(additionalId).getData().getAdditionalDailyPrice();
         return dailyPrice * orderedAdditionalQuantity * totalDays;
     }
@@ -195,7 +193,6 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     @Override
     public void checkAllValidationForAddOrderedAdditional(int additionalId, int orderedAdditionalQuantity) throws BusinessException {
         this.additionalService.checkIfExistsByAdditionalId(additionalId);
-
         int maxUnitsPerRental = this.additionalService.getByAdditionalId(additionalId).getData().getMaxUnitsPerRental();
         if(orderedAdditionalQuantity > maxUnitsPerRental || orderedAdditionalQuantity < 1){
             throw new BusinessException("For this additional service, the Minimum quantity can be 1, the maximum quantity is: " + maxUnitsPerRental);

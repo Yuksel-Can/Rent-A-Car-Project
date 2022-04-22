@@ -227,7 +227,7 @@ public class InvoiceManager implements InvoiceService {
         int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate());
         double priceOfDays = this.rentalCarService.calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
         double priceOfDiffCity = this.rentalCarService.calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(), rentalCar.getDeliveredCity().getCityId());
-        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionalListByRentalCarId(rentalCar.getRentalCarId(), totalDays);      //todo:bu kayıtlı additionalları hesaplıyor
+        double priceOfAdditionals = this.orderedAdditionalService.getPriceCalculatorForOrderedAdditionalListByRentalCarId(rentalCar.getRentalCarId(), totalDays);      //todo:bu kayıtlı additionalları hesaplıyor
         double totalPrice = priceOfDays + priceOfDiffCity + priceOfAdditionals;
 
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();

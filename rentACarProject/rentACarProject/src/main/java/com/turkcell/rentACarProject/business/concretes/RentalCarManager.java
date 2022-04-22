@@ -401,7 +401,7 @@ public class RentalCarManager implements RentalCarService {
         }
     }
 
-    //for maintenance(*)
+    //for maintenance(**)
     @Override
     public void checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(int carId, LocalDate startDate, LocalDate finishDate) throws BusinessException {
     List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
@@ -414,7 +414,7 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
-    //for maintenance(*)
+    //for maintenance(**)
     @Override
     public void checkIfNotCarAlreadyRentedEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
     List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
@@ -476,20 +476,6 @@ public class RentalCarManager implements RentalCarService {
         }
 
     }
-/*
-    @Override
-    public void checkIsNotExistsByRentedCity_CityId(int rentedCityId) throws BusinessException {
-        if(this.rentalCarDao.existsByRentedCity_CityId(rentedCityId)){
-        throw new BusinessException("City id exists in rental car list, rentedCityId: " + rentedCityId);
-        }
-    }
-
-    @Override
-    public void checkIsNotExistsByDeliveredCity_CityId(int deliveredCityId) throws BusinessException {
-        if(this.rentalCarDao.existsByDeliveredCity_CityId(deliveredCityId)){
-        throw new BusinessException("City id exists in rental car list, deliveredCityId: " + deliveredCityId);
-        }
-    }*/
 
     @Override
     public void checkIfRentalCar_CustomerIdNotExists(int customerId) throws BusinessException {

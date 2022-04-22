@@ -165,7 +165,7 @@ public class PaymentManager implements PaymentService {
 
         checkAllValidationsForOrderedAdditionalAdd(orderedAdditionalAddModel.getRentalCarId(), orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList());
 
-        double totalPrice = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionalList(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList(),
+        double totalPrice = this.orderedAdditionalService.getPriceCalculatorForOrderedAdditionalList(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList(),
                                                                                     this.rentalCarService.getTotalDaysForRental(orderedAdditionalAddModel.getRentalCarId()));
 
         this.posService.payment(orderedAdditionalAddModel.getCreateCreditCardRequest().getCardNumber(), orderedAdditionalAddModel.getCreateCreditCardRequest().getCardOwner(),
@@ -211,7 +211,7 @@ public class PaymentManager implements PaymentService {
 
         int paymentId = this.paymentDao.save(payment).getPaymentId();
         this.creditCardService.checkSaveInformationAndSaveCreditCard(makePayment.getCreateCreditCardRequest(), cardSaveInformation);
-        this.orderedAdditionalService.saveOrderedAdditional(makePayment.getCreateOrderedAdditionalRequestList(), rentalCarId);
+        this.orderedAdditionalService.saveOrderedAdditionalList(makePayment.getCreateOrderedAdditionalRequestList(), rentalCarId);
         this.invoiceService.createAndAddInvoice(rentalCarId, paymentId);
     }
 
@@ -229,7 +229,7 @@ public class PaymentManager implements PaymentService {
 
         int paymentId = this.paymentDao.save(payment).getPaymentId();
         this.creditCardService.checkSaveInformationAndSaveCreditCard(makePayment.getCreateCreditCardRequest(), cardSaveInformation);
-        this.orderedAdditionalService.saveOrderedAdditional(makePayment.getCreateOrderedAdditionalRequestList(), rentalCarId);
+        this.orderedAdditionalService.saveOrderedAdditionalList(makePayment.getCreateOrderedAdditionalRequestList(), rentalCarId);
         this.invoiceService.createAndAddInvoice(rentalCarId, paymentId);
     }
 
@@ -301,7 +301,7 @@ public class PaymentManager implements PaymentService {
 
         int paymentId = this.paymentDao.save(payment).getPaymentId();
         this.creditCardService.checkSaveInformationAndSaveCreditCard(orderedAdditionalAddModel.getCreateCreditCardRequest(), cardSaveInformation);
-        this.orderedAdditionalService.saveOrderedAdditional(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList(), orderedAdditionalAddModel.getRentalCarId());
+        this.orderedAdditionalService.saveOrderedAdditionalList(orderedAdditionalAddModel.getCreateOrderedAdditionalRequestList(), orderedAdditionalAddModel.getRentalCarId());
         this.invoiceService.createAndAddInvoice(orderedAdditionalAddModel.getRentalCarId(), paymentId);
     }
 
@@ -399,7 +399,7 @@ public class PaymentManager implements PaymentService {
         int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCarRequest.getStartDate(), rentalCarRequest.getFinishDate());
         double priceOfRental = this.rentalCarService.calculateAndReturnRentPrice(rentalCarRequest.getStartDate(), rentalCarRequest.getFinishDate(),
                 this.carService.getDailyPriceByCarId(rentalCarRequest.getCarId()), rentalCarRequest.getRentedCityCityId(), rentalCarRequest.getDeliveredCityId());
-        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionalList(orderedAdditionalRequestList,totalDays);
+        double priceOfAdditionals = this.orderedAdditionalService.getPriceCalculatorForOrderedAdditionalList(orderedAdditionalRequestList,totalDays);
 
         return priceOfRental + priceOfAdditionals;
     }
@@ -410,7 +410,7 @@ public class PaymentManager implements PaymentService {
 
         double priceOfRental = this.rentalCarService.calculateRentalCarTotalDayPrice(rentalCar.getFinishDate(), updateDeliveryDateRequest.getFinishDate(),
                 this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
-        double priceOfAdditionals = this.orderedAdditionalService.calculateTotalPriceForOrderedAdditionalListByRentalCarId(rentalCar.getRentalCarId(), totalDays);
+        double priceOfAdditionals = this.orderedAdditionalService.getPriceCalculatorForOrderedAdditionalListByRentalCarId(rentalCar.getRentalCarId(), totalDays);
 
         return priceOfRental + priceOfAdditionals;
     }
@@ -433,10 +433,10 @@ public class PaymentManager implements PaymentService {
     private double calculatePriceDifferenceWithPreviousOrderedAdditional(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
         OrderedAdditional orderedAdditional = this.orderedAdditionalService.getById(updateOrderedAdditionalRequest.getOrderedAdditionalId());
 
-        double previousPrice = this.orderedAdditionalService.getPriceCalculatorForAdditional(orderedAdditional.getAdditional().getAdditionalId(),
+        double previousPrice = this.orderedAdditionalService.getPriceCalculatorForOrderedAdditional(orderedAdditional.getAdditional().getAdditionalId(),
                 orderedAdditional.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(orderedAdditional.getRentalCar().getRentalCarId()));
 
-        double nextPrice = this.orderedAdditionalService.getPriceCalculatorForAdditional(updateOrderedAdditionalRequest.getAdditionalId(),
+        double nextPrice = this.orderedAdditionalService.getPriceCalculatorForOrderedAdditional(updateOrderedAdditionalRequest.getAdditionalId(),
                 updateOrderedAdditionalRequest.getOrderedAdditionalQuantity(), this.rentalCarService.getTotalDaysForRental(updateOrderedAdditionalRequest.getRentalCarId()));
 
         if(nextPrice>previousPrice){
