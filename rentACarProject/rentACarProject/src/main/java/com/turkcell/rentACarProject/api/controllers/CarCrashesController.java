@@ -7,7 +7,9 @@ import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashLis
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.CreateCarCrashRequest;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.DeleteCarCrashRequest;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.UpdateCarCrashRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carCrashExceptions.CarCrashNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carCrashExceptions.CrashDateAfterTodayException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.CarNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,7 @@ import java.util.List;
 @RequestMapping("/api/carCrashes")
 public class CarCrashesController {
 
-    private CarCrashService carCrashService;
+    private final CarCrashService carCrashService;
 
     @Autowired
     public CarCrashesController(CarCrashService carCrashService) {
@@ -34,27 +36,27 @@ public class CarCrashesController {
     }
 
     @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateCarCrashRequest createCarCrashRequest) throws BusinessException {
+    public Result add(@RequestBody @Valid CreateCarCrashRequest createCarCrashRequest) throws CrashDateAfterTodayException, CarNotFoundException {
         return this.carCrashService.add(createCarCrashRequest);
     }
 
     @PutMapping("/update")
-    public Result update(@RequestBody @Valid UpdateCarCrashRequest updateCarCrashRequest) throws BusinessException {
+    public Result update(@RequestBody @Valid UpdateCarCrashRequest updateCarCrashRequest) throws CrashDateAfterTodayException, CarCrashNotFoundException, CarNotFoundException {
         return this.carCrashService.update(updateCarCrashRequest);
     }
 
     @DeleteMapping("/delete")
-    public Result delete(@RequestBody @Valid DeleteCarCrashRequest deleteCarCrashRequest) throws BusinessException {
+    public Result delete(@RequestBody @Valid DeleteCarCrashRequest deleteCarCrashRequest) throws CarCrashNotFoundException {
         return this.carCrashService.delete(deleteCarCrashRequest);
     }
 
     @GetMapping("/getById")
-    public DataResult<GetCarCrashDto> getById(@RequestParam int carCrashId) throws BusinessException {
+    public DataResult<GetCarCrashDto> getById(@RequestParam int carCrashId) throws CarCrashNotFoundException {
         return this.carCrashService.getById(carCrashId);
     }
 
     @GetMapping("/getCarCrashByCar_CarId")
-    public DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(@RequestParam int carId) throws BusinessException {
+    public DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(@RequestParam int carId) throws CarNotFoundException {
         return this.carCrashService.getCarCrashByCar_CarId(carId);
     }
 }

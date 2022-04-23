@@ -3,7 +3,7 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.CityService;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.lists.CityListDto;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.gets.GetCityDto;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.cityExceptions.CityNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
@@ -39,7 +39,7 @@ public class CityManager implements CityService {
     }
 
     @Override
-    public DataResult<GetCityDto> getByCityId(int cityId) throws BusinessException {
+    public DataResult<GetCityDto> getByCityId(int cityId) throws CityNotFoundException {
 
         checkIfExistsByCityId(cityId);
 
@@ -50,9 +50,9 @@ public class CityManager implements CityService {
         return new SuccessDataResult<>(result, "City listed by cityId: " + cityId);
     }
 
-    public void checkIfExistsByCityId(int cityId) throws BusinessException {
+    public void checkIfExistsByCityId(int cityId) throws CityNotFoundException {
         if(!this.cityDao.existsByCityId(cityId)){
-            throw new BusinessException("City id not exists");
+            throw new CityNotFoundException("City id not exists");
         }
     }
 

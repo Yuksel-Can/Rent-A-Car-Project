@@ -3,6 +3,9 @@ package com.turkcell.rentACarProject.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.BrandExistsInCarException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +16,6 @@ import com.turkcell.rentACarProject.business.dtos.brandDtos.gets.GetBrandDto;
 import com.turkcell.rentACarProject.business.requests.brandRequests.CreateBrandRequest;
 import com.turkcell.rentACarProject.business.requests.brandRequests.DeleteBrandRequest;
 import com.turkcell.rentACarProject.business.requests.brandRequests.UpdateBrandRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -48,7 +50,7 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public Result add(CreateBrandRequest createBrandRequest) throws BusinessException {
+	public Result add(CreateBrandRequest createBrandRequest) throws BrandAlreadyExistsException {
 
 		checkIsNotExistByBrandName(createBrandRequest.getBrandName());
 		
@@ -60,7 +62,7 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public Result update(UpdateBrandRequest updateBrandRequest) throws BusinessException {
+	public Result update(UpdateBrandRequest updateBrandRequest) throws BrandAlreadyExistsException, BrandNotFoundException {
 				
 		checkIsExistsByBrandId(updateBrandRequest.getBrandId());
 		checkIsNotExistByBrandName(updateBrandRequest.getBrandName());
@@ -73,7 +75,7 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public Result delete(DeleteBrandRequest deleteBrandRequest) throws BusinessException {
+	public Result delete(DeleteBrandRequest deleteBrandRequest) throws BrandNotFoundException, BrandExistsInCarException {
 		
 		checkIsExistsByBrandId(deleteBrandRequest.getBrandId());
 		this.carService.checkIsNotExistsByCar_BrandId(deleteBrandRequest.getBrandId());
@@ -84,7 +86,7 @@ public class BrandManager implements BrandService {
 	}
 
 	@Override
-	public DataResult<GetBrandDto> getById(int id) throws BusinessException {
+	public DataResult<GetBrandDto> getById(int id) throws BrandNotFoundException {
 
 		checkIsExistsByBrandId(id);
 			
@@ -97,16 +99,16 @@ public class BrandManager implements BrandService {
 	
 	/**/
 	
-	public void checkIsExistsByBrandId(int id) throws BusinessException {
+	public void checkIsExistsByBrandId(int id) throws BrandNotFoundException {
 		if(!this.brandDao.existsByBrandId(id)) {
-			throw new BusinessException("Brand id not exists");
+			throw new BrandNotFoundException("Brand id not exists");
 		}
 		
 	}
 
-	public void checkIsNotExistByBrandName(String name) throws BusinessException {
+	public void checkIsNotExistByBrandName(String name) throws BrandAlreadyExistsException {
 		if(this.brandDao.existsByBrandName(name)) {
-			throw new BusinessException("Brand name already exists");
+			throw new BrandAlreadyExistsException("Brand name already exists");
 		}
 	}
 

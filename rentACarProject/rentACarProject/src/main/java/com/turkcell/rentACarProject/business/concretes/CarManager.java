@@ -7,6 +7,12 @@ import java.util.stream.Collectors;
 import com.turkcell.rentACarProject.business.abstracts.*;
 import com.turkcell.rentACarProject.business.dtos.carDtos.gets.GetCarDto;
 import com.turkcell.rentACarProject.business.dtos.carDtos.lists.*;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carCrashExceptions.CarExistsInCarCrashException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.*;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.CarExistsInCarMaintenanceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.colorExceptions.ColorNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.CarAlreadyExistsInRentalCarException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +23,6 @@ import org.springframework.stereotype.Service;
 import com.turkcell.rentACarProject.business.requests.carRequests.CreateCarRequest;
 import com.turkcell.rentACarProject.business.requests.carRequests.DeleteCarRequest;
 import com.turkcell.rentACarProject.business.requests.carRequests.UpdateCarRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.ErrorDataResult;
@@ -64,7 +69,7 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public Result add(CreateCarRequest createCarRequest)  throws BusinessException {
+	public Result add(CreateCarRequest createCarRequest) throws ModelYearAfterThisYearException, BrandNotFoundException, ColorNotFoundException {
 
 		this.brandService.checkIsExistsByBrandId(createCarRequest.getBrandId());
 		this.colorService.checkIsExistsByColorId(createCarRequest.getColorId());
@@ -75,11 +80,11 @@ public class CarManager implements CarService{
 		this.carDao.save(car);
 
 		return new SuccessResult("Car added");
-		
+
 	}
 
 	@Override
-	public Result update(UpdateCarRequest updateCarRequest) throws BusinessException {
+	public Result update(UpdateCarRequest updateCarRequest) throws ModelYearAfterThisYearException, BrandNotFoundException, CarNotFoundException, ColorNotFoundException {
 
 		checkIsExistsByCarId(updateCarRequest.getCarId());
 		this.brandService.checkIsExistsByBrandId(updateCarRequest.getBrandId());
@@ -95,7 +100,7 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public Result delete(DeleteCarRequest deleteCarRequest) throws BusinessException {
+	public Result delete(DeleteCarRequest deleteCarRequest) throws CarExistsInCarCrashException, CarExistsInCarMaintenanceException, CarNotFoundException, CarAlreadyExistsInRentalCarException {
 
 		checkIsExistsByCarId(deleteCarRequest.getCarId());
 		this.rentalCarService.checkIsNotExistsByRentalCar_CarId(deleteCarRequest.getCarId());
@@ -109,7 +114,7 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public void updateKilometer(int carId, int kilometer) throws BusinessException {
+	public void updateKilometer(int carId, int kilometer) throws ReturnKilometerLessThanRentKilometerException, CarNotFoundException {
 
 		checkIsExistsByCarId(carId);
 		Car car = this.carDao.getById(carId);
@@ -121,7 +126,7 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public DataResult<GetCarDto> getById(int id) throws BusinessException {
+	public DataResult<GetCarDto> getById(int id) throws CarNotFoundException {
 
 		checkIsExistsByCarId(id);
 
@@ -134,7 +139,7 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public DataResult<List<CarListByBrandIdDto>> getAllByCar_BrandId(int brandId) throws BusinessException {
+	public DataResult<List<CarListByBrandIdDto>> getAllByCar_BrandId(int brandId) throws BrandNotFoundException {
 
 		this.brandService.checkIsExistsByBrandId(brandId);
 
@@ -148,7 +153,7 @@ public class CarManager implements CarService{
 	}
 
 	@Override
-	public DataResult<List<CarListByColorIdDto>> getAllByCar_ColorId(int colorId) throws BusinessException {
+	public DataResult<List<CarListByColorIdDto>> getAllByCar_ColorId(int colorId) throws ColorNotFoundException {
 
 		this.colorService.checkIsExistsByColorId(colorId);
 
@@ -202,52 +207,49 @@ public class CarManager implements CarService{
 
 	/**/
 
-	private void checkIsModelYearBeforeThisYear(int modelYear) throws BusinessException {
+	private void checkIsModelYearBeforeThisYear(int modelYear) throws ModelYearAfterThisYearException {
 		if(modelYear > LocalDate.now().getYear()){
-			throw new BusinessException("The model year may be this year or previous years.");
+			throw new ModelYearAfterThisYearException("The model year may be this year or previous years.");
 		}
 
 	}
 
-	private void checkIfReturnKilometerValid(int beforeKilometer, int afterKilometer) throws BusinessException {
+	private void checkIfReturnKilometerValid(int beforeKilometer, int afterKilometer) throws ReturnKilometerLessThanRentKilometerException {
 		if(beforeKilometer> afterKilometer){
-			throw new BusinessException("Delivered kilometer cannot be lower than rented kilometer");
+			throw new ReturnKilometerLessThanRentKilometerException("Delivered kilometer cannot be lower than rented kilometer");
 		}
 	}
 
 	@Override
-	public void checkIsExistsByCarId(int carId) throws BusinessException {
+	public void checkIsExistsByCarId(int carId) throws CarNotFoundException {
 		if(!this.carDao.existsByCarId(carId)) {
-			throw new BusinessException("Car id not exists");
+			throw new CarNotFoundException("Car id not exists");
 		}
 	}
 
 	@Override
-	public void checkIsNotExistsByCar_BrandId(int brandId) throws BusinessException {
+	public void checkIsNotExistsByCar_BrandId(int brandId) throws BrandExistsInCarException {
 
 		if(this.carDao.existsByBrand_BrandId(brandId)) {
-			throw new BusinessException("Brand id used by a car");
+			throw new BrandExistsInCarException("Brand id used by a car");
 		}
 	}
 
 	@Override
-	public void checkIsNotExistsByCar_ColorId(int colorId) throws BusinessException {
+	public void checkIsNotExistsByCar_ColorId(int colorId) throws ColorExistsInCarException {
 
 		if(this.carDao.existsByColor_ColorId(colorId)) {
-			throw new BusinessException("Color id used by a car");
+			throw new ColorExistsInCarException("Color id used by a car");
 		}
 	}
 
 	@Override
 	public double getDailyPriceByCarId(int carId) {
-
 		Car car = this.carDao.getById(carId);
 		return car.getDailyPrice();
-
 	}
 
 	Sort selectSortedType(int sort) {
-
 		if(sort==1) {
 			return Sort.by(Sort.Direction.ASC, "dailyPrice");
 		}else if(sort==0) {

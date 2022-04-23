@@ -3,7 +3,8 @@ package com.turkcell.rentACarProject.api.controllers;
 import com.turkcell.rentACarProject.business.abstracts.CreditCardService;
 import com.turkcell.rentACarProject.business.dtos.creditCardDtos.gets.GetCreditCardDto;
 import com.turkcell.rentACarProject.business.dtos.creditCardDtos.lists.CreditCardListDto;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.creditCardExceptions.CreditCardNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.customerExceptions.CustomerNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/creditCards")
 public class CreditCardsController {
 
-    private CreditCardService creditCardService;
+    private final CreditCardService creditCardService;
 
     @Autowired
     public CreditCardsController(CreditCardService creditCardService) {
@@ -31,12 +32,12 @@ public class CreditCardsController {
     }
 
     @GetMapping("/getById")
-    public DataResult<GetCreditCardDto> getById(@RequestParam int creditCardId) throws BusinessException {
+    public DataResult<GetCreditCardDto> getById(@RequestParam int creditCardId) throws CreditCardNotFoundException {
         return this.creditCardService.getById(creditCardId);
     }
 
     @GetMapping("/getAllCreditCardByCustomer_CustomerId")
-    public DataResult<List<CreditCardListDto>> getAllCreditCardByCustomer_CustomerId(@RequestParam int customerId) throws BusinessException {
+    public DataResult<List<CreditCardListDto>> getAllCreditCardByCustomer_CustomerId(@RequestParam int customerId) throws CustomerNotFoundException {
         return this.creditCardService.getAllCreditCardByCustomer_CustomerId(customerId);
     }
 

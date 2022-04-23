@@ -3,7 +3,7 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.CustomerService;
 import com.turkcell.rentACarProject.business.dtos.customerDtos.lists.CustomerListDto;
 import com.turkcell.rentACarProject.business.dtos.customerDtos.gets.GetCustomerDto;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.customerExceptions.CustomerNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
@@ -40,7 +40,7 @@ public class CustomerManager implements CustomerService {
     }
 
     @Override
-    public DataResult<GetCustomerDto> getById(int customerId) throws BusinessException {
+    public DataResult<GetCustomerDto> getById(int customerId) throws CustomerNotFoundException {
 
         checkIfCustomerIdExists(customerId);
 
@@ -52,9 +52,9 @@ public class CustomerManager implements CustomerService {
     }
 
     @Override
-    public void checkIfCustomerIdExists(int customerId) throws BusinessException {
+    public void checkIfCustomerIdExists(int customerId) throws CustomerNotFoundException {
         if(!this.customerDao.existsByCustomerId(customerId)){
-            throw new BusinessException("Customer id not found, customerId: " + customerId);
+            throw new CustomerNotFoundException("Customer id not found, customerId: " + customerId);
         }
     }
 

@@ -3,7 +3,7 @@ package com.turkcell.rentACarProject.api.controllers;
 import com.turkcell.rentACarProject.business.abstracts.CityService;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.lists.CityListDto;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.gets.GetCityDto;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.cityExceptions.CityNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/api/cities")
 public class CitiesController {
 
-    private CityService cityService;
+    private final CityService cityService;
 
     @Autowired
     public CitiesController(CityService cityService) {
@@ -28,7 +28,7 @@ public class CitiesController {
     }
 
     @GetMapping("getByCityId")
-    public DataResult<GetCityDto> getByCityId(@RequestParam int cityId) throws BusinessException {
+    public DataResult<GetCityDto> getByCityId(@RequestParam int cityId) throws CityNotFoundException {
         return this.cityService.getByCityId(cityId);
     }
 }

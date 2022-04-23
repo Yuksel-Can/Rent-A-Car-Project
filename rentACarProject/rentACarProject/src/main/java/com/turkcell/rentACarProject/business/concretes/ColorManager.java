@@ -3,6 +3,9 @@ package com.turkcell.rentACarProject.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.ColorExistsInCarException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.colorExceptions.ColorAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.colorExceptions.ColorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +16,6 @@ import com.turkcell.rentACarProject.business.dtos.colorDtos.gets.GetColorDto;
 import com.turkcell.rentACarProject.business.requests.colorRequests.CreateColorRequest;
 import com.turkcell.rentACarProject.business.requests.colorRequests.DeleteColorRequest;
 import com.turkcell.rentACarProject.business.requests.colorRequests.UpdateColorRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -48,7 +50,7 @@ public class ColorManager implements ColorService{
 	}
 
 	@Override
-	public Result add(CreateColorRequest createColorRequest) throws BusinessException {
+	public Result add(CreateColorRequest createColorRequest) throws ColorAlreadyExistsException {
 		
 		checkIsNotExistsByColorName(createColorRequest.getColorName());
 		
@@ -60,7 +62,7 @@ public class ColorManager implements ColorService{
 	}
 
 	@Override
-	public Result update(UpdateColorRequest updateColorRequest) throws BusinessException {
+	public Result update(UpdateColorRequest updateColorRequest) throws ColorAlreadyExistsException, ColorNotFoundException {
 
 		checkIsExistsByColorId(updateColorRequest.getColorId());
 		checkIsNotExistsByColorName(updateColorRequest.getColorName());
@@ -73,7 +75,7 @@ public class ColorManager implements ColorService{
 	}
 
 	@Override
-	public Result delete(DeleteColorRequest deleteColorRequest) throws BusinessException {
+	public Result delete(DeleteColorRequest deleteColorRequest) throws ColorExistsInCarException, ColorNotFoundException {
 
 		checkIsExistsByColorId(deleteColorRequest.getColorId());
 		this.carService.checkIsNotExistsByCar_ColorId(deleteColorRequest.getColorId());
@@ -84,7 +86,7 @@ public class ColorManager implements ColorService{
 	}
 
 	@Override
-	public DataResult<GetColorDto> getById(int id) throws BusinessException {
+	public DataResult<GetColorDto> getById(int id) throws ColorNotFoundException {
 
 		checkIsExistsByColorId(id);
 		
@@ -95,15 +97,15 @@ public class ColorManager implements ColorService{
 		return new SuccessDataResult<>(getColorDto, "Color listed");
 	}
 	
-	public void checkIsExistsByColorId(int brandId) throws BusinessException {
+	public void checkIsExistsByColorId(int brandId) throws ColorNotFoundException {
 		if(!this.colorDao.existsByColorId(brandId)) {
-			throw new BusinessException("Color id not exists");
+			throw new ColorNotFoundException("Color id not exists");
 		}
 	}
-	
-	public void checkIsNotExistsByColorName(String brandName) throws BusinessException {
+
+	private void checkIsNotExistsByColorName(String brandName) throws ColorAlreadyExistsException {
 		if(this.colorDao.existsByColorName(brandName)) {
-			throw new BusinessException("Color name already exists");
+			throw new ColorAlreadyExistsException("Color name already exists");
 		}
 	}
 

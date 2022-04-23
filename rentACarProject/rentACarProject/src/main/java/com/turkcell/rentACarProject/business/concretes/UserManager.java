@@ -3,7 +3,9 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.UserService;
 import com.turkcell.rentACarProject.business.dtos.userDtos.gets.GetUserDto;
 import com.turkcell.rentACarProject.business.dtos.userDtos.lists.UserListDto;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserEmailNotValidException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
@@ -18,8 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class UserManager implements UserService {
 
-    private UserDao userDao;
-    private ModelMapperService modelMapperService;
+    private final UserDao userDao;
+    private final ModelMapperService modelMapperService;
 
     @Autowired
     public UserManager(UserDao userDao, ModelMapperService modelMapperService) {
@@ -41,7 +43,7 @@ public class UserManager implements UserService {
     }
 
     @Override
-    public DataResult<GetUserDto> getById(int userId) throws BusinessException {
+    public DataResult<GetUserDto> getById(int userId) throws UserNotFoundException {
 
         checkIfUserIdExists(userId);
 
@@ -55,25 +57,25 @@ public class UserManager implements UserService {
 
 
     @Override
-    public boolean checkIfUserIdExists(int userId) throws BusinessException {
+    public boolean checkIfUserIdExists(int userId) throws UserNotFoundException {
         if(!this.userDao.existsByUserId(userId)){
-          throw new BusinessException("User id not exists, userId: " + userId);
+          throw new UserNotFoundException("User id not exists, userId: " + userId);
         }
         return true;
     }
 
     @Override
-    public boolean checkIfUserEmailNotExists(String email) throws BusinessException {
+    public boolean checkIfUserEmailNotExists(String email) throws UserAlreadyExistsException {
         if(this.userDao.existsByEmail(email)){
-            throw new BusinessException("User Already exists, email: " + email);
+            throw new UserAlreadyExistsException("User Already exists, email: " + email);
         }
         return true;
     }
 
     @Override
-    public boolean checkIfUserEmailNotExistsForUpdate(int userId, String email) throws BusinessException {
+    public boolean checkIfUserEmailNotExistsForUpdate(int userId, String email) throws UserEmailNotValidException {
         if(this.userDao.existsByEmailAndUserIdIsNot(email, userId)){
-            throw new BusinessException("User Already exists, email: " + email);
+            throw new UserEmailNotValidException("User Already exists, email: " + email);
         }
         return true;
     }

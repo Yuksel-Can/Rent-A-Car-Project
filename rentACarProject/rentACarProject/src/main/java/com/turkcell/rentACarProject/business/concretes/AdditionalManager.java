@@ -7,7 +7,9 @@ import com.turkcell.rentACarProject.business.dtos.additionalDtos.gets.GetAdditio
 import com.turkcell.rentACarProject.business.requests.additionalRequests.CreateAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.additionalRequests.DeleteAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.additionalRequests.UpdateAdditionalRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.additionalExceptions.AdditionalAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.additionalExceptions.AdditionalNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.orderedAdditionalExceptions.AdditionalAlreadyExistsInOrderedAdditionalException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -50,7 +52,7 @@ public class AdditionalManager implements AdditionalService {
     }
 
     @Override
-    public Result add(CreateAdditionalRequest createAdditionalRequest) throws BusinessException {
+    public Result add(CreateAdditionalRequest createAdditionalRequest) throws AdditionalAlreadyExistsException {
 
         checkIsNotExistsByAdditionalName(createAdditionalRequest.getAdditionalName());
 
@@ -63,7 +65,7 @@ public class AdditionalManager implements AdditionalService {
     }
 
     @Override
-    public Result update(UpdateAdditionalRequest updateAdditionalRequest) throws BusinessException {
+    public Result update(UpdateAdditionalRequest updateAdditionalRequest) throws AdditionalAlreadyExistsException, AdditionalNotFoundException {
 
         checkIfExistsByAdditionalId(updateAdditionalRequest.getAdditionalId());
         checkIsNotExistsByAdditionalName(updateAdditionalRequest.getAdditionalName());
@@ -77,7 +79,7 @@ public class AdditionalManager implements AdditionalService {
     }
 
     @Override
-    public Result delete(DeleteAdditionalRequest deleteAdditionalRequest) throws BusinessException {
+    public Result delete(DeleteAdditionalRequest deleteAdditionalRequest) throws AdditionalNotFoundException, AdditionalAlreadyExistsInOrderedAdditionalException {
 
         checkIfExistsByAdditionalId(deleteAdditionalRequest.getAdditionalId());
         this.orderedAdditionalService.checkIsNotExistsByOrderedAdditional_AdditionalId(deleteAdditionalRequest.getAdditionalId());
@@ -89,7 +91,7 @@ public class AdditionalManager implements AdditionalService {
     }
 
     @Override
-    public DataResult<GetAdditionalDto> getByAdditionalId(int additionalId) throws BusinessException {
+    public DataResult<GetAdditionalDto> getByAdditionalId(int additionalId) throws AdditionalNotFoundException {
 
         checkIfExistsByAdditionalId(additionalId);
 
@@ -102,15 +104,15 @@ public class AdditionalManager implements AdditionalService {
     }
 
     @Override
-    public void checkIfExistsByAdditionalId(int additionalId) throws BusinessException {
+    public void checkIfExistsByAdditionalId(int additionalId) throws AdditionalNotFoundException {
         if(!this.additionalDao.existsByAdditionalId(additionalId)){
-            throw new BusinessException("Additional Service ıd not exists, additionalId: " + additionalId);
+            throw new AdditionalNotFoundException("Additional Service ıd not exists, additionalId: " + additionalId);
         }
     }
 
-    private void checkIsNotExistsByAdditionalName(String additionalName) throws BusinessException {
+    private void checkIsNotExistsByAdditionalName(String additionalName) throws AdditionalAlreadyExistsException {
         if(this.additionalDao.existsByAdditionalName(additionalName)){
-            throw new BusinessException("Additional Service name already exists, name: " + additionalName);
+            throw new AdditionalAlreadyExistsException("Additional Service name already exists, name: " + additionalName);
         }
     }
 

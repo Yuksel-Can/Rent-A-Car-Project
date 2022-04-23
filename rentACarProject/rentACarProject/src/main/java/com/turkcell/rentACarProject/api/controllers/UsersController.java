@@ -3,7 +3,7 @@ package com.turkcell.rentACarProject.api.controllers;
 import com.turkcell.rentACarProject.business.abstracts.UserService;
 import com.turkcell.rentACarProject.business.dtos.userDtos.gets.GetUserDto;
 import com.turkcell.rentACarProject.business.dtos.userDtos.lists.UserListDto;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UsersController {
 
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UsersController(UserService userService) {
@@ -30,7 +30,7 @@ public class UsersController {
     }
 
     @GetMapping("/getById")
-    public DataResult<GetUserDto> getById(@RequestParam int userId) throws BusinessException {
+    public DataResult<GetUserDto> getById(@RequestParam int userId) throws UserNotFoundException {
         return this.userService.getById(userId);
     }
 }

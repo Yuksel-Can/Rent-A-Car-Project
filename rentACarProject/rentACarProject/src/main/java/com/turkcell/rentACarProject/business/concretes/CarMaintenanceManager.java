@@ -9,7 +9,13 @@ import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.gets.GetCar
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.CreateCarMaintenanceRequest;
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.DeleteCarMaintenanceRequest;
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.UpdateCarMaintenanceRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.CarNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.CarAlreadyInMaintenanceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.CarExistsInCarMaintenanceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.CarMaintenanceNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.MaintenanceReturnDateBeforeTodayException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.CarAlreadyRentedEnteredDateException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.StartDateBeforeTodayException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -53,7 +59,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
+    public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws MaintenanceReturnDateBeforeTodayException, CarAlreadyInMaintenanceException, CarNotFoundException, CarAlreadyRentedEnteredDateException, StartDateBeforeTodayException {
 
         checkAllValidationForCarMaintenance(createCarMaintenanceRequest.getReturnDate(),createCarMaintenanceRequest.getCarId());
 
@@ -66,7 +72,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws BusinessException {
+    public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws CarMaintenanceNotFoundException, MaintenanceReturnDateBeforeTodayException, CarAlreadyInMaintenanceException, CarNotFoundException, CarAlreadyRentedEnteredDateException, StartDateBeforeTodayException {
 
         checkIsExistsByCarMaintenanceId(updateCarMaintenanceRequest.getMaintenanceId());
         checkAllValidationForCarMaintenance(updateCarMaintenanceRequest.getReturnDate(), updateCarMaintenanceRequest.getCarId());
@@ -79,7 +85,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public Result delete(DeleteCarMaintenanceRequest carMaintenanceRequest) throws BusinessException {
+    public Result delete(DeleteCarMaintenanceRequest carMaintenanceRequest) throws CarMaintenanceNotFoundException {
 
         checkIsExistsByCarMaintenanceId(carMaintenanceRequest.getMaintenanceId());
 
@@ -89,7 +95,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public DataResult<GetCarMaintenanceDto> getById(int carMaintenanceId) throws BusinessException {
+    public DataResult<GetCarMaintenanceDto> getById(int carMaintenanceId) throws CarMaintenanceNotFoundException {
 
         checkIsExistsByCarMaintenanceId(carMaintenanceId);
 
@@ -100,7 +106,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
     }
 
     @Override
-    public DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(int carId) throws BusinessException {
+    public DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(int carId) throws CarNotFoundException {
 
         this.carService.checkIsExistsByCarId(carId);
 
@@ -112,7 +118,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         return new SuccessDataResult<>(result, "Car maintenances are listed by car id: " + carId);
     }
 
-    private void checkAllValidationForCarMaintenance(LocalDate returnDate, int carId) throws BusinessException {
+    private void checkAllValidationForCarMaintenance(LocalDate returnDate, int carId) throws CarAlreadyInMaintenanceException, MaintenanceReturnDateBeforeTodayException, CarNotFoundException, CarAlreadyRentedEnteredDateException, StartDateBeforeTodayException {
 
         checkIfNotReturnDateBeforeToday(returnDate);
         this.carService.checkIsExistsByCarId(carId);
@@ -123,16 +129,16 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         this.rentalCarService.checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(carId, LocalDate.now(), returnDate);
     }
 
-    private void checkIfNotReturnDateBeforeToday(LocalDate returnDate) throws BusinessException {
+    private void checkIfNotReturnDateBeforeToday(LocalDate returnDate) throws MaintenanceReturnDateBeforeTodayException {
         if(returnDate != null){
             if(returnDate.isBefore(LocalDate.now())){
-                throw new BusinessException("return date cannot be a past date");
+                throw new MaintenanceReturnDateBeforeTodayException("return date cannot be a past date");
             }
         }
     }
 
     @Override
-    public void checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(int carId, LocalDate enteredDate) throws BusinessException {
+    public void checkIfNotCarAlreadyInMaintenanceOnTheEnteredDate(int carId, LocalDate enteredDate) throws CarAlreadyInMaintenanceException {
 
         List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findAllByCar_CarId(carId);
 
@@ -140,25 +146,25 @@ public class CarMaintenanceManager implements CarMaintenanceService {
             for (CarMaintenance carMaintenance : carMaintenances){
                 if (carMaintenance.getReturnDate()==null){
                     if(carMaintenance.getReturnDate().now().plusDays(14).isAfter(enteredDate)){         //todo:bu çalışmıyor olabilir, carMaintenance.getReturnDate() kısmını sil LocalDate.now() koy
-                        throw new BusinessException("The car is in maintenance on the entered date");
+                        throw new CarAlreadyInMaintenanceException("The car is in maintenance on the entered date");
                     }
                 }else if(carMaintenance.getReturnDate().isAfter(enteredDate)){
-                    throw new BusinessException("The car is in maintenance on the entered date");
+                    throw new CarAlreadyInMaintenanceException("The car is in maintenance on the entered date");
                 }
             }
         }
     }
 
-    private void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws BusinessException {
+    private void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws CarMaintenanceNotFoundException {
         if(!this.carMaintenanceDao.existsByMaintenanceId(carMaintenanceId)){
-            throw new BusinessException("Car Maintenance id not exists");
+            throw new CarMaintenanceNotFoundException("Car Maintenance id not exists");
         }
     }
 
     @Override
-    public void checkIsExistsByCar_CarId(int carId) throws BusinessException {
-        if(!this.carMaintenanceDao.existsByCar_CarId(carId)){
-            throw new BusinessException("Car id not found in car maintenance");
+    public void checkIsExistsByCar_CarId(int carId) throws CarExistsInCarMaintenanceException {
+        if(this.carMaintenanceDao.existsByCar_CarId(carId)){
+            throw new CarExistsInCarMaintenanceException("Car id not found in car maintenance");
         }
     }
 

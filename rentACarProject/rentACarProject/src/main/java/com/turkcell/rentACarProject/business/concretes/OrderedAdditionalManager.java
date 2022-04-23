@@ -10,7 +10,9 @@ import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.lists.Or
 import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.CreateOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.DeleteOrderedAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.orderedAdditionalRequests.UpdateOrderedAdditionalRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.additionalExceptions.AdditionalNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.orderedAdditionalExceptions.*;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.RentalCarNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -58,7 +60,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws BusinessException {
+    public Result add(CreateOrderedAdditionalRequest createOrderedAdditionalRequest) throws RentalCarNotFoundException {
 
         this.rentalCarService.checkIsExistsByRentalCarId(createOrderedAdditionalRequest.getRentalCarId());
 
@@ -71,7 +73,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws BusinessException {
+    public Result update(UpdateOrderedAdditionalRequest updateOrderedAdditionalRequest) throws OrderedAdditionalNotFoundException {
 
         checkIsExistsByOrderedAdditionalId(updateOrderedAdditionalRequest.getOrderedAdditionalId());
 
@@ -84,7 +86,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public Result delete(DeleteOrderedAdditionalRequest deleteOrderedAdditionalRequest) throws BusinessException {
+    public Result delete(DeleteOrderedAdditionalRequest deleteOrderedAdditionalRequest) throws OrderedAdditionalNotFoundException {
 
         checkIsExistsByOrderedAdditionalId(deleteOrderedAdditionalRequest.getOrderedAdditionalId());
 
@@ -96,7 +98,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public DataResult<GetOrderedAdditionalDto> getByOrderedAdditionalId(int orderedAdditionalId) throws BusinessException {
+    public DataResult<GetOrderedAdditionalDto> getByOrderedAdditionalId(int orderedAdditionalId) throws OrderedAdditionalNotFoundException {
 
         checkIsExistsByOrderedAdditionalId(orderedAdditionalId);
 
@@ -111,7 +113,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public DataResult<List<OrderedAdditionalListByRentalCarIdDto>> getByOrderedAdditional_RentalCarId(int rentalCarId) throws BusinessException {
+    public DataResult<List<OrderedAdditionalListByRentalCarIdDto>> getByOrderedAdditional_RentalCarId(int rentalCarId) throws RentalCarNotFoundException {
 
         this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
 
@@ -129,7 +131,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public DataResult<List<OrderedAdditionalListByAdditionalIdDto>> getByOrderedAdditional_AdditionalId(int additionalId) throws BusinessException {
+    public DataResult<List<OrderedAdditionalListByAdditionalIdDto>> getByOrderedAdditional_AdditionalId(int additionalId) throws AdditionalNotFoundException {
 
         this.additionalService.checkIfExistsByAdditionalId(additionalId);
 
@@ -147,7 +149,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public void saveOrderedAdditionalList(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int rentalCarId) throws BusinessException {
+    public void saveOrderedAdditionalList(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int rentalCarId) throws RentalCarNotFoundException {
         for(CreateOrderedAdditionalRequest createOrderedAdditionalRequest : createOrderedAdditionalRequestList){
             createOrderedAdditionalRequest.setRentalCarId(rentalCarId);
             add(createOrderedAdditionalRequest);
@@ -155,7 +157,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public double getPriceCalculatorForOrderedAdditionalListByRentalCarId(int rentalCarId, int totalDays) throws BusinessException {
+    public double getPriceCalculatorForOrderedAdditionalListByRentalCarId(int rentalCarId, int totalDays) throws AdditionalNotFoundException {
 
         List<OrderedAdditional> orderedAdditionalList = this.orderedAdditionalDao.getAllByRentalCar_RentalCarId(rentalCarId);
         double totalPrice = 0;
@@ -168,7 +170,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public double getPriceCalculatorForOrderedAdditionalList(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws BusinessException {
+    public double getPriceCalculatorForOrderedAdditionalList(List<CreateOrderedAdditionalRequest> createOrderedAdditionalRequestList, int totalDays) throws AdditionalNotFoundException {
 
         double totalPrice = 0;
         if(createOrderedAdditionalRequestList != null){
@@ -180,7 +182,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public double getPriceCalculatorForOrderedAdditional(int additionalId, double orderedAdditionalQuantity, int totalDays) throws BusinessException {
+    public double getPriceCalculatorForOrderedAdditional(int additionalId, double orderedAdditionalQuantity, int totalDays) throws AdditionalNotFoundException {
         double dailyPrice = this.additionalService.getByAdditionalId(additionalId).getData().getAdditionalDailyPrice();
         return dailyPrice * orderedAdditionalQuantity * totalDays;
     }
@@ -191,45 +193,45 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     }
 
     @Override
-    public void checkAllValidationForAddOrderedAdditional(int additionalId, int orderedAdditionalQuantity) throws BusinessException {
+    public void checkAllValidationForAddOrderedAdditional(int additionalId, int orderedAdditionalQuantity) throws AdditionalQuantityNotValidException, AdditionalNotFoundException {
         this.additionalService.checkIfExistsByAdditionalId(additionalId);
         int maxUnitsPerRental = this.additionalService.getByAdditionalId(additionalId).getData().getMaxUnitsPerRental();
         if(orderedAdditionalQuantity > maxUnitsPerRental || orderedAdditionalQuantity < 1){
-            throw new BusinessException("For this additional service, the Minimum quantity can be 1, the maximum quantity is: " + maxUnitsPerRental);
+            throw new AdditionalQuantityNotValidException("For this additional service, the Minimum quantity can be 1, the maximum quantity is: " + maxUnitsPerRental);
         }
     }
 
-    public void checkAllValidationForAddOrderedAdditionalList(List<CreateOrderedAdditionalRequest> orderedAdditionalRequestList) throws BusinessException {
+    public void checkAllValidationForAddOrderedAdditionalList(List<CreateOrderedAdditionalRequest> orderedAdditionalRequestList) throws AdditionalQuantityNotValidException, AdditionalNotFoundException {
         for (CreateOrderedAdditionalRequest orderedAdditionalRequest : orderedAdditionalRequestList){
             checkAllValidationForAddOrderedAdditional(orderedAdditionalRequest.getAdditionalId(), orderedAdditionalRequest.getOrderedAdditionalQuantity());
         }
     }
 
     @Override
-    public void checkIsOnlyOneOrderedAdditionalByAdditionalIdAndRentalCarIdForUpdate(int additionalId, int rentalCarId) throws BusinessException {
+    public void checkIsOnlyOneOrderedAdditionalByAdditionalIdAndRentalCarIdForUpdate(int additionalId, int rentalCarId) throws OrderedAdditionalAlreadyExistsException {
         if(this.orderedAdditionalDao.getAllByAdditional_AdditionalIdAndRentalCar_RentalCarId(additionalId, rentalCarId).size() > 1){
-            throw new BusinessException("This Ordered is already exists");
+            throw new OrderedAdditionalAlreadyExistsException("This Ordered is already exists");
         }
     }
 
     @Override
-    public void checkIsExistsByOrderedAdditionalId(int orderedAdditionalId) throws BusinessException {
+    public void checkIsExistsByOrderedAdditionalId(int orderedAdditionalId) throws OrderedAdditionalNotFoundException {
         if(!this.orderedAdditionalDao.existsByOrderedAdditionalId(orderedAdditionalId)){
-            throw new BusinessException("Ordered Additional id not exists");
+            throw new OrderedAdditionalNotFoundException("Ordered Additional id not exists");
         }
     }
 
     @Override
-    public void checkIsNotExistsByOrderedAdditional_RentalCarId(int rentalCarId) throws BusinessException {
+    public void checkIsNotExistsByOrderedAdditional_RentalCarId(int rentalCarId) throws RentalCarAlreadyExistsInOrderedAdditionalException {
         if(this.orderedAdditionalDao.existsByRentalCar_RentalCarId(rentalCarId)){
-            throw new BusinessException("Rental Car Id is available in the ordered additional table, rentalCarId: " + rentalCarId);
+            throw new RentalCarAlreadyExistsInOrderedAdditionalException("Rental Car Id is available in the ordered additional table, rentalCarId: " + rentalCarId);
         }
     }
 
     @Override
-    public void checkIsNotExistsByOrderedAdditional_AdditionalId(int additionalId) throws BusinessException {
+    public void checkIsNotExistsByOrderedAdditional_AdditionalId(int additionalId) throws AdditionalAlreadyExistsInOrderedAdditionalException {
         if(this.orderedAdditionalDao.existsByAdditional_AdditionalId(additionalId)){
-            throw new BusinessException("Additional Id is available in the ordered additional table, additionalId: " + additionalId);
+            throw new AdditionalAlreadyExistsInOrderedAdditionalException("Additional Id is available in the ordered additional table, additionalId: " + additionalId);
         }
     }
 

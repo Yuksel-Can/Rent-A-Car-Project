@@ -5,7 +5,17 @@ import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.*;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.lists.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.invoiceRequests.CreateInvoiceRequest;
 import com.turkcell.rentACarProject.business.requests.invoiceRequests.InvoiceGetDateBetweenRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.additionalExceptions.AdditionalNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.corporateCustomerExceptions.CorporateCustomerNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.customerExceptions.CustomerNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.individualCustomerExceptions.IndividualCustomerNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.invoiceExceptions.CustomerNotFoundInInvoiceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.invoiceExceptions.InvoiceNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.invoiceExceptions.PaymentNotFoundInInvoiceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.invoiceExceptions.RentalCarNotFoundInInvoiceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.paymentExceptions.PaymentNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.RentalCarNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.generate.GenerateRandomCode;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
@@ -66,7 +76,7 @@ public class InvoiceManager implements InvoiceService {
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
-    public Result add(CreateInvoiceRequest createInvoiceRequest) throws BusinessException {
+    public Result add(CreateInvoiceRequest createInvoiceRequest) throws RentalCarNotFoundException {
 
         this.rentalCarService.checkIsExistsByRentalCarId(createInvoiceRequest.getRentalCarId());
         createInvoiceRequest.setInvoiceNo(generateCode());
@@ -82,7 +92,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetIndividualCustomerInvoiceByInvoiceIdDto> getIndividualCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException {
+    public DataResult<GetIndividualCustomerInvoiceByInvoiceIdDto> getIndividualCustomerInvoiceByInvoiceId(int invoiceId) throws IndividualCustomerNotFoundException, InvoiceNotFoundException {
 
         checkIfInvoiceIdExists(invoiceId);
         Invoice invoice = this.invoiceDao.getById(invoiceId);
@@ -100,7 +110,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetCorporateCustomerInvoiceByInvoiceIdDto> getCorporateCustomerInvoiceByInvoiceId(int invoiceId) throws BusinessException {
+    public DataResult<GetCorporateCustomerInvoiceByInvoiceIdDto> getCorporateCustomerInvoiceByInvoiceId(int invoiceId) throws CorporateCustomerNotFoundException, InvoiceNotFoundException {
 
         checkIfInvoiceIdExists(invoiceId);
 
@@ -117,7 +127,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetIndividualCustomerInvoiceByInvoiceNoDto> getIndividualCustomerInvoiceByInvoiceNo(String invoiceNo) throws BusinessException {
+    public DataResult<GetIndividualCustomerInvoiceByInvoiceNoDto> getIndividualCustomerInvoiceByInvoiceNo(String invoiceNo) throws IndividualCustomerNotFoundException, InvoiceNotFoundException {
 
         checkIfInvoiceNoExists(invoiceNo);
 
@@ -135,7 +145,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetCorporateCustomerInvoiceByInvoiceNoDto> getCorporateCustomerInvoiceByInvoiceNo(String invoiceNo) throws BusinessException {
+    public DataResult<GetCorporateCustomerInvoiceByInvoiceNoDto> getCorporateCustomerInvoiceByInvoiceNo(String invoiceNo) throws CorporateCustomerNotFoundException, InvoiceNotFoundException {
 
         checkIfInvoiceNoExists(invoiceNo);
 
@@ -154,7 +164,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<GetInvoiceDto> getInvoiceByPayment_PaymentId(int paymentId) throws BusinessException {
+    public DataResult<GetInvoiceDto> getInvoiceByPayment_PaymentId(int paymentId) throws PaymentNotFoundInInvoiceException, PaymentNotFoundException {
 
         this.paymentService.checkIfExistsByPaymentId(paymentId);
         checkIfExistsByPaymentId(paymentId);
@@ -168,7 +178,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<List<InvoiceListDto>> getAllByRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
+    public DataResult<List<InvoiceListDto>> getAllByRentalCar_RentalCarId(int rentalCarId) throws RentalCarNotFoundException {
 
         this.rentalCarService.checkIsExistsByRentalCarId(rentalCarId);
 
@@ -181,7 +191,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public DataResult<List<InvoiceListDto>> getAllByCustomer_CustomerId(int customerId) throws BusinessException {
+    public DataResult<List<InvoiceListDto>> getAllByCustomer_CustomerId(int customerId) throws CustomerNotFoundException {
 
         this.customerService.checkIfCustomerIdExists(customerId);
 
@@ -218,7 +228,7 @@ public class InvoiceManager implements InvoiceService {
     }
 
     @Override
-    public void createAndAddInvoice(int rentalCarId, int paymentId) throws BusinessException {
+    public void createAndAddInvoice(int rentalCarId, int paymentId) throws AdditionalNotFoundException, RentalCarNotFoundException {
 
         //todo:parametre olarak total price verildi dogru mu?
         RentalCar rentalCar = this.rentalCarService.getById(rentalCarId);
@@ -254,36 +264,36 @@ public class InvoiceManager implements InvoiceService {
         }
     }
 
-    private void checkIfInvoiceIdExists(int invoiceId) throws BusinessException {
+    private void checkIfInvoiceIdExists(int invoiceId) throws InvoiceNotFoundException {
         if(!this.invoiceDao.existsByInvoiceId(invoiceId)){
-            throw new BusinessException("Invoice id not exists, invoiceId: " + invoiceId);
+            throw new InvoiceNotFoundException("Invoice id not exists, invoiceId: " + invoiceId);
         }
 
     }
 
-    private void checkIfInvoiceNoExists(String invoiceNo) throws BusinessException {
+    private void checkIfInvoiceNoExists(String invoiceNo) throws InvoiceNotFoundException {
         if(!this.invoiceDao.existsByInvoiceNo(invoiceNo)){
-            throw new BusinessException("Invoice no not exists, invoiceNo: " + invoiceNo);
+            throw new InvoiceNotFoundException("Invoice no not exists, invoiceNo: " + invoiceNo);
         }
     }
 
-    private void checkIfExistsByPaymentId(int paymentId) throws BusinessException {
+    private void checkIfExistsByPaymentId(int paymentId) throws PaymentNotFoundInInvoiceException {
         if(!this.invoiceDao.existsByPayment_PaymentId(paymentId)){
-            throw new BusinessException("Payment id not found in the invoice table, paymentId: " + paymentId);
+            throw new PaymentNotFoundInInvoiceException("Payment id not found in the invoice table, paymentId: " + paymentId);
         }
     }
 
     @Override
-    public void checkIfNotExistsByCustomer_CustomerId(int customerId) throws BusinessException {
+    public void checkIfNotExistsByCustomer_CustomerId(int customerId) throws CustomerNotFoundInInvoiceException {
         if(this.invoiceDao.existsByCustomer_CustomerId(customerId)){
-            throw new BusinessException("Customer id already exists in the invoice table, customerId: " + customerId);
+            throw new CustomerNotFoundInInvoiceException("Customer id already exists in the invoice table, customerId: " + customerId);
         }
     }
 
     @Override
-    public void checkIfNotExistsByRentalCar_RentalCarId(int rentalCarId) throws BusinessException {
+    public void checkIfNotExistsByRentalCar_RentalCarId(int rentalCarId) throws RentalCarNotFoundInInvoiceException {
         if(this.invoiceDao.existsByRentalCar_RentalCarId(rentalCarId)){
-            throw new BusinessException("Rental car already exists in the invoice table, rentalCarId: " + rentalCarId);
+            throw new RentalCarNotFoundInInvoiceException("Rental car already exists in the invoice table, rentalCarId: " + rentalCarId);
         }
     }
 }

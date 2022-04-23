@@ -6,7 +6,13 @@ import com.turkcell.rentACarProject.business.dtos.corporateCustomerDtos.lists.Co
 import com.turkcell.rentACarProject.business.requests.corporateCustomerRequests.CreateCorporateCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.corporateCustomerRequests.DeleteCorporateCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.corporateCustomerRequests.UpdateCorporateCustomerRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.corporateCustomerExceptions.CorporateCustomerNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.corporateCustomerExceptions.TaxNumberAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.creditCardExceptions.CreditCardAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.invoiceExceptions.CustomerNotFoundInInvoiceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.CustomerAlreadyExistsInRentalCarException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserEmailNotValidException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -54,7 +60,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     }
 
     @Override
-    public Result add(CreateCorporateCustomerRequest createCorporateCustomerRequest) throws BusinessException {
+    public Result add(CreateCorporateCustomerRequest createCorporateCustomerRequest) throws TaxNumberAlreadyExistsException, UserAlreadyExistsException {
 
         this.userService.checkIfUserEmailNotExists(createCorporateCustomerRequest.getEmail());
         checkIfTaxNumberNotExists(createCorporateCustomerRequest.getTaxNumber());
@@ -68,7 +74,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     }
 
     @Override
-    public Result update(UpdateCorporateCustomerRequest updateCorporateCustomerRequest) throws BusinessException {
+    public Result update(UpdateCorporateCustomerRequest updateCorporateCustomerRequest) throws TaxNumberAlreadyExistsException, CorporateCustomerNotFoundException, UserEmailNotValidException {
 
         checkIfCorporateCustomerIdExists(updateCorporateCustomerRequest.getUserId());
         this.userService.checkIfUserEmailNotExistsForUpdate(updateCorporateCustomerRequest.getUserId(), updateCorporateCustomerRequest.getEmail());
@@ -83,7 +89,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     }
 
     @Override
-    public Result delete(DeleteCorporateCustomerRequest deleteCorporateCustomerRequest) throws BusinessException {
+    public Result delete(DeleteCorporateCustomerRequest deleteCorporateCustomerRequest) throws CorporateCustomerNotFoundException, CreditCardAlreadyExistsException, CustomerNotFoundInInvoiceException, CustomerAlreadyExistsInRentalCarException {
 
         checkIfCorporateCustomerIdExists(deleteCorporateCustomerRequest.getUserId());
         this.rentalCarService.checkIfRentalCar_CustomerIdNotExists(deleteCorporateCustomerRequest.getUserId());
@@ -97,7 +103,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
     }
 
     @Override
-    public DataResult<GetCorporateCustomerDto> getById(int corporateCustomerId) throws BusinessException {
+    public DataResult<GetCorporateCustomerDto> getById(int corporateCustomerId) throws CorporateCustomerNotFoundException {
 
         checkIfCorporateCustomerIdExists(corporateCustomerId);
 
@@ -114,22 +120,22 @@ public class CorporateCustomerManager implements CorporateCustomerService {
         return this.corporateCustomerDao.getById(corporateCustomerId);
     }
     @Override
-    public void checkIfCorporateCustomerIdExists(int corporateCustomerId) throws BusinessException {
+    public void checkIfCorporateCustomerIdExists(int corporateCustomerId) throws CorporateCustomerNotFoundException {
         if(!this.corporateCustomerDao.existsByCorporateCustomerId(corporateCustomerId)){
-            throw new BusinessException("Corporate Customer Id not exists, corporateCustomerId: " + corporateCustomerId);
+            throw new CorporateCustomerNotFoundException("Corporate Customer Id not exists, corporateCustomerId: " + corporateCustomerId);
         }
 
     }
 
-    void checkIfTaxNumberNotExists(String taxNumber) throws BusinessException {
+    void checkIfTaxNumberNotExists(String taxNumber) throws TaxNumberAlreadyExistsException {
         if(this.corporateCustomerDao.existsByTaxNumber(taxNumber)){
-            throw new BusinessException("Tax Number already exists, taxNumber: " + taxNumber);
+            throw new TaxNumberAlreadyExistsException("Tax Number already exists, taxNumber: " + taxNumber);
         }
     }
 
-    void checkIfTaxNumberNotExistsForUpdate(int corporateCustomerId, String taxNumber) throws BusinessException {
+    void checkIfTaxNumberNotExistsForUpdate(int corporateCustomerId, String taxNumber) throws TaxNumberAlreadyExistsException {
         if(this.corporateCustomerDao.existsByTaxNumberAndCorporateCustomerIdIsNot(taxNumber, corporateCustomerId)){
-            throw new BusinessException("Tax Number already exists, taxNumber: " + taxNumber);
+            throw new TaxNumberAlreadyExistsException("Tax Number already exists, taxNumber: " + taxNumber);
         }
     }
 

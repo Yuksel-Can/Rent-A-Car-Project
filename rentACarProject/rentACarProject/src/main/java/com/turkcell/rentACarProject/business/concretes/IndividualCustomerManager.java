@@ -6,7 +6,13 @@ import com.turkcell.rentACarProject.business.dtos.individualCustomerDtos.lists.I
 import com.turkcell.rentACarProject.business.requests.individualCustomerRequests.CreateIndividualCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.individualCustomerRequests.DeleteIndividualCustomerRequest;
 import com.turkcell.rentACarProject.business.requests.individualCustomerRequests.UpdateIndividualCustomerRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.creditCardExceptions.CreditCardAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.individualCustomerExceptions.IndividualCustomerNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.individualCustomerExceptions.NationalIdentityAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.invoiceExceptions.CustomerNotFoundInInvoiceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.CustomerAlreadyExistsInRentalCarException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserEmailNotValidException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -56,7 +62,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest) throws BusinessException {
+    public Result add(CreateIndividualCustomerRequest createIndividualCustomerRequest) throws NationalIdentityAlreadyExistsException, UserAlreadyExistsException {
 
         this.userService.checkIfUserEmailNotExists(createIndividualCustomerRequest.getEmail());
         checkIfNationalIdentityNotExists(createIndividualCustomerRequest.getNationalIdentity());
@@ -70,7 +76,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public Result update(UpdateIndividualCustomerRequest updateIndividualCustomerRequest) throws BusinessException {
+    public Result update(UpdateIndividualCustomerRequest updateIndividualCustomerRequest) throws NationalIdentityAlreadyExistsException, IndividualCustomerNotFoundException, UserEmailNotValidException {
 
         checkIfIndividualCustomerIdExists(updateIndividualCustomerRequest.getUserId());
         this.userService.checkIfUserEmailNotExistsForUpdate(updateIndividualCustomerRequest.getUserId(), updateIndividualCustomerRequest.getEmail());
@@ -85,7 +91,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public Result delete(DeleteIndividualCustomerRequest deleteIndividualCustomerRequest) throws BusinessException {
+    public Result delete(DeleteIndividualCustomerRequest deleteIndividualCustomerRequest) throws CreditCardAlreadyExistsException, IndividualCustomerNotFoundException, CustomerNotFoundInInvoiceException, CustomerAlreadyExistsInRentalCarException {
 
         checkIfIndividualCustomerIdExists(deleteIndividualCustomerRequest.getUserId());
         this.rentalCarService.checkIfRentalCar_CustomerIdNotExists(deleteIndividualCustomerRequest.getUserId());
@@ -99,7 +105,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public DataResult<GetIndividualCustomerDto> getById(int individualCustomerId) throws BusinessException {
+    public DataResult<GetIndividualCustomerDto> getById(int individualCustomerId) throws IndividualCustomerNotFoundException {
 
         checkIfIndividualCustomerIdExists(individualCustomerId);
 
@@ -117,22 +123,22 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public boolean checkIfIndividualCustomerIdExists(int individualCustomerId) throws BusinessException {
+    public boolean checkIfIndividualCustomerIdExists(int individualCustomerId) throws IndividualCustomerNotFoundException {
         if(!this.individualCustomerDao.existsByIndividualCustomerId(individualCustomerId)){
-            throw new BusinessException("Individual Customer Id not exists, individualCustomerId: " + individualCustomerId);
+            throw new IndividualCustomerNotFoundException("Individual Customer Id not exists, individualCustomerId: " + individualCustomerId);
         }
         return false;
     }
 
-    void checkIfNationalIdentityNotExists(String nationalIdentity) throws BusinessException {
+    void checkIfNationalIdentityNotExists(String nationalIdentity) throws NationalIdentityAlreadyExistsException {
         if(this.individualCustomerDao.existsByNationalIdentity(nationalIdentity)){
-            throw new BusinessException("National Identity already exists, nationalIdentity: " + nationalIdentity);
+            throw new NationalIdentityAlreadyExistsException("National Identity already exists, nationalIdentity: " + nationalIdentity);
         }
     }
 
-    void checkIfNationalIdentityNotExistsForUpdate(int individualCustomerId, String nationalIdentity) throws BusinessException {
+    void checkIfNationalIdentityNotExistsForUpdate(int individualCustomerId, String nationalIdentity) throws NationalIdentityAlreadyExistsException {
         if(this.individualCustomerDao.existsByNationalIdentityAndIndividualCustomerIdIsNot(nationalIdentity, individualCustomerId)){
-            throw new BusinessException("National Identity already exists, nationalIdentity: " + nationalIdentity);
+            throw new NationalIdentityAlreadyExistsException("National Identity already exists, nationalIdentity: " + nationalIdentity);
         }
     }
 

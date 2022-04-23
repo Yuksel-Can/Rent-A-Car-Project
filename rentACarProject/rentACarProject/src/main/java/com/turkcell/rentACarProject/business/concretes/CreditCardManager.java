@@ -5,7 +5,9 @@ import com.turkcell.rentACarProject.business.abstracts.CustomerService;
 import com.turkcell.rentACarProject.business.dtos.creditCardDtos.gets.GetCreditCardDto;
 import com.turkcell.rentACarProject.business.dtos.creditCardDtos.lists.CreditCardListDto;
 import com.turkcell.rentACarProject.business.requests.creditCardRequests.CreateCreditCardRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.creditCardExceptions.CreditCardAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.creditCardExceptions.CreditCardNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.customerExceptions.CustomerNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -49,7 +51,7 @@ public class CreditCardManager implements CreditCardService {
     }
 
     @Override
-    public Result add(CreateCreditCardRequest createCreditCardRequest) throws BusinessException {
+    public Result add(CreateCreditCardRequest createCreditCardRequest) throws CustomerNotFoundException {
 
         this.customerService.checkIfCustomerIdExists(createCreditCardRequest.getCustomerId());
 
@@ -64,7 +66,7 @@ public class CreditCardManager implements CreditCardService {
     }
 
     @Override
-    public DataResult<GetCreditCardDto> getById(int creditCardId) throws BusinessException {
+    public DataResult<GetCreditCardDto> getById(int creditCardId) throws CreditCardNotFoundException {
 
         checkIfExistsById(creditCardId);
 
@@ -76,7 +78,7 @@ public class CreditCardManager implements CreditCardService {
     }
 
     @Override
-    public DataResult<List<CreditCardListDto>> getAllCreditCardByCustomer_CustomerId(int customerId) throws BusinessException {
+    public DataResult<List<CreditCardListDto>> getAllCreditCardByCustomer_CustomerId(int customerId) throws CustomerNotFoundException {
 
         this.customerService.checkIfCustomerIdExists(customerId);
 
@@ -89,7 +91,7 @@ public class CreditCardManager implements CreditCardService {
     }
 
     @Override
-    public void checkSaveInformationAndSaveCreditCard(CreateCreditCardRequest createCreditCardRequest, CreditCardManager.CardSaveInformation cardSaveInformation) throws BusinessException {
+    public void checkSaveInformationAndSaveCreditCard(CreateCreditCardRequest createCreditCardRequest, CreditCardManager.CardSaveInformation cardSaveInformation) throws CustomerNotFoundException {
         if(cardSaveInformation.equals(CreditCardManager.CardSaveInformation.SAVE)){
             add(createCreditCardRequest);
         }
@@ -102,16 +104,16 @@ public class CreditCardManager implements CreditCardService {
         return true;
     }
 
-    private void checkIfExistsById(int creditCardId) throws BusinessException {
+    private void checkIfExistsById(int creditCardId) throws CreditCardNotFoundException {
         if(!this.creditCardDao.existsByCreditCardId(creditCardId)){
-            throw new BusinessException("Credit card not found, creditCardId: " + creditCardId);
+            throw new CreditCardNotFoundException("Credit card not found, creditCardId: " + creditCardId);
         }
     }
 
     @Override
-    public void checkIfNotExistsByCustomer_CustomerId(int customerId) throws BusinessException {
+    public void checkIfNotExistsByCustomer_CustomerId(int customerId) throws CreditCardAlreadyExistsException {
         if(this.creditCardDao.existsByCustomer_CustomerId(customerId)){
-            throw new BusinessException("Credit card already exists, creditCardId: " + customerId);
+            throw new CreditCardAlreadyExistsException("Credit card already exists, creditCardId: " + customerId);
         }
     }
 

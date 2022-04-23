@@ -7,7 +7,12 @@ import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.gets.GetCar
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.CreateCarMaintenanceRequest;
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.DeleteCarMaintenanceRequest;
 import com.turkcell.rentACarProject.business.requests.carMaintenanceRequests.UpdateCarMaintenanceRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.CarNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.CarAlreadyInMaintenanceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.CarMaintenanceNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.MaintenanceReturnDateBeforeTodayException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.CarAlreadyRentedEnteredDateException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.StartDateBeforeTodayException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +22,10 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/carmaintenances")
+@RequestMapping("/api/carMaintenances")
 public class CarMaintenancesController {
 
-    private CarMaintenanceService carMaintenanceService;
+    private final CarMaintenanceService carMaintenanceService;
 
     @Autowired
     public CarMaintenancesController(CarMaintenanceService carMaintenanceService){
@@ -29,32 +34,32 @@ public class CarMaintenancesController {
 
 
     @GetMapping("/getAll")
-    public DataResult<List<CarMaintenanceListDto>> getall() {
+    public DataResult<List<CarMaintenanceListDto>> getAll() {
         return this.carMaintenanceService.getAll();
     }
 
     @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateCarMaintenanceRequest createCarMaintenanceRequest) throws BusinessException {
+    public Result add(@RequestBody @Valid CreateCarMaintenanceRequest createCarMaintenanceRequest) throws CarNotFoundException, MaintenanceReturnDateBeforeTodayException, CarAlreadyInMaintenanceException, StartDateBeforeTodayException, CarAlreadyRentedEnteredDateException {
         return this.carMaintenanceService.add(createCarMaintenanceRequest);
     }
 
     @PutMapping("/update")
-    public Result update(@RequestBody @Valid UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws BusinessException {
+    public Result update(@RequestBody @Valid UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws CarNotFoundException, MaintenanceReturnDateBeforeTodayException, CarAlreadyInMaintenanceException, CarMaintenanceNotFoundException, StartDateBeforeTodayException, CarAlreadyRentedEnteredDateException {
         return this.carMaintenanceService.update(updateCarMaintenanceRequest);
     }
 
     @DeleteMapping("/delete")
-    public Result delete(@RequestBody @Valid DeleteCarMaintenanceRequest deleteCarMaintenanceRequest) throws BusinessException {
+    public Result delete(@RequestBody @Valid DeleteCarMaintenanceRequest deleteCarMaintenanceRequest) throws CarMaintenanceNotFoundException {
         return this.carMaintenanceService.delete(deleteCarMaintenanceRequest);
     }
 
     @GetMapping("/getByCarMaintenanceId")
-    public DataResult<GetCarMaintenanceDto> getByCarMaintenanceId(@RequestParam int carMaintenanceId) throws BusinessException {
+    public DataResult<GetCarMaintenanceDto> getByCarMaintenanceId(@RequestParam int carMaintenanceId) throws CarMaintenanceNotFoundException {
         return this.carMaintenanceService.getById(carMaintenanceId);
     }
 
     @GetMapping("/getAllByCarMaintenance_CarId")
-    public DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(@RequestParam int carId) throws BusinessException {
+    public DataResult<List<CarMaintenanceListByCarIdDto>> getAllByCarMaintenance_CarId(@RequestParam int carId) throws CarNotFoundException {
         return this.carMaintenanceService.getAllByCarMaintenance_CarId(carId);
     }
 

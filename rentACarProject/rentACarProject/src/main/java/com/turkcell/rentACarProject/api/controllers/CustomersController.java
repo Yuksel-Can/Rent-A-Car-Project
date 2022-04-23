@@ -3,7 +3,7 @@ package com.turkcell.rentACarProject.api.controllers;
 import com.turkcell.rentACarProject.business.abstracts.CustomerService;
 import com.turkcell.rentACarProject.business.dtos.customerDtos.lists.CustomerListDto;
 import com.turkcell.rentACarProject.business.dtos.customerDtos.gets.GetCustomerDto;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.customerExceptions.CustomerNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/customers")
 public class CustomersController {
 
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
     @Autowired
     public CustomersController(CustomerService customerService) {
@@ -30,7 +30,7 @@ public class CustomersController {
     }
 
     @GetMapping("getById")
-    public DataResult<GetCustomerDto> getById(@RequestParam int customerId) throws BusinessException {
+    public DataResult<GetCustomerDto> getById(@RequestParam int customerId) throws CustomerNotFoundException {
         return this.customerService.getById(customerId);
     }
 }

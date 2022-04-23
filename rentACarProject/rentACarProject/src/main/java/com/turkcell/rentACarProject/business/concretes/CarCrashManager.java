@@ -8,7 +8,10 @@ import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashLis
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.CreateCarCrashRequest;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.DeleteCarCrashRequest;
 import com.turkcell.rentACarProject.business.requests.carCrashRequests.UpdateCarCrashRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carCrashExceptions.CarCrashNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carCrashExceptions.CarExistsInCarCrashException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carCrashExceptions.CrashDateAfterTodayException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.CarNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
@@ -53,7 +56,7 @@ public class CarCrashManager implements CarCrashService {
     }
 
     @Override
-    public Result add(CreateCarCrashRequest createCarCrashRequest) throws BusinessException {
+    public Result add(CreateCarCrashRequest createCarCrashRequest) throws CrashDateAfterTodayException, CarNotFoundException {
 
         checkIfCrashDateBeforeToday(createCarCrashRequest.getCrashDate());
         this.carService.checkIsExistsByCarId(createCarCrashRequest.getCarId());
@@ -66,7 +69,7 @@ public class CarCrashManager implements CarCrashService {
     }
 
     @Override
-    public Result update(UpdateCarCrashRequest updateCarCrashRequest) throws BusinessException {
+    public Result update(UpdateCarCrashRequest updateCarCrashRequest) throws CrashDateAfterTodayException, CarCrashNotFoundException, CarNotFoundException {
 
         checkIfExistsByCarCrashId(updateCarCrashRequest.getCarCrashId());
         checkIfCrashDateBeforeToday(updateCarCrashRequest.getCrashDate());
@@ -80,7 +83,7 @@ public class CarCrashManager implements CarCrashService {
     }
 
     @Override
-    public Result delete(DeleteCarCrashRequest deleteCarCrashRequest) throws BusinessException {
+    public Result delete(DeleteCarCrashRequest deleteCarCrashRequest) throws CarCrashNotFoundException {
 
         checkIfExistsByCarCrashId(deleteCarCrashRequest.getCarCrashId());
 
@@ -90,7 +93,7 @@ public class CarCrashManager implements CarCrashService {
     }
 
     @Override
-    public DataResult<GetCarCrashDto> getById(int carCrashId) throws BusinessException {
+    public DataResult<GetCarCrashDto> getById(int carCrashId) throws CarCrashNotFoundException {
 
         checkIfExistsByCarCrashId(carCrashId);
 
@@ -103,7 +106,7 @@ public class CarCrashManager implements CarCrashService {
     }
 
     @Override
-    public DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(int carId) throws BusinessException {
+    public DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(int carId) throws CarNotFoundException {
 
         this.carService.checkIsExistsByCarId(carId);
 
@@ -118,22 +121,22 @@ public class CarCrashManager implements CarCrashService {
         return new SuccessDataResult<>(result, "Car Crash listed by car id, carId: " + carId);
     }
 
-    private void checkIfExistsByCarCrashId(int carCrashId) throws BusinessException {
+    private void checkIfExistsByCarCrashId(int carCrashId) throws CarCrashNotFoundException {
         if(!this.carCrashDao.existsByCarCrashId(carCrashId)){
-            throw new BusinessException("Car crash id not found, carCrashId: " + carCrashId);
+            throw new CarCrashNotFoundException("Car crash id not found, carCrashId: " + carCrashId);
         }
     }
 
-    private void checkIfCrashDateBeforeToday(LocalDate crashDate) throws BusinessException {
+    private void checkIfCrashDateBeforeToday(LocalDate crashDate) throws CrashDateAfterTodayException {
         if(crashDate.isAfter(LocalDate.now())){
-            throw new BusinessException("Crash date cannot be after today, crashDate: " + crashDate);
+            throw new CrashDateAfterTodayException("Crash date cannot be after today, crashDate: " + crashDate);
         }
     }
 
     @Override
-    public void checkIfNotExistsCarCrashByCar_CarId(int carId) throws BusinessException {
+    public void checkIfNotExistsCarCrashByCar_CarId(int carId) throws CarExistsInCarCrashException {
         if(this.carCrashDao.existsByCar_CarId(carId)){
-            throw new BusinessException("Car id already exists in the Car Crash table, carId: " + carId);
+            throw new CarExistsInCarCrashException("Car id already exists in the Car Crash table, carId: " + carId);
         }
     }
 }

@@ -6,7 +6,9 @@ import com.turkcell.rentACarProject.business.dtos.additionalDtos.gets.GetAdditio
 import com.turkcell.rentACarProject.business.requests.additionalRequests.CreateAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.additionalRequests.DeleteAdditionalRequest;
 import com.turkcell.rentACarProject.business.requests.additionalRequests.UpdateAdditionalRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.additionalExceptions.AdditionalAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.additionalExceptions.AdditionalNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.orderedAdditionalExceptions.AdditionalAlreadyExistsInOrderedAdditionalException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ import java.util.List;
 @RequestMapping("/api/additionals")
 public class AdditionalsController {
 
-    private AdditionalService additionalService;
+    private final AdditionalService additionalService;
 
     @Autowired
     public AdditionalsController(AdditionalService additionalService) {
@@ -33,22 +35,22 @@ public class AdditionalsController {
     }
 
     @PostMapping("/add")
-    public Result add(@RequestBody @Valid CreateAdditionalRequest createAdditionalRequest) throws BusinessException {
+    public Result add(@RequestBody @Valid CreateAdditionalRequest createAdditionalRequest) throws AdditionalAlreadyExistsException {
         return this.additionalService.add(createAdditionalRequest);
     }
 
     @PutMapping("/update")
-    public Result update(@RequestBody @Valid UpdateAdditionalRequest updateAdditionalRequest) throws BusinessException {
+    public Result update(@RequestBody @Valid UpdateAdditionalRequest updateAdditionalRequest) throws AdditionalNotFoundException, AdditionalAlreadyExistsException {
         return this.additionalService.update(updateAdditionalRequest);
     }
 
     @DeleteMapping("/delete")
-    public Result delete(@RequestBody @Valid DeleteAdditionalRequest deleteAdditionalRequest) throws BusinessException {
+    public Result delete(@RequestBody @Valid DeleteAdditionalRequest deleteAdditionalRequest) throws AdditionalNotFoundException, AdditionalAlreadyExistsInOrderedAdditionalException {
         return this.additionalService.delete(deleteAdditionalRequest);
     }
 
     @GetMapping("/getById")
-    public DataResult<GetAdditionalDto> getById(@RequestParam int additionalId) throws BusinessException {
+    public DataResult<GetAdditionalDto> getById(@RequestParam int additionalId) throws AdditionalNotFoundException {
         return this.additionalService.getByAdditionalId(additionalId);
     }
 

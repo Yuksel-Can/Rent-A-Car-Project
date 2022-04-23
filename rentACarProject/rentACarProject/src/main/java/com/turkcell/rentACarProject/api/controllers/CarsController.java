@@ -5,6 +5,13 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.turkcell.rentACarProject.business.dtos.carDtos.lists.*;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carCrashExceptions.CarExistsInCarCrashException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.CarNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.ModelYearAfterThisYearException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carMaintenanceExceptions.CarExistsInCarMaintenanceException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.colorExceptions.ColorNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.rentalCarExceptions.CarAlreadyExistsInRentalCarException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +27,6 @@ import com.turkcell.rentACarProject.business.dtos.carDtos.gets.GetCarDto;
 import com.turkcell.rentACarProject.business.requests.carRequests.CreateCarRequest;
 import com.turkcell.rentACarProject.business.requests.carRequests.DeleteCarRequest;
 import com.turkcell.rentACarProject.business.requests.carRequests.UpdateCarRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
@@ -28,7 +34,7 @@ import com.turkcell.rentACarProject.core.utilities.result.Result;
 @RequestMapping("/api/cars")
 public class CarsController {
 	
-	private CarService carService;
+	private final CarService carService;
 	
 	@Autowired
 	public CarsController(CarService carService) {
@@ -42,32 +48,32 @@ public class CarsController {
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody @Valid CreateCarRequest createCarRequest) throws BusinessException {
+	public Result add(@RequestBody @Valid CreateCarRequest createCarRequest) throws ColorNotFoundException, ModelYearAfterThisYearException, BrandNotFoundException {
 		return this.carService.add(createCarRequest);
 	}
 	
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateCarRequest updateCarRequest) throws BusinessException {
+	public Result update(@RequestBody @Valid UpdateCarRequest updateCarRequest) throws ColorNotFoundException, CarNotFoundException, ModelYearAfterThisYearException, BrandNotFoundException {
 		return this.carService.update(updateCarRequest);
 	}
 	
 	@DeleteMapping("/delete")
-	public Result delete(@RequestBody @Valid DeleteCarRequest deleteCarRequest) throws BusinessException {
+	public Result delete(@RequestBody @Valid DeleteCarRequest deleteCarRequest) throws CarNotFoundException, CarAlreadyExistsInRentalCarException, CarExistsInCarMaintenanceException, CarExistsInCarCrashException {
 		return this.carService.delete(deleteCarRequest);
 	}
 	
 	@GetMapping("/getById")
-	public DataResult<GetCarDto> getById(@RequestParam int carId) throws BusinessException {
+	public DataResult<GetCarDto> getById(@RequestParam int carId) throws CarNotFoundException {
 		return this.carService.getById(carId);
 	}
 
 	@GetMapping("/getAllByCar_BrandId")
-	public DataResult<List<CarListByBrandIdDto>> getAllByCar_BrandId(@RequestParam int brandId) throws BusinessException {
+	public DataResult<List<CarListByBrandIdDto>> getAllByCar_BrandId(@RequestParam int brandId) throws BrandNotFoundException {
 		return this.carService.getAllByCar_BrandId(brandId);
 	}
 
 	@GetMapping("/getAllByCar_ColorId")
-	public DataResult<List<CarListByColorIdDto>> getAllByCar_ColorId(@RequestParam int colorId) throws BusinessException {
+	public DataResult<List<CarListByColorIdDto>> getAllByCar_ColorId(@RequestParam int colorId) throws ColorNotFoundException {
 		return this.carService.getAllByCar_ColorId(colorId);
 	}
 

@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.ColorExistsInCarException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.colorExceptions.ColorAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.colorExceptions.ColorNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +23,6 @@ import com.turkcell.rentACarProject.business.dtos.colorDtos.gets.GetColorDto;
 import com.turkcell.rentACarProject.business.requests.colorRequests.CreateColorRequest;
 import com.turkcell.rentACarProject.business.requests.colorRequests.DeleteColorRequest;
 import com.turkcell.rentACarProject.business.requests.colorRequests.UpdateColorRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
@@ -28,7 +30,7 @@ import com.turkcell.rentACarProject.core.utilities.result.Result;
 @RequestMapping("/api/colors")
 public class ColorsController {
 	
-	private ColorService colorService;
+	private final ColorService colorService;
 	
 	@Autowired
 	public ColorsController(ColorService colorService) {
@@ -42,22 +44,22 @@ public class ColorsController {
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody @Valid CreateColorRequest createColorRequest) throws BusinessException {
+	public Result add(@RequestBody @Valid CreateColorRequest createColorRequest) throws ColorAlreadyExistsException {
 		return this.colorService.add(createColorRequest);
 	}
 	
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateColorRequest updateColorRequest) throws BusinessException {
+	public Result update(@RequestBody @Valid UpdateColorRequest updateColorRequest) throws ColorNotFoundException, ColorAlreadyExistsException {
 		return this.colorService.update(updateColorRequest);
 	}
 	
 	@DeleteMapping("/delete")
-	public Result delete(@RequestBody @Valid DeleteColorRequest deleteColorRequest) throws BusinessException {
+	public Result delete(@RequestBody @Valid DeleteColorRequest deleteColorRequest) throws ColorNotFoundException, ColorExistsInCarException {
 		return this.colorService.delete(deleteColorRequest);
 	}
 	
 	@GetMapping("/getById")
-	public DataResult<GetColorDto> getById(@RequestParam int colorId) throws BusinessException {
+	public DataResult<GetColorDto> getById(@RequestParam int colorId) throws ColorNotFoundException {
 		return this.colorService.getById(colorId);
 	}
 	

@@ -4,6 +4,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandAlreadyExistsException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandNotFoundException;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.BrandExistsInCarException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +23,6 @@ import com.turkcell.rentACarProject.business.dtos.brandDtos.gets.GetBrandDto;
 import com.turkcell.rentACarProject.business.requests.brandRequests.CreateBrandRequest;
 import com.turkcell.rentACarProject.business.requests.brandRequests.DeleteBrandRequest;
 import com.turkcell.rentACarProject.business.requests.brandRequests.UpdateBrandRequest;
-import com.turkcell.rentACarProject.core.utilities.exception.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 
@@ -28,7 +30,7 @@ import com.turkcell.rentACarProject.core.utilities.result.Result;
 @RequestMapping("/api/brands")
 public class BrandsController {
 	
-	private BrandService brandService; 
+	private final BrandService brandService;
 	
 	@Autowired
 	public BrandsController(BrandService brandService) {
@@ -42,22 +44,22 @@ public class BrandsController {
 	}
 	
 	@PostMapping("/add")
-	public Result add(@RequestBody @Valid CreateBrandRequest createBrandRequest) throws BusinessException {
+	public Result add(@RequestBody @Valid CreateBrandRequest createBrandRequest) throws BrandAlreadyExistsException {
 		return this.brandService.add(createBrandRequest);
 	}
 	
 	@PutMapping("/update")
-	public Result update(@RequestBody @Valid UpdateBrandRequest updateBrandRequest) throws BusinessException {
+	public Result update(@RequestBody @Valid UpdateBrandRequest updateBrandRequest) throws BrandAlreadyExistsException, BrandNotFoundException {
 		return this.brandService.update(updateBrandRequest);
 	}
 	
 	@DeleteMapping("/delete")
-	public Result delete(@RequestBody @Valid DeleteBrandRequest deleteBrandRequest) throws BusinessException {
+	public Result delete(@RequestBody @Valid DeleteBrandRequest deleteBrandRequest) throws BrandNotFoundException, BrandExistsInCarException {
 		return this.brandService.delete(deleteBrandRequest);
 	}
 	
 	@GetMapping("/getById")
-	public DataResult<GetBrandDto> getById(@RequestParam int brandId) throws BusinessException {
+	public DataResult<GetBrandDto> getById(@RequestParam int brandId) throws BrandNotFoundException {
 		return this.brandService.getById(brandId);
 	}
 	
