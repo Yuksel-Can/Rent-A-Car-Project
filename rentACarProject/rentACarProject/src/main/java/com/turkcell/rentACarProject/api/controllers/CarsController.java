@@ -91,6 +91,5 @@ public class CarsController {
 	public DataResult<List<CarSortedDto>> getAllSortedCar(@RequestParam int sort){
 		return this.carService.getAllSortedCar(sort);
 	}
-	
-	
+
 }

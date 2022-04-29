@@ -3,10 +3,14 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.CityService;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.lists.CityListDto;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.gets.GetCityDto;
+import com.turkcell.rentACarProject.business.requests.citiesRequests.CreateCityRequest;
+import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.cityExceptions.CityAlreadyExistsException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.cityExceptions.CityNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
+import com.turkcell.rentACarProject.core.utilities.result.Result;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
+import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
 import com.turkcell.rentACarProject.dataAccess.abstracts.CityDao;
 import com.turkcell.rentACarProject.entities.concretes.City;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,19 @@ public class CityManager implements CityService {
     }
 
     @Override
+    public Result add(CreateCityRequest createCityRequest) throws CityAlreadyExistsException {
+
+        checkIsNotExistByCityName(createCityRequest.getCityName());
+
+        City city = this.modelMapperService.forRequest().map(createCityRequest, City.class);
+        city.setCityId(0);
+
+        this.cityDao.save(city);
+
+        return new SuccessResult("City added");
+    }
+
+    @Override
     public DataResult<GetCityDto> getByCityId(int cityId) throws CityNotFoundException {
 
         checkIfExistsByCityId(cityId);
@@ -53,6 +70,12 @@ public class CityManager implements CityService {
     public void checkIfExistsByCityId(int cityId) throws CityNotFoundException {
         if(!this.cityDao.existsByCityId(cityId)){
             throw new CityNotFoundException("City id not exists");
+        }
+    }
+
+    private void checkIsNotExistByCityName(String cityName) throws CityAlreadyExistsException {
+        if(this.cityDao.existsByCityName(cityName)) {
+            throw new CityAlreadyExistsException("City name already exists");
         }
     }
 

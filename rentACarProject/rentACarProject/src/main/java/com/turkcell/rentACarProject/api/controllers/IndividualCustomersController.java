@@ -32,6 +32,7 @@ public class IndividualCustomersController {
         this.individualCustomerService = individualCustomerService;
     }
 
+
     @GetMapping("/getAll")
     public DataResult<List<IndividualCustomerListDto>> getAll(){
         return this.individualCustomerService.getAll();
@@ -56,4 +57,5 @@ public class IndividualCustomersController {
     public DataResult<GetIndividualCustomerDto> getById(@RequestParam int individualCustomerId) throws IndividualCustomerNotFoundException {
         return this.individualCustomerService.getById(individualCustomerId);
     }
+
 }

@@ -62,6 +62,5 @@ public class ColorsController {
 	public DataResult<GetColorDto> getById(@RequestParam int colorId) throws ColorNotFoundException {
 		return this.colorService.getById(colorId);
 	}
-	
-	
+
 }

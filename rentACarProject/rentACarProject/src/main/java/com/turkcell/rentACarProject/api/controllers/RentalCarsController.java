@@ -26,7 +26,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rentalcars")
+@RequestMapping("/api/rentalCars")
 public class RentalCarsController {
 
     private final RentalCarService rentalCarService;

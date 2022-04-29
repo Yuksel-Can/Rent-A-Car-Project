@@ -35,7 +35,7 @@ public class CreditCardManager implements CreditCardService {
         this.modelMapperService = modelMapperService;
     }
 
-    public static enum CardSaveInformation {
+    public enum CardSaveInformation {
         SAVE, DONT_SAVE;
     }
 
@@ -46,6 +46,7 @@ public class CreditCardManager implements CreditCardService {
 
         List<CreditCardListDto> result = creditCardList.stream().map(creditCard -> this.modelMapperService.forDto().map(creditCard, CreditCardListDto.class))
                 .collect(Collectors.toList());
+        setCustomerIdForAllCreditCard(creditCardList, result);
 
         return new SuccessDataResult<>(result, "Credit Cards listed");
     }
@@ -73,6 +74,7 @@ public class CreditCardManager implements CreditCardService {
         CreditCard creditCard = this.creditCardDao.getById(creditCardId);
 
         GetCreditCardDto result = this.modelMapperService.forDto().map(creditCard, GetCreditCardDto.class);
+        result.setCustomerId(creditCard.getCustomer().getCustomerId());
 
         return new SuccessDataResult<>(result, "Credit card getted by id, creditCardId: " + creditCardId);
     }
@@ -86,27 +88,22 @@ public class CreditCardManager implements CreditCardService {
 
         List<CreditCardListDto> result = creditCardList.stream().map(creditCard -> this.modelMapperService.forDto().map(creditCard, CreditCardListDto.class))
                 .collect(Collectors.toList());
+        setCustomerIdForAllCreditCard(creditCardList, result);
 
         return new SuccessDataResult<>(result, "Credit card getted by customer id, customerId: " + customerId);
+    }
+
+    private void setCustomerIdForAllCreditCard(List<CreditCard> creditCardList, List<CreditCardListDto> result) {
+
+        for(int i=0; i< creditCardList.size();i++){
+            result.get(i).setCustomerId(creditCardList.get(i).getCustomer().getCustomerId());
+        }
     }
 
     @Override
     public void checkSaveInformationAndSaveCreditCard(CreateCreditCardRequest createCreditCardRequest, CreditCardManager.CardSaveInformation cardSaveInformation) throws CustomerNotFoundException {
         if(cardSaveInformation.equals(CreditCardManager.CardSaveInformation.SAVE)){
             add(createCreditCardRequest);
-        }
-    }
-
-    private boolean checkIfNotExistsByCardNumber(String cardNumber) {
-        if(this.creditCardDao.existsByCardNumber(cardNumber)){
-            return false;
-        }
-        return true;
-    }
-
-    private void checkIfExistsById(int creditCardId) throws CreditCardNotFoundException {
-        if(!this.creditCardDao.existsByCreditCardId(creditCardId)){
-            throw new CreditCardNotFoundException("Credit card not found, creditCardId: " + creditCardId);
         }
     }
 
@@ -117,5 +114,14 @@ public class CreditCardManager implements CreditCardService {
         }
     }
 
+    private boolean checkIfNotExistsByCardNumber(String cardNumber) {
+        return !this.creditCardDao.existsByCardNumber(cardNumber);
+    }
+
+    private void checkIfExistsById(int creditCardId) throws CreditCardNotFoundException {
+        if(!this.creditCardDao.existsByCreditCardId(creditCardId)){
+            throw new CreditCardNotFoundException("Credit card not found, creditCardId: " + creditCardId);
+        }
+    }
 
 }

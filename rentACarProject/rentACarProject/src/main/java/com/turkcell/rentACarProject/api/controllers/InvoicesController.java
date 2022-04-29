@@ -29,6 +29,7 @@ public class InvoicesController {
         this.invoiceService = invoiceService;
     }
 
+
     @GetMapping("/getAll")
     public DataResult<List<InvoiceListDto>> getAll(){
         return this.invoiceService.getAll();
@@ -73,5 +74,6 @@ public class InvoicesController {
     public DataResult<List<InvoiceListDto>> findByInvoiceDateBetween(@RequestBody @Valid InvoiceGetDateBetweenRequest invoiceGetDateBetweenRequest){
         return this.invoiceService.findByInvoiceDateBetween(invoiceGetDateBetweenRequest);
     }
+
 }
 

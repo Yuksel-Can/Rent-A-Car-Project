@@ -59,4 +59,5 @@ public class CarCrashesController {
     public DataResult<List<CarCrashListByCarIdDto>> getCarCrashByCar_CarId(@RequestParam int carId) throws CarNotFoundException {
         return this.carCrashService.getCarCrashByCar_CarId(carId);
     }
+
 }

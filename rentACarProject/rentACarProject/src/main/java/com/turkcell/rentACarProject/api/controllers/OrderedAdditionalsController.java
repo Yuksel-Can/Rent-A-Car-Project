@@ -54,5 +54,4 @@ public class OrderedAdditionalsController {
         return this.orderedAdditionalService.getByOrderedAdditional_AdditionalId(additionalId);
     }
 
-
 }

@@ -24,6 +24,7 @@ public class UsersController {
         this.userService = userService;
     }
 
+
     @GetMapping("/getAll")
     public DataResult<List<UserListDto>> getAll(){
         return this.userService.getAll();
@@ -33,4 +34,5 @@ public class UsersController {
     public DataResult<GetUserDto> getById(@RequestParam int userId) throws UserNotFoundException {
         return this.userService.getById(userId);
     }
+
 }

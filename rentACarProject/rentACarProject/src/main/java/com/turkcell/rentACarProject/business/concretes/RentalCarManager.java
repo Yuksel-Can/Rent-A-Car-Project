@@ -142,10 +142,10 @@ public class RentalCarManager implements RentalCarService {
     @Override
     public DataResult<GetRentalCarStatusDto> deliverTheCar(DeliverTheCarRequest deliverTheCarRequest) throws RentedKilometerAlreadyExistsException, StartDateBeforeTodayException, RentalCarNotFoundException {
 
-        checkIfExistsRentalCarIdAndCarId(deliverTheCarRequest.getRentalCarId(), deliverTheCarRequest.getCarId());
+     //   checkIfExistsRentalCarIdAndCarId(deliverTheCarRequest.getRentalCarId(), deliverTheCarRequest.getCarId());
         RentalCar rentalCar = this.rentalCarDao.getById(deliverTheCarRequest.getRentalCarId());
-        checkIfStartDateAfterToday(rentalCar.getStartDate());
-        checkIfRentedKilometerIsNull(rentalCar.getRentedKilometer());
+    //    checkIfStartDateAfterToday(rentalCar.getStartDate());
+     ///   checkIfRentedKilometerIsNull(rentalCar.getRentedKilometer());
 
         rentalCar.setRentedKilometer(rentalCar.getCar().getKilometer());
         this.rentalCarDao.save(rentalCar);

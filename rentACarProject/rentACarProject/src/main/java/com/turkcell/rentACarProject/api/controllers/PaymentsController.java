@@ -39,6 +39,7 @@ public class PaymentsController {
         this.paymentService = paymentService;
     }
 
+
     @GetMapping("/getAll")
     public DataResult<List<PaymentListDto>> getAll(){
         return this.paymentService.getAll();

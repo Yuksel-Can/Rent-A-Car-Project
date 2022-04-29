@@ -24,6 +24,7 @@ public class CustomersController {
         this.customerService = customerService;
     }
 
+
     @GetMapping("/getAll")
     public DataResult<List<CustomerListDto>> getAll(){
         return this.customerService.getAll();
@@ -33,4 +34,5 @@ public class CustomersController {
     public DataResult<GetCustomerDto> getById(@RequestParam int customerId) throws CustomerNotFoundException {
         return this.customerService.getById(customerId);
     }
+
 }

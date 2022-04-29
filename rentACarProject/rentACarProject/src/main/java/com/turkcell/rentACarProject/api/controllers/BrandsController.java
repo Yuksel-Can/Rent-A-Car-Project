@@ -62,6 +62,5 @@ public class BrandsController {
 	public DataResult<GetBrandDto> getById(@RequestParam int brandId) throws BrandNotFoundException {
 		return this.brandService.getById(brandId);
 	}
-	
-	
+
 }
