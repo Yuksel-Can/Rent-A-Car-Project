@@ -3,7 +3,6 @@ package com.turkcell.rentACarProject.business.abstracts;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.lists.CityListDto;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.gets.GetCityDto;
 import com.turkcell.rentACarProject.business.requests.citiesRequests.CreateCityRequest;
-import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.cityExceptions.CityAlreadyExistsException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.cityExceptions.CityNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;

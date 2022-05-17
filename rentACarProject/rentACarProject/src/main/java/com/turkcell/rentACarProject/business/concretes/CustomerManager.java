@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CustomerService;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.customerDtos.lists.CustomerListDto;
 import com.turkcell.rentACarProject.business.dtos.customerDtos.gets.GetCustomerDto;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.customerExceptions.CustomerNotFoundException;
@@ -36,7 +37,7 @@ public class CustomerManager implements CustomerService {
         List<CustomerListDto> result = customers.stream().map(customer -> this.modelMapperService.forDto().map(customer, CustomerListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Customer listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -48,13 +49,13 @@ public class CustomerManager implements CustomerService {
 
         GetCustomerDto result = this.modelMapperService.forDto().map(customer, GetCustomerDto.class);
 
-        return new SuccessDataResult<>(result, "Customer listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + customerId);
     }
 
     @Override
     public void checkIfCustomerIdExists(int customerId) throws CustomerNotFoundException {
         if(!this.customerDao.existsByCustomerId(customerId)){
-            throw new CustomerNotFoundException("Customer id not found, customerId: " + customerId);
+            throw new CustomerNotFoundException(BusinessMessages.CustomerMessages.CUSTOMER_ID_NOT_FOUND + customerId);
         }
     }
 

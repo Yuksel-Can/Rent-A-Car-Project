@@ -13,6 +13,5 @@ public class GetCarStatus {
     private int modelYear;
     private int kilometer;
     private String description;
-    //todo:buraya damage ekle
 
 }

@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.requests.invoiceRequests;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.entities.concretes.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +18,7 @@ import java.time.LocalDate;
 public class CreateInvoiceRequest {
 
     @JsonIgnore
-    @Pattern(regexp = "^[0-9]{16}", message = "not number") //todo:açıklama düzelt
+    @Pattern(regexp = "^[0-9]{16}", message = BusinessMessages.InvoiceMessages.INVOICE_NO_NOT_VALID)
     private String invoiceNo;
 
     @JsonIgnore

@@ -11,8 +11,6 @@ public interface RentalCarDao extends JpaRepository<RentalCar, Integer> {
 
     boolean existsByRentalCarId(int rentalCarId);
     boolean existsByCar_CarId(int carId);
-    boolean existsByRentedCity_CityId(int cityId);
-//    boolean existsByDeliveredCity_CityId(int cityId);
     boolean existsByCustomer_CustomerId(int customerId);
     boolean existsByRentalCarIdAndCar_CarId(int rentalCarId, int carId);
 

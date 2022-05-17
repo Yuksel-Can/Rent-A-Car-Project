@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CityService;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.lists.CityListDto;
 import com.turkcell.rentACarProject.business.dtos.cityDtos.gets.GetCityDto;
 import com.turkcell.rentACarProject.business.requests.citiesRequests.CreateCityRequest;
@@ -39,7 +40,7 @@ public class CityManager implements CityService {
         List<CityListDto> result = cities.stream().map(city -> this.modelMapperService.forDto().map(city, CityListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Cities listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class CityManager implements CityService {
 
         this.cityDao.save(city);
 
-        return new SuccessResult("City added");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
@@ -64,18 +65,18 @@ public class CityManager implements CityService {
 
         GetCityDto result = this.modelMapperService.forDto().map(city, GetCityDto.class);
 
-        return new SuccessDataResult<>(result, "City listed by cityId: " + cityId);
+        return new SuccessDataResult<>(result,BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + cityId);
     }
 
     public void checkIfExistsByCityId(int cityId) throws CityNotFoundException {
         if(!this.cityDao.existsByCityId(cityId)){
-            throw new CityNotFoundException("City id not exists");
+            throw new CityNotFoundException(BusinessMessages.CityMessages.CITY_ID_NOT_FOUND + cityId);
         }
     }
 
     private void checkIsNotExistByCityName(String cityName) throws CityAlreadyExistsException {
         if(this.cityDao.existsByCityName(cityName)) {
-            throw new CityAlreadyExistsException("City name already exists");
+            throw new CityAlreadyExistsException(BusinessMessages.CityMessages.CITY_NAME_ALREADY_EXISTS + cityName);
         }
     }
 

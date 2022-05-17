@@ -3,6 +3,7 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.AdditionalService;
 import com.turkcell.rentACarProject.business.abstracts.OrderedAdditionalService;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.gets.GetOrderedAdditionalDto;
 import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.lists.OrderedAdditionalListByAdditionalIdDto;
 import com.turkcell.rentACarProject.business.dtos.orderedAdditionalDtos.lists.OrderedAdditionalListByRentalCarIdDto;
@@ -56,7 +57,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
             result.get(i).setRentalCarId(orderedAdditionalList.get(i).getRentalCar().getRentalCarId());
         }
 
-        return new SuccessDataResult<>(result,"Ordered Additional Service listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -69,7 +70,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         this.orderedAdditionalDao.save(orderedAdditional);
 
-        return new SuccessResult("Ordered Additional Service added");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         this.orderedAdditionalDao.save(orderedAdditional);
 
-        return new SuccessResult("Ordered Additional Service updated");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateOrderedAdditionalRequest.getOrderedAdditionalId());
     }
 
     @Override
@@ -94,7 +95,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
 
         this.orderedAdditionalDao.deleteById(orderedAdditional.getOrderedAdditionalId());
 
-        return new SuccessResult("Ordered Additional Service deleted");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + deleteOrderedAdditionalRequest.getOrderedAdditionalId());
     }
 
     @Override
@@ -109,7 +110,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
             result.setRentalCarId(orderedAdditional.getRentalCar().getRentalCarId());
         }
 
-        return new SuccessDataResult<>(result, "Ordered Additional Service listed by orderedAdditionalId: " + orderedAdditionalId);
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + orderedAdditionalId);
     }
 
     @Override
@@ -122,12 +123,12 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         List<OrderedAdditionalListByRentalCarIdDto> result = orderedAdditionalList.stream().map(orderedAdditional -> this.modelMapperService
                 .forDto().map(orderedAdditional, OrderedAdditionalListByRentalCarIdDto.class)).collect(Collectors.toList());
 
-        if(result.size() != 0){ //todo:result != null mı olmalı .size()!=0 mı - Bunu dene
+        if(result.size() != 0){
             for(int i = 0; i < result.size(); i++) {
                 result.get(i).setRentalCarId(orderedAdditionalList.get(i).getRentalCar().getRentalCarId());
             }
         }
-        return new SuccessDataResult<>(result, "Ordered Additional Service of the Rented Car listed by RentalCarId: " + rentalCarId);
+        return new SuccessDataResult<>(result, BusinessMessages.OrderedAdditionalMessages.ORDERED_ADDITIONAL_LISTED_BY_RENTAL_CAR_ID + rentalCarId);
     }
 
     @Override
@@ -145,7 +146,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
                 result.get(i).setRentalCarId(orderedAdditionalList.get(i).getRentalCar().getRentalCarId());
             }
         }
-        return new SuccessDataResult<>(result, "Ordered Additional Service of the Additional listed by AdditionalId: " + additionalId);
+        return new SuccessDataResult<>(result, BusinessMessages.OrderedAdditionalMessages.ORDERED_ADDITIONAL_LISTED_BY_ADDITIONAL_ID + additionalId);
     }
 
     @Override
@@ -197,7 +198,7 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
         this.additionalService.checkIfExistsByAdditionalId(additionalId);
         int maxUnitsPerRental = this.additionalService.getByAdditionalId(additionalId).getData().getMaxUnitsPerRental();
         if(orderedAdditionalQuantity > maxUnitsPerRental || orderedAdditionalQuantity < 1){
-            throw new AdditionalQuantityNotValidException("For this additional service, the Minimum quantity can be 1, the maximum quantity is: " + maxUnitsPerRental);
+            throw new AdditionalQuantityNotValidException(BusinessMessages.OrderedAdditionalMessages.ADDITIONAL_QUANTITY_NOT_VALID + maxUnitsPerRental);
         }
     }
 
@@ -210,28 +211,28 @@ public class OrderedAdditionalManager implements OrderedAdditionalService {
     @Override
     public void checkIsOnlyOneOrderedAdditionalByAdditionalIdAndRentalCarIdForUpdate(int additionalId, int rentalCarId) throws OrderedAdditionalAlreadyExistsException {
         if(this.orderedAdditionalDao.getAllByAdditional_AdditionalIdAndRentalCar_RentalCarId(additionalId, rentalCarId).size() > 1){
-            throw new OrderedAdditionalAlreadyExistsException("This Ordered is already exists");
+            throw new OrderedAdditionalAlreadyExistsException(BusinessMessages.OrderedAdditionalMessages.ORDERED_ADDITIONAL_ALREADY_EXISTS);
         }
     }
 
     @Override
     public void checkIsExistsByOrderedAdditionalId(int orderedAdditionalId) throws OrderedAdditionalNotFoundException {
         if(!this.orderedAdditionalDao.existsByOrderedAdditionalId(orderedAdditionalId)){
-            throw new OrderedAdditionalNotFoundException("Ordered Additional id not exists");
+            throw new OrderedAdditionalNotFoundException(BusinessMessages.OrderedAdditionalMessages.ORDERED_ADDITIONAL_ID_NOT_FOUND + orderedAdditionalId);
         }
     }
 
     @Override
     public void checkIsNotExistsByOrderedAdditional_RentalCarId(int rentalCarId) throws RentalCarAlreadyExistsInOrderedAdditionalException {
         if(this.orderedAdditionalDao.existsByRentalCar_RentalCarId(rentalCarId)){
-            throw new RentalCarAlreadyExistsInOrderedAdditionalException("Rental Car Id is available in the ordered additional table, rentalCarId: " + rentalCarId);
+            throw new RentalCarAlreadyExistsInOrderedAdditionalException(BusinessMessages.OrderedAdditionalMessages.RENTAL_CAR_ID_ALREADY_EXISTS_IN_THE_ORDERED_ADDITIONAL_TABLE + rentalCarId);
         }
     }
 
     @Override
     public void checkIsNotExistsByOrderedAdditional_AdditionalId(int additionalId) throws AdditionalAlreadyExistsInOrderedAdditionalException {
         if(this.orderedAdditionalDao.existsByAdditional_AdditionalId(additionalId)){
-            throw new AdditionalAlreadyExistsInOrderedAdditionalException("Additional Id is available in the ordered additional table, additionalId: " + additionalId);
+            throw new AdditionalAlreadyExistsInOrderedAdditionalException(BusinessMessages.OrderedAdditionalMessages.ADDITIONAL_ID_ALREADY_EXISTS_IN_THE_ORDERED_ADDITIONAL_TABLE+ additionalId);
         }
     }
 

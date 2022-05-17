@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.requests.corporateCustomerRequests;
 
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.requests.customerRequests.CreateCustomerRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,7 +23,7 @@ public class CreateCorporateCustomerRequest extends CreateCustomerRequest {
 
     @NotNull
     @NotBlank
-    @Pattern(regexp = "^[0-9]{10}", message = "not number") //todo:açıklama düzelt
+    @Pattern(regexp = "^[0-9]{10}", message = BusinessMessages.CorporateCustomerMessages.TAX_NUMBER_NOT_VALID)
     private String taxNumber;
 
 }

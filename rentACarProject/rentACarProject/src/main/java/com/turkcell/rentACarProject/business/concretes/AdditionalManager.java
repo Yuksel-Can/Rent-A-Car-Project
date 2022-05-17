@@ -2,6 +2,7 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.AdditionalService;
 import com.turkcell.rentACarProject.business.abstracts.OrderedAdditionalService;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.additionalDtos.lists.AdditionalListDto;
 import com.turkcell.rentACarProject.business.dtos.additionalDtos.gets.GetAdditionalDto;
 import com.turkcell.rentACarProject.business.requests.additionalRequests.CreateAdditionalRequest;
@@ -47,8 +48,7 @@ public class AdditionalManager implements AdditionalService {
         List<AdditionalListDto> result = additionalList.stream().map(additional -> this.modelMapperService.forDto().map(additional, AdditionalListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Additional Services listed");
-
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -60,8 +60,7 @@ public class AdditionalManager implements AdditionalService {
 
         this.additionalDao.save(additional);
 
-        return new SuccessResult("Additional Service added");
-
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
@@ -74,8 +73,7 @@ public class AdditionalManager implements AdditionalService {
 
         this.additionalDao.save(additional);
 
-        return new SuccessResult("Additional Service updated, id: " + updateAdditionalRequest.getAdditionalId());
-
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateAdditionalRequest.getAdditionalId());
     }
 
     @Override
@@ -86,8 +84,7 @@ public class AdditionalManager implements AdditionalService {
 
         this.additionalDao.deleteById(deleteAdditionalRequest.getAdditionalId());
 
-        return new SuccessResult("Additional Service deleted");
-
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + deleteAdditionalRequest.getAdditionalId());
     }
 
     @Override
@@ -99,20 +96,19 @@ public class AdditionalManager implements AdditionalService {
 
         GetAdditionalDto result = this.modelMapperService.forDto().map(addition, GetAdditionalDto.class);
 
-        return new SuccessDataResult<>(result, "Additional Service get by id: " + additionalId);
-
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + additionalId);
     }
 
     @Override
     public void checkIfExistsByAdditionalId(int additionalId) throws AdditionalNotFoundException {
         if(!this.additionalDao.existsByAdditionalId(additionalId)){
-            throw new AdditionalNotFoundException("Additional Service ıd not exists, additionalId: " + additionalId);
+            throw new AdditionalNotFoundException(BusinessMessages.AdditionalMessages.ADDITIONAL_ID_NOT_FOUND + additionalId);
         }
     }
 
     private void checkIsNotExistsByAdditionalName(String additionalName) throws AdditionalAlreadyExistsException {
         if(this.additionalDao.existsByAdditionalName(additionalName)){
-            throw new AdditionalAlreadyExistsException("Additional Service name already exists, name: " + additionalName);
+            throw new AdditionalAlreadyExistsException(BusinessMessages.AdditionalMessages.ADDITIONAL_NAME_ALREADY_EXISTS + additionalName);
         }
     }
 

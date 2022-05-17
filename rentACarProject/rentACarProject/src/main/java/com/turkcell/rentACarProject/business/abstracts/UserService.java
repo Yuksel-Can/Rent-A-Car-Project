@@ -2,7 +2,6 @@ package com.turkcell.rentACarProject.business.abstracts;
 
 import com.turkcell.rentACarProject.business.dtos.userDtos.gets.GetUserDto;
 import com.turkcell.rentACarProject.business.dtos.userDtos.lists.UserListDto;
-import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserAlreadyExistsException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserEmailNotValidException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.userExceptions.UserNotFoundException;

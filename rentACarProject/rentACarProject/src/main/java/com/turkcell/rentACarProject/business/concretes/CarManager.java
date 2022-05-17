@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.carDtos.gets.GetCarDto;
 import com.turkcell.rentACarProject.business.dtos.carDtos.lists.*;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandNotFoundException;
@@ -25,7 +26,6 @@ import com.turkcell.rentACarProject.business.requests.carRequests.DeleteCarReque
 import com.turkcell.rentACarProject.business.requests.carRequests.UpdateCarRequest;
 import com.turkcell.rentACarProject.core.utilities.mapping.ModelMapperService;
 import com.turkcell.rentACarProject.core.utilities.result.DataResult;
-import com.turkcell.rentACarProject.core.utilities.result.ErrorDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.Result;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessDataResult;
 import com.turkcell.rentACarProject.core.utilities.result.SuccessResult;
@@ -64,8 +64,7 @@ public class CarManager implements CarService{
 		List<CarListDto> carsDto = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<>(carsDto, "Cars listed");
-		
+		return new SuccessDataResult<>(carsDto, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
 	}
 
 	@Override
@@ -79,8 +78,7 @@ public class CarManager implements CarService{
 
 		this.carDao.save(car);
 
-		return new SuccessResult("Car added");
-
+		return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
 	}
 
 	@Override
@@ -95,8 +93,7 @@ public class CarManager implements CarService{
 
 		this.carDao.save(car);
 
-		return new SuccessResult("Car updated, id: " + updateCarRequest.getCarId());
-
+		return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateCarRequest.getCarId());
 	}
 
 	@Override
@@ -109,8 +106,7 @@ public class CarManager implements CarService{
 
 		this.carDao.deleteById(deleteCarRequest.getCarId());
 
-		return new SuccessResult("Car deleted, carId: " + deleteCarRequest.getCarId());
-
+		return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + deleteCarRequest.getCarId());
 	}
 
 	@Override
@@ -122,7 +118,6 @@ public class CarManager implements CarService{
 
 		car.setKilometer(kilometer);
 		this.carDao.save(car);
-
 	}
 
 	@Override
@@ -134,8 +129,7 @@ public class CarManager implements CarService{
 
 		GetCarDto carDto = this.modelMapperService.forDto().map(car, GetCarDto.class);
 
-		return new SuccessDataResult<>(carDto, "Car listed");
-
+		return new SuccessDataResult<>(carDto, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
 	}
 
 	@Override
@@ -148,8 +142,7 @@ public class CarManager implements CarService{
 		List<CarListByBrandIdDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByBrandIdDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<>(result, "Cars listed by brandId: " + brandId);
-
+		return new SuccessDataResult<>(result, BusinessMessages.CarMessages.CAR_LISTED_BY_BRAND_ID + brandId);
 	}
 
 	@Override
@@ -162,7 +155,7 @@ public class CarManager implements CarService{
 		List<CarListByColorIdDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByColorIdDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<>(result, "Cars listed by colorId: " + colorId);
+		return new SuccessDataResult<>(result, BusinessMessages.CarMessages.CAR_LISTED_BY_COLOR_ID + colorId);
 	}
 
 	@Override
@@ -173,22 +166,21 @@ public class CarManager implements CarService{
 		List<CarListByDailyPriceDto> response = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarListByDailyPriceDto.class))
 					.collect(Collectors.toList());
 
-		return new SuccessDataResult<>(response, "Less than Car listed");
+		return new SuccessDataResult<>(response, BusinessMessages.CarMessages.CAR_LISTED_BY_LESS_THEN_EQUAL + dailyPrice);
 	}
 
 	@Override
-	public DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize) {
+	public DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize) throws CarNotFoundException {
 
-		if(pageNo <= 0 || pageSize <= 0) {
-			return new ErrorDataResult<>("please enter valid value");
-		}
+		checkIfPageNoAndPageSizeValid(pageNo, pageSize);
+
 		Pageable pageable = PageRequest.of(pageNo-1, pageSize);
 		List<Car> cars = this.carDao.findAll(pageable).getContent();
 
 		List<CarPagedDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarPagedDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<>(result, "All cars paged");
+		return new SuccessDataResult<>(result,BusinessMessages.CarMessages.ALL_CARS_PAGED);
 	}
 
 	@Override
@@ -201,7 +193,7 @@ public class CarManager implements CarService{
 		List<CarSortedDto> result = cars.stream().map(car -> this.modelMapperService.forDto().map(car, CarSortedDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<>(result, "All cars sorted");
+		return new SuccessDataResult<>(result, BusinessMessages.CarMessages.ALL_CARS_SORTED);
 	}
 
 
@@ -209,21 +201,26 @@ public class CarManager implements CarService{
 
 	private void checkIsModelYearBeforeThisYear(int modelYear) throws ModelYearAfterThisYearException {
 		if(modelYear > LocalDate.now().getYear()){
-			throw new ModelYearAfterThisYearException("The model year may be this year or previous years.");
+			throw new ModelYearAfterThisYearException(BusinessMessages.CarMessages.MODEL_YEAR_CANNOT_AFTER_TODAY + modelYear);
 		}
-
 	}
 
 	private void checkIfReturnKilometerValid(int beforeKilometer, int afterKilometer) throws ReturnKilometerLessThanRentKilometerException {
 		if(beforeKilometer> afterKilometer){
-			throw new ReturnKilometerLessThanRentKilometerException("Delivered kilometer cannot be lower than rented kilometer");
+			throw new ReturnKilometerLessThanRentKilometerException(BusinessMessages.CarMessages.DELIVERED_KILOMETER_CANNOT_LESS_THAN_RENTED_KILOMETER);
+		}
+	}
+
+	private void checkIfPageNoAndPageSizeValid(int pageNo, int pageSize) throws CarNotFoundException {
+		if(pageNo <= 0 || pageSize <= 0) {
+			throw new CarNotFoundException(BusinessMessages.CarMessages.PAGE_NO_OR_PAGE_SIZE_NOT_VALID);
 		}
 	}
 
 	@Override
 	public void checkIsExistsByCarId(int carId) throws CarNotFoundException {
 		if(!this.carDao.existsByCarId(carId)) {
-			throw new CarNotFoundException("Car id not exists");
+			throw new CarNotFoundException(BusinessMessages.CarMessages.CAR_ID_NOT_FOUND + carId);
 		}
 	}
 
@@ -231,7 +228,7 @@ public class CarManager implements CarService{
 	public void checkIsNotExistsByCar_BrandId(int brandId) throws BrandExistsInCarException {
 
 		if(this.carDao.existsByBrand_BrandId(brandId)) {
-			throw new BrandExistsInCarException("Brand id used by a car");
+			throw new BrandExistsInCarException(BusinessMessages.CarMessages.BRAND_ID_ALREADY_EXISTS_IN_THE_CAR_TABLE + brandId);
 		}
 	}
 
@@ -239,7 +236,7 @@ public class CarManager implements CarService{
 	public void checkIsNotExistsByCar_ColorId(int colorId) throws ColorExistsInCarException {
 
 		if(this.carDao.existsByColor_ColorId(colorId)) {
-			throw new ColorExistsInCarException("Color id used by a car");
+			throw new ColorExistsInCarException(BusinessMessages.CarMessages.COLOR_ID_ALREADY_EXISTS_IN_THE_CAR_TABLE + colorId);
 		}
 	}
 

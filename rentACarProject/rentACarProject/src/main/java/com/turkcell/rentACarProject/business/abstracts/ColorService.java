@@ -7,7 +7,6 @@ import com.turkcell.rentACarProject.business.dtos.colorDtos.gets.GetColorDto;
 import com.turkcell.rentACarProject.business.requests.colorRequests.CreateColorRequest;
 import com.turkcell.rentACarProject.business.requests.colorRequests.DeleteColorRequest;
 import com.turkcell.rentACarProject.business.requests.colorRequests.UpdateColorRequest;
-import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.ColorExistsInCarException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.colorExceptions.ColorAlreadyExistsException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.colorExceptions.ColorNotFoundException;

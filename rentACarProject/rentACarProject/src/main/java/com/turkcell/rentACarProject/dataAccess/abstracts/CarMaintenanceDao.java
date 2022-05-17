@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface CarMaintenanceDao extends JpaRepository<CarMaintenance, Integer>{
 
-    boolean existsByMaintenanceId(int carManintenanceId);
+    boolean existsByMaintenanceId(int carMaintenanceId);
     boolean existsByCar_CarId(int carId);
 
     List<CarMaintenance> findAllByCar_CarId(int carId);

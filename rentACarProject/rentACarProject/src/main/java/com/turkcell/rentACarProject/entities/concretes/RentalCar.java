@@ -43,10 +43,10 @@ public class RentalCar {
     @JoinColumn(name = "delivered_city", nullable = false)
     private City deliveredCity;
 
-    @Column(name = "rented_kilometer", nullable = false)
+    @Column(name = "rented_kilometer")
     private Integer rentedKilometer;
 
-    @Column(name = "delivered_kilometer", nullable = false)
+    @Column(name = "delivered_kilometer")
     private Integer deliveredKilometer;
 
     @OneToMany(mappedBy = "rentalCar")

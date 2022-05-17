@@ -27,7 +27,7 @@ public interface CarService {
 	void updateKilometer(int carId, int kilometer) throws ReturnKilometerLessThanRentKilometerException, CarNotFoundException;
 
 	DataResult<List<CarListByDailyPriceDto>> findByDailyPriceLessThenEqual(double dailyPrice);
-	DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize);
+	DataResult<List<CarPagedDto>> getAllPagedCar(int pageNo, int pageSize) throws CarNotFoundException;
 	DataResult<List<CarSortedDto>> getAllSortedCar(int sort);
 	DataResult<GetCarDto> getById(int id) throws CarNotFoundException;
 	DataResult<List<CarListByBrandIdDto>> getAllByCar_BrandId(int brandId) throws BrandNotFoundException;

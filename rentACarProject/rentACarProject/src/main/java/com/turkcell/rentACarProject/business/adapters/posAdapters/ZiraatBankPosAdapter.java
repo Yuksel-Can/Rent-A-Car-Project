@@ -1,7 +1,6 @@
 package com.turkcell.rentACarProject.business.adapters.posAdapters;
 
 import com.turkcell.rentACarProject.business.outServices.ZiraatBankPosService;
-import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.PosServiceExceptions.MakePaymentFailedException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ public class ZiraatBankPosAdapter implements PosService {
         ZiraatBankPosService ziraatBankPosService = new ZiraatBankPosService();
 
         if(!ziraatBankPosService.makePayment(cardNumber, cardOwner, cardCvv, cardExpirationDate, totalPrice)){
-            throw new MakePaymentFailedException("payment failed, ziraat");
+            throw new MakePaymentFailedException("payment failed, Ziraat");
         }
         return true;
     }

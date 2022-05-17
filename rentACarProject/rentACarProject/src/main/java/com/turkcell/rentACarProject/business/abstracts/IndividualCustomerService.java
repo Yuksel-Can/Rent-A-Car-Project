@@ -29,6 +29,6 @@ public interface IndividualCustomerService {
     DataResult<GetIndividualCustomerDto> getById(int individualCustomerId) throws IndividualCustomerNotFoundException;
     IndividualCustomer getIndividualCustomerById(int individualCustomerId);
 
-    boolean checkIfIndividualCustomerIdExists(int individualCustomerId) throws IndividualCustomerNotFoundException;
+    void checkIfIndividualCustomerIdExists(int individualCustomerId) throws IndividualCustomerNotFoundException;
 }
 

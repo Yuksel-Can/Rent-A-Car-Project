@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.gets.*;
 import com.turkcell.rentACarProject.business.dtos.invoiceDtos.lists.InvoiceListDto;
 import com.turkcell.rentACarProject.business.requests.invoiceRequests.CreateInvoiceRequest;
@@ -71,7 +72,7 @@ public class InvoiceManager implements InvoiceService {
         List<InvoiceListDto> result = invoices.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
         manuelFieldSetter(invoices, result);
 
-        return new SuccessDataResult<>(result, "Invoices listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -87,8 +88,7 @@ public class InvoiceManager implements InvoiceService {
 
         this.invoiceDao.save(invoice);
 
-
-        return new SuccessResult("Invoice added");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class InvoiceManager implements InvoiceService {
         result.setNationalIdentity(individualCustomer.getNationalIdentity());
         manuelFieldSetter(invoice, result);
 
-        return new SuccessDataResult<>(result, "Individual Customer Invoice getted by individual invoice id, invoiceId: " + invoiceId);
+        return new SuccessDataResult<>(result, BusinessMessages.InvoiceMessages.INDIVIDUAL_CUSTOMER_INVOICE_LISTED_BY_INVOICE_ID + invoiceId);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class InvoiceManager implements InvoiceService {
         result.setTaxNumber(corporateCustomer.getTaxNumber());
         manuelFieldSetter(invoice, result);
 
-        return new SuccessDataResult<>(result, "Corporate Customer Invoice getted by corporate invoice id, invoiceId " + invoiceId);
+        return new SuccessDataResult<>(result, BusinessMessages.InvoiceMessages.CORPORATE_CUSTOMER_INVOICE_LISTED_BY_INVOICE_ID + invoiceId);
     }
 
     @Override
@@ -141,7 +141,7 @@ public class InvoiceManager implements InvoiceService {
         result.setNationalIdentity(individualCustomer.getNationalIdentity());
         manuelFieldSetter(invoice, result);
 
-        return new SuccessDataResult<>(result, "Individual Customer Invoice getted by individual invoice no, invoiceNo: " + invoiceNo);
+        return new SuccessDataResult<>(result, BusinessMessages.InvoiceMessages.INDIVIDUAL_CUSTOMER_INVOICE_LISTED_BY_INVOICE_NO + invoiceNo);
     }
 
     @Override
@@ -159,7 +159,7 @@ public class InvoiceManager implements InvoiceService {
         result.setTaxNumber(corporateCustomer.getTaxNumber());
         manuelFieldSetter(invoice, result);
 
-        return new SuccessDataResult<>(result, "Corporate Customer Invoice getted by corporate invoice no, invoiceNo: " + invoiceNo);
+        return new SuccessDataResult<>(result, BusinessMessages.InvoiceMessages.CORPORATE_CUSTOMER_INVOICE_LISTED_BY_INVOICE_NO + invoiceNo);
 
     }
 
@@ -174,7 +174,7 @@ public class InvoiceManager implements InvoiceService {
         GetInvoiceDto result = this.modelMapperService.forDto().map(invoice, GetInvoiceDto.class);
         manuelFieldSetter(invoice, result);
 
-        return new SuccessDataResult<>(result, "Invoice listed by paymentId, paymentId: " + paymentId);
+        return new SuccessDataResult<>(result, BusinessMessages.InvoiceMessages.INVOICE_LISTED_BY_PAYMENT_ID + paymentId);
     }
 
     @Override
@@ -187,7 +187,7 @@ public class InvoiceManager implements InvoiceService {
         List<InvoiceListDto> result = invoiceList.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
         manuelFieldSetter(invoiceList, result);
 
-        return new SuccessDataResult<>(result, "Invoice listed by rentalCarId, rentalCarId: " + rentalCarId);
+        return new SuccessDataResult<>(result, BusinessMessages.InvoiceMessages.INVOICE_LISTED_BY_RENTAL_ID + rentalCarId);
     }
 
     @Override
@@ -200,7 +200,7 @@ public class InvoiceManager implements InvoiceService {
         List<InvoiceListDto> result = invoiceList.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
         manuelFieldSetter(invoiceList, result);
 
-        return new SuccessDataResult<>(result, "Invoice listed by customerId, customerId: " + customerId);
+        return new SuccessDataResult<>(result, BusinessMessages.InvoiceMessages.INVOICE_LISTED_BY_CUSTOMER_ID + customerId);
     }
 
     @Override
@@ -211,7 +211,7 @@ public class InvoiceManager implements InvoiceService {
         List<InvoiceListDto> result = invoices.stream().map(invoice -> this.modelMapperService.forDto().map(invoice, InvoiceListDto.class)).collect(Collectors.toList());
         manuelFieldSetter(invoices, result);
 
-        return new SuccessDataResult<>(result, "Girilen tarihler arasındaki faturalar başarıyla listelendi");
+        return new SuccessDataResult<>(result, BusinessMessages.InvoiceMessages.INVOICE_LISTED_BY_BETWEEN_DATE);
     }
 
     private void manuelFieldSetter(Invoice invoice, GetInvoiceDto result) {
@@ -230,14 +230,11 @@ public class InvoiceManager implements InvoiceService {
     @Override
     public void createAndAddInvoice(int rentalCarId, int paymentId) throws AdditionalNotFoundException, RentalCarNotFoundException {
 
-        //todo:parametre olarak total price verildi dogru mu?
         RentalCar rentalCar = this.rentalCarService.getById(rentalCarId);
-        //todo:bunları buradan sil
-        //todo: heryerde tekrar eden veri
         int totalDays = this.rentalCarService.getTotalDaysForRental(rentalCar.getStartDate(), rentalCar.getFinishDate());
         double priceOfDays = this.rentalCarService.calculateRentalCarTotalDayPrice(rentalCar.getStartDate(), rentalCar.getFinishDate(), this.carService.getDailyPriceByCarId(rentalCar.getCar().getCarId()));
         double priceOfDiffCity = this.rentalCarService.calculateCarDeliveredToTheSamCity(rentalCar.getRentedCity().getCityId(), rentalCar.getDeliveredCity().getCityId());
-        double priceOfAdditionals = this.orderedAdditionalService.getPriceCalculatorForOrderedAdditionalListByRentalCarId(rentalCar.getRentalCarId(), totalDays);      //todo:bu kayıtlı additionalları hesaplıyor
+        double priceOfAdditionals = this.orderedAdditionalService.getPriceCalculatorForOrderedAdditionalListByRentalCarId(rentalCar.getRentalCarId(), totalDays);
         double totalPrice = priceOfDays + priceOfDiffCity + priceOfAdditionals;
 
         CreateInvoiceRequest createInvoiceRequest = new CreateInvoiceRequest();
@@ -266,34 +263,34 @@ public class InvoiceManager implements InvoiceService {
 
     private void checkIfInvoiceIdExists(int invoiceId) throws InvoiceNotFoundException {
         if(!this.invoiceDao.existsByInvoiceId(invoiceId)){
-            throw new InvoiceNotFoundException("Invoice id not exists, invoiceId: " + invoiceId);
+            throw new InvoiceNotFoundException(BusinessMessages.InvoiceMessages.INVOICE_ID_NOT_FOUND + invoiceId);
         }
 
     }
 
     private void checkIfInvoiceNoExists(String invoiceNo) throws InvoiceNotFoundException {
         if(!this.invoiceDao.existsByInvoiceNo(invoiceNo)){
-            throw new InvoiceNotFoundException("Invoice no not exists, invoiceNo: " + invoiceNo);
+            throw new InvoiceNotFoundException(BusinessMessages.InvoiceMessages.INVOICE_NO_NOT_FOUND + invoiceNo);
         }
     }
 
     private void checkIfExistsByPaymentId(int paymentId) throws PaymentNotFoundInInvoiceException {
         if(!this.invoiceDao.existsByPayment_PaymentId(paymentId)){
-            throw new PaymentNotFoundInInvoiceException("Payment id not found in the invoice table, paymentId: " + paymentId);
+            throw new PaymentNotFoundInInvoiceException(BusinessMessages.InvoiceMessages.PAYMENT_ID_NOT_FOUND_IN_THE_INVOICE_TABLE + paymentId);
         }
     }
 
     @Override
     public void checkIfNotExistsByCustomer_CustomerId(int customerId) throws CustomerNotFoundInInvoiceException {
         if(this.invoiceDao.existsByCustomer_CustomerId(customerId)){
-            throw new CustomerNotFoundInInvoiceException("Customer id already exists in the invoice table, customerId: " + customerId);
+            throw new CustomerNotFoundInInvoiceException(BusinessMessages.InvoiceMessages.CUSTOMER_ID_ALREADY_EXISTS_IN_THE_INVOICE_TABLE + customerId);
         }
     }
 
     @Override
     public void checkIfNotExistsByRentalCar_RentalCarId(int rentalCarId) throws RentalCarNotFoundInInvoiceException {
         if(this.invoiceDao.existsByRentalCar_RentalCarId(rentalCarId)){
-            throw new RentalCarNotFoundInInvoiceException("Rental car already exists in the invoice table, rentalCarId: " + rentalCarId);
+            throw new RentalCarNotFoundInInvoiceException(BusinessMessages.InvoiceMessages.RENTAL_CAR_ID_ALREADY_EXISTS_IN_THE_INVOICE_TABLE + rentalCarId);
         }
     }
 }

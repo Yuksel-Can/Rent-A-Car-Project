@@ -1,5 +1,6 @@
 package com.turkcell.rentACarProject.business.requests.individualCustomerRequests;
 
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.requests.customerRequests.UpdateCustomerRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +25,7 @@ public class UpdateIndividualCustomerRequest extends UpdateCustomerRequest {
 
     @NotNull
     @NotBlank
-    @Pattern(regexp = "^[0-9]{11}", message = "not number") //todo:açıklama düzelt
+    @Pattern(regexp = "^[0-9]{11}", message = BusinessMessages.IndividualCustomerMessages.NATIONAL_IDENTITY_NOT_VALID)
     private String nationalIdentity;
 
 }

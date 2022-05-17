@@ -15,9 +15,6 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class MakePaymentForRentDeliveryDateUpdate {
 
-    @Valid
-    CreatePaymentRequest createPaymentRequest;
-
     @NotNull
     @Valid
     CreateCreditCardRequest createCreditCardRequest;

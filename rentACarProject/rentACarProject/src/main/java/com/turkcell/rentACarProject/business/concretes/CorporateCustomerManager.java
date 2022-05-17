@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.corporateCustomerDtos.gets.GetCorporateCustomerDto;
 import com.turkcell.rentACarProject.business.dtos.corporateCustomerDtos.lists.CorporateCustomerListDto;
 import com.turkcell.rentACarProject.business.requests.corporateCustomerRequests.CreateCorporateCustomerRequest;
@@ -56,7 +57,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
         List<CorporateCustomerListDto> result = corporateCustomers.stream().map(corporateCustomer -> this.modelMapperService.forDto()
                 .map(corporateCustomer, CorporateCustomerListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Corporate Customer listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -69,8 +70,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         this.corporateCustomerDao.save(corporateCustomer);
 
-        return new SuccessResult("Corporate Customer Added");
-
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
@@ -84,8 +84,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         this.corporateCustomerDao.save(corporateCustomer);
 
-        return new SuccessResult("Corporate Customer updated");
-
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateCorporateCustomerRequest.getUserId());
     }
 
     @Override
@@ -98,8 +97,7 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         this.corporateCustomerDao.deleteById(deleteCorporateCustomerRequest.getUserId());
 
-        return new SuccessResult("Corporate Customer deleted");
-
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + deleteCorporateCustomerRequest.getUserId());
     }
 
     @Override
@@ -111,31 +109,30 @@ public class CorporateCustomerManager implements CorporateCustomerService {
 
         GetCorporateCustomerDto result = this.modelMapperService.forDto().map(corporateCustomer, GetCorporateCustomerDto.class);
 
-        return new SuccessDataResult<>(result, "Corporate Customer listed");
-
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + corporateCustomerId);
     }
 
     @Override
     public CorporateCustomer getCorporateCustomerById(int corporateCustomerId){
         return this.corporateCustomerDao.getById(corporateCustomerId);
     }
+
     @Override
     public void checkIfCorporateCustomerIdExists(int corporateCustomerId) throws CorporateCustomerNotFoundException {
         if(!this.corporateCustomerDao.existsByCorporateCustomerId(corporateCustomerId)){
-            throw new CorporateCustomerNotFoundException("Corporate Customer Id not exists, corporateCustomerId: " + corporateCustomerId);
+            throw new CorporateCustomerNotFoundException(BusinessMessages.CorporateCustomerMessages.CORPORATE_CUSTOMER_ID_NOT_FOUND + corporateCustomerId);
         }
-
     }
 
     void checkIfTaxNumberNotExists(String taxNumber) throws TaxNumberAlreadyExistsException {
         if(this.corporateCustomerDao.existsByTaxNumber(taxNumber)){
-            throw new TaxNumberAlreadyExistsException("Tax Number already exists, taxNumber: " + taxNumber);
+            throw new TaxNumberAlreadyExistsException(BusinessMessages.CorporateCustomerMessages.TAX_NAME_ALREADY_EXISTS + taxNumber);
         }
     }
 
     void checkIfTaxNumberNotExistsForUpdate(int corporateCustomerId, String taxNumber) throws TaxNumberAlreadyExistsException {
         if(this.corporateCustomerDao.existsByTaxNumberAndCorporateCustomerIdIsNot(taxNumber, corporateCustomerId)){
-            throw new TaxNumberAlreadyExistsException("Tax Number already exists, taxNumber: " + taxNumber);
+            throw new TaxNumberAlreadyExistsException(BusinessMessages.CorporateCustomerMessages.TAX_NAME_ALREADY_EXISTS + taxNumber);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.individualCustomerDtos.gets.GetIndividualCustomerDto;
 import com.turkcell.rentACarProject.business.dtos.individualCustomerDtos.lists.IndividualCustomerListDto;
 import com.turkcell.rentACarProject.business.requests.individualCustomerRequests.CreateIndividualCustomerRequest;
@@ -57,8 +58,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
         List<IndividualCustomerListDto> result = individualCustomers.stream().map(individualCustomer -> this.modelMapperService.forDto()
                 .map(individualCustomer,IndividualCustomerListDto.class)).collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "IndividualCustomer listed");
-
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -71,8 +71,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         this.individualCustomerDao.save(individualCustomer);
 
-        return new SuccessResult("Individual Customer added");
-
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
@@ -86,7 +85,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         this.individualCustomerDao.save(individualCustomer);
 
-        return new SuccessResult("Individual Customer updated");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateIndividualCustomerRequest.getUserId());
 
     }
 
@@ -100,8 +99,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         this.individualCustomerDao.deleteById(deleteIndividualCustomerRequest.getUserId());
 
-        return new SuccessResult("Individual Customer deleted");
-
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + deleteIndividualCustomerRequest.getUserId());
     }
 
     @Override
@@ -113,8 +111,7 @@ public class IndividualCustomerManager implements IndividualCustomerService {
 
         GetIndividualCustomerDto result = this.modelMapperService.forDto().map(individualCustomer, GetIndividualCustomerDto.class);
 
-        return new SuccessDataResult<>(result, "Individual Customer listed");
-
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + individualCustomerId);
     }
 
     @Override
@@ -123,22 +120,21 @@ public class IndividualCustomerManager implements IndividualCustomerService {
     }
 
     @Override
-    public boolean checkIfIndividualCustomerIdExists(int individualCustomerId) throws IndividualCustomerNotFoundException {
+    public void checkIfIndividualCustomerIdExists(int individualCustomerId) throws IndividualCustomerNotFoundException {
         if(!this.individualCustomerDao.existsByIndividualCustomerId(individualCustomerId)){
-            throw new IndividualCustomerNotFoundException("Individual Customer Id not exists, individualCustomerId: " + individualCustomerId);
+            throw new IndividualCustomerNotFoundException(BusinessMessages.IndividualCustomerMessages.INDIVIDUAL_CUSTOMER_ID_NOT_FOUND + individualCustomerId);
         }
-        return false;
     }
 
     void checkIfNationalIdentityNotExists(String nationalIdentity) throws NationalIdentityAlreadyExistsException {
         if(this.individualCustomerDao.existsByNationalIdentity(nationalIdentity)){
-            throw new NationalIdentityAlreadyExistsException("National Identity already exists, nationalIdentity: " + nationalIdentity);
+            throw new NationalIdentityAlreadyExistsException(BusinessMessages.IndividualCustomerMessages.NATIONAL_IDENTITY_ALREADY_EXISTS + nationalIdentity);
         }
     }
 
     void checkIfNationalIdentityNotExistsForUpdate(int individualCustomerId, String nationalIdentity) throws NationalIdentityAlreadyExistsException {
         if(this.individualCustomerDao.existsByNationalIdentityAndIndividualCustomerIdIsNot(nationalIdentity, individualCustomerId)){
-            throw new NationalIdentityAlreadyExistsException("National Identity already exists, nationalIdentity: " + nationalIdentity);
+            throw new NationalIdentityAlreadyExistsException(BusinessMessages.IndividualCustomerMessages.NATIONAL_IDENTITY_ALREADY_EXISTS + nationalIdentity);
         }
     }
 

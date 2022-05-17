@@ -3,6 +3,7 @@ package com.turkcell.rentACarProject.business.concretes;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandAlreadyExistsException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.brandExceptions.BrandNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.carExceptions.BrandExistsInCarException;
@@ -46,7 +47,7 @@ public class BrandManager implements BrandService {
 		List<BrandListDto> result = brands.stream().map(brand -> this.modelMapperService.forDto().map(brand, BrandListDto.class))
 				.collect(Collectors.toList());
 
-		return new SuccessDataResult<>(result, "Brand listed");
+		return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class BrandManager implements BrandService {
 
 		this.brandDao.save(brand);
 
-		return new SuccessResult("Brand added");
+		return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
 	}
 
 	@Override
@@ -71,7 +72,7 @@ public class BrandManager implements BrandService {
 
 		this.brandDao.save(brand);
 
-		return new SuccessResult("Brand updated");
+		return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateBrandRequest.getBrandId());
 	}
 
 	@Override
@@ -82,7 +83,7 @@ public class BrandManager implements BrandService {
 		
 		this.brandDao.deleteById(deleteBrandRequest.getBrandId());
 
-		return new SuccessResult("Brand deleted");
+		return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + deleteBrandRequest.getBrandId());
 	}
 
 	@Override
@@ -94,21 +95,21 @@ public class BrandManager implements BrandService {
 
 		GetBrandDto getBrandDto = this.modelMapperService.forDto().map(brand, GetBrandDto.class);
 
-		return new SuccessDataResult<>(getBrandDto, "Brand listed");
+		return new SuccessDataResult<>(getBrandDto, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + id);
 	}
 	
 	/**/
 	
 	public void checkIsExistsByBrandId(int id) throws BrandNotFoundException {
 		if(!this.brandDao.existsByBrandId(id)) {
-			throw new BrandNotFoundException("Brand id not exists");
+			throw new BrandNotFoundException(BusinessMessages.BrandMessages.BRAND_ID_NOT_FOUND + id);
 		}
 		
 	}
 
 	public void checkIsNotExistByBrandName(String name) throws BrandAlreadyExistsException {
 		if(this.brandDao.existsByBrandName(name)) {
-			throw new BrandAlreadyExistsException("Brand name already exists");
+			throw new BrandAlreadyExistsException(BusinessMessages.BrandMessages.BRAND_NAME_ALREADY_EXISTS + name);
 		}
 	}
 

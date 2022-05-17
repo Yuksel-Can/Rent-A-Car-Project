@@ -22,7 +22,6 @@ import java.util.List;
 public class Customer extends User {
 
     @Column(name = "customer_id", insertable = false, updatable = false)
-//    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     private int customerId;
 
     @JsonIgnore
@@ -33,9 +32,9 @@ public class Customer extends User {
     @OneToMany(mappedBy = "customer")
     private List<RentalCar> rentedCars;
 
-    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
     private List<Invoice> invoices;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<CreditCard> creditCards;
 }

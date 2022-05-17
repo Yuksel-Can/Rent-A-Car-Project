@@ -34,5 +34,4 @@ public class InvoiceListDto {
     private String email;
     private int paymentId;
 
-    //todo:buraya ad soyad vs
 }

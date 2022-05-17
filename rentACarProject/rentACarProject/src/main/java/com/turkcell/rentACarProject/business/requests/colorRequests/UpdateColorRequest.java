@@ -22,4 +22,5 @@ public class UpdateColorRequest {
 	@NotBlank
 	@Size(min = 3, max = 30)
 	private String colorName;
+
 }

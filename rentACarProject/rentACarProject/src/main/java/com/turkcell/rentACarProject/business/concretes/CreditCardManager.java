@@ -2,6 +2,7 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CreditCardService;
 import com.turkcell.rentACarProject.business.abstracts.CustomerService;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.creditCardDtos.gets.GetCreditCardDto;
 import com.turkcell.rentACarProject.business.dtos.creditCardDtos.lists.CreditCardListDto;
 import com.turkcell.rentACarProject.business.requests.creditCardRequests.CreateCreditCardRequest;
@@ -48,7 +49,7 @@ public class CreditCardManager implements CreditCardService {
                 .collect(Collectors.toList());
         setCustomerIdForAllCreditCard(creditCardList, result);
 
-        return new SuccessDataResult<>(result, "Credit Cards listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class CreditCardManager implements CreditCardService {
             this.creditCardDao.save(creditCard);
 
         }
-        return new SuccessResult("Credit Card added");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
@@ -76,7 +77,7 @@ public class CreditCardManager implements CreditCardService {
         GetCreditCardDto result = this.modelMapperService.forDto().map(creditCard, GetCreditCardDto.class);
         result.setCustomerId(creditCard.getCustomer().getCustomerId());
 
-        return new SuccessDataResult<>(result, "Credit card getted by id, creditCardId: " + creditCardId);
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + creditCardId);
     }
 
     @Override
@@ -90,7 +91,7 @@ public class CreditCardManager implements CreditCardService {
                 .collect(Collectors.toList());
         setCustomerIdForAllCreditCard(creditCardList, result);
 
-        return new SuccessDataResult<>(result, "Credit card getted by customer id, customerId: " + customerId);
+        return new SuccessDataResult<>(result, BusinessMessages.CreditCardMessages.CREDIT_CARD_LISTED_BY_CUSTOMER_ID + customerId);
     }
 
     private void setCustomerIdForAllCreditCard(List<CreditCard> creditCardList, List<CreditCardListDto> result) {
@@ -110,7 +111,7 @@ public class CreditCardManager implements CreditCardService {
     @Override
     public void checkIfNotExistsByCustomer_CustomerId(int customerId) throws CreditCardAlreadyExistsException {
         if(this.creditCardDao.existsByCustomer_CustomerId(customerId)){
-            throw new CreditCardAlreadyExistsException("Credit card already exists, creditCardId: " + customerId);
+            throw new CreditCardAlreadyExistsException(BusinessMessages.CreditCardMessages.CREDIT_CARD_ALREADY_EXISTS + customerId);
         }
     }
 
@@ -120,7 +121,7 @@ public class CreditCardManager implements CreditCardService {
 
     private void checkIfExistsById(int creditCardId) throws CreditCardNotFoundException {
         if(!this.creditCardDao.existsByCreditCardId(creditCardId)){
-            throw new CreditCardNotFoundException("Credit card not found, creditCardId: " + creditCardId);
+            throw new CreditCardNotFoundException(BusinessMessages.CreditCardMessages.CREDIT_CARD_ID_NOT_FOUND + creditCardId);
         }
     }
 

@@ -12,5 +12,4 @@ public class CreatePaymentRequest {
     @JsonIgnore
     private int rentalCarId;
 
-    //todo:bir üstü jsonignore burası notnull bunu kontrol et
 }

@@ -16,7 +16,6 @@ import javax.persistence.*;
 public class IndividualCustomer extends Customer{
 
     @Column(name = "individual_customer_id", insertable = false, updatable = false)
-//    @Cascade({org.hibernate.annotations.CascadeType.ALL})
     private int individualCustomerId;
 
     @Column(name = "first_name", nullable = false)

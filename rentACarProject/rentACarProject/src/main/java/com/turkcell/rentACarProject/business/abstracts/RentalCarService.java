@@ -52,7 +52,7 @@ public interface RentalCarService {
     void checkIsNotExistsByRentalCar_CarId(int carId) throws CarAlreadyExistsInRentalCarException;
 
     void checkIfFirstDateBeforeSecondDate(LocalDate firstDate, LocalDate secondDate) throws StartDateBeforeFinishDateException;
-    void checkIfCarAlreadyRentedForDeliveryDateUpdate(int carId, LocalDate enteredDate) throws CarAlreadyRentedEnteredDateException;
+    void checkIfCarAlreadyRentedForDeliveryDateUpdate(int carId, LocalDate enteredDate, int rentalCarId) throws CarAlreadyRentedEnteredDateException;
 
     void checkIfRentedKilometerIsNotNull(Integer rentedKilometer) throws RentedKilometerNullException;
     void checkIfDeliveredKilometerIsNull(Integer deliveredKilometer) throws DeliveredKilometerAlreadyExistsException;
@@ -60,7 +60,6 @@ public interface RentalCarService {
 
     void checkIfRentalCar_CustomerIdNotExists(int customerId) throws CustomerAlreadyExistsInRentalCarException;
     int getTotalDaysForRental(LocalDate startDate, LocalDate finishDate);
-    //todo:bunu teke indir
     int getTotalDaysForRental(int rentalCarId);
 
     void checkAllValidationsForIndividualRentAdd(CreateRentalCarRequest createRentalCarRequest) throws CarAlreadyRentedEnteredDateException, IndividualCustomerNotFoundException, CustomerNotFoundException, CityNotFoundException, CarAlreadyInMaintenanceException, StartDateBeforeTodayException, StartDateBeforeFinishDateException, CarNotFoundException;

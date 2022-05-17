@@ -3,6 +3,7 @@ package com.turkcell.rentACarProject.business.concretes;
 import com.turkcell.rentACarProject.business.abstracts.CarMaintenanceService;
 import com.turkcell.rentACarProject.business.abstracts.CarService;
 import com.turkcell.rentACarProject.business.abstracts.RentalCarService;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListByCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.lists.CarMaintenanceListDto;
 import com.turkcell.rentACarProject.business.dtos.carMaintenanceDtos.gets.GetCarMaintenanceDto;
@@ -55,33 +56,33 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         List<CarMaintenanceListDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "CarMaintenance listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
     public Result add(CreateCarMaintenanceRequest createCarMaintenanceRequest) throws MaintenanceReturnDateBeforeTodayException, CarAlreadyInMaintenanceException, CarNotFoundException, CarAlreadyRentedEnteredDateException, StartDateBeforeTodayException {
 
-        checkAllValidationForCarMaintenance(createCarMaintenanceRequest.getReturnDate(),createCarMaintenanceRequest.getCarId());
+        checkAllValidationForCarMaintenanceForAdd(createCarMaintenanceRequest.getReturnDate(),createCarMaintenanceRequest.getCarId());
 
         CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(createCarMaintenanceRequest, CarMaintenance.class);
         carMaintenance.setMaintenanceId(0);
 
         this.carMaintenanceDao.save(carMaintenance);
 
-        return new SuccessResult("CarMaintenance added");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
     public Result update(UpdateCarMaintenanceRequest updateCarMaintenanceRequest) throws CarMaintenanceNotFoundException, MaintenanceReturnDateBeforeTodayException, CarAlreadyInMaintenanceException, CarNotFoundException, CarAlreadyRentedEnteredDateException, StartDateBeforeTodayException {
 
         checkIsExistsByCarMaintenanceId(updateCarMaintenanceRequest.getMaintenanceId());
-        checkAllValidationForCarMaintenance(updateCarMaintenanceRequest.getReturnDate(), updateCarMaintenanceRequest.getCarId());
+        checkAllValidationForCarMaintenanceForUpdate(updateCarMaintenanceRequest.getReturnDate(), updateCarMaintenanceRequest.getCarId(), updateCarMaintenanceRequest.getMaintenanceId());
 
         CarMaintenance carMaintenance = this.modelMapperService.forRequest().map(updateCarMaintenanceRequest, CarMaintenance.class);
 
         this.carMaintenanceDao.save(carMaintenance);
 
-        return new SuccessResult("CarMaintenance updated");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateCarMaintenanceRequest.getMaintenanceId());
     }
 
     @Override
@@ -91,7 +92,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
         this.carMaintenanceDao.deleteById(carMaintenanceRequest.getMaintenanceId());
 
-        return new SuccessResult("CarMaintenance deleted");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + carMaintenanceRequest.getMaintenanceId());
     }
 
     @Override
@@ -102,7 +103,7 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         CarMaintenance carMaintenance = this.carMaintenanceDao.getById(carMaintenanceId);
         GetCarMaintenanceDto result = this.modelMapperService.forDto().map(carMaintenance, GetCarMaintenanceDto.class);
 
-        return new SuccessDataResult<>(result, "Car Maintenence getted by id: " + carMaintenanceId);
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + carMaintenanceId);
     }
 
     @Override
@@ -115,10 +116,10 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         List<CarMaintenanceListByCarIdDto> result = carMaintenances.stream().map(carMaintenance -> this.modelMapperService.forDto().map(carMaintenance, CarMaintenanceListByCarIdDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Car maintenances are listed by car id: " + carId);
+        return new SuccessDataResult<>(result, BusinessMessages.CarMaintenanceMessages.CAR_MAINTENANCE_LISTED_BY_CAR_ID + carId);
     }
 
-    private void checkAllValidationForCarMaintenance(LocalDate returnDate, int carId) throws CarAlreadyInMaintenanceException, MaintenanceReturnDateBeforeTodayException, CarNotFoundException, CarAlreadyRentedEnteredDateException, StartDateBeforeTodayException {
+    private void checkAllValidationForCarMaintenanceForAdd(LocalDate returnDate, int carId) throws CarAlreadyInMaintenanceException, MaintenanceReturnDateBeforeTodayException, CarNotFoundException, CarAlreadyRentedEnteredDateException, StartDateBeforeTodayException {
 
         checkIfNotReturnDateBeforeToday(returnDate);
         this.carService.checkIsExistsByCarId(carId);
@@ -129,10 +130,21 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         this.rentalCarService.checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(carId, LocalDate.now(), returnDate);
     }
 
+    private void checkAllValidationForCarMaintenanceForUpdate(LocalDate returnDate, int carId, int maintenanceId) throws CarAlreadyInMaintenanceException, MaintenanceReturnDateBeforeTodayException, CarNotFoundException, CarAlreadyRentedEnteredDateException, StartDateBeforeTodayException {
+
+        checkIfNotReturnDateBeforeToday(returnDate);
+        this.carService.checkIsExistsByCarId(carId);
+        checkIfNotCarAlreadyInMaintenanceOnTheEnteredDateForUpdate(carId, LocalDate.now(), maintenanceId);
+
+        this.rentalCarService.checkIfNotCarAlreadyRentedEnteredDate(carId,LocalDate.now());
+        this.rentalCarService.checkIfNotCarAlreadyRentedEnteredDate(carId,returnDate);
+        this.rentalCarService.checkIfNotCarAlreadyRentedBetweenStartAndFinishDates(carId, LocalDate.now(), returnDate);
+    }
+
     private void checkIfNotReturnDateBeforeToday(LocalDate returnDate) throws MaintenanceReturnDateBeforeTodayException {
         if(returnDate != null){
             if(returnDate.isBefore(LocalDate.now())){
-                throw new MaintenanceReturnDateBeforeTodayException("return date cannot be a past date");
+                throw new MaintenanceReturnDateBeforeTodayException(BusinessMessages.CarMaintenanceMessages.RETURN_DATE_CANNOT_BEFORE_TODAY + returnDate);
             }
         }
     }
@@ -145,11 +157,31 @@ public class CarMaintenanceManager implements CarMaintenanceService {
         if(carMaintenances != null){
             for (CarMaintenance carMaintenance : carMaintenances){
                 if (carMaintenance.getReturnDate()==null){
-                    if(carMaintenance.getReturnDate().now().plusDays(14).isAfter(enteredDate)){         //todo:bu çalışmıyor olabilir, carMaintenance.getReturnDate() kısmını sil LocalDate.now() koy
-                        throw new CarAlreadyInMaintenanceException("The car is in maintenance on the entered date");
+                    if(carMaintenance.getReturnDate().now().plusDays(14).isAfter(enteredDate)){
+                        throw new CarAlreadyInMaintenanceException(BusinessMessages.CarMaintenanceMessages.CAR_ALREADY_IN_MAINTENANCE);
                     }
                 }else if(carMaintenance.getReturnDate().isAfter(enteredDate)){
-                    throw new CarAlreadyInMaintenanceException("The car is in maintenance on the entered date");
+                    throw new CarAlreadyInMaintenanceException(BusinessMessages.CarMaintenanceMessages.CAR_ALREADY_IN_MAINTENANCE);
+                }
+            }
+        }
+    }
+
+    public void checkIfNotCarAlreadyInMaintenanceOnTheEnteredDateForUpdate(int carId, LocalDate enteredDate, int maintenanceId) throws CarAlreadyInMaintenanceException {
+
+        List<CarMaintenance> carMaintenances = this.carMaintenanceDao.findAllByCar_CarId(carId);
+
+        if(carMaintenances != null){
+            for (CarMaintenance carMaintenance : carMaintenances){
+                if(carMaintenance.getMaintenanceId() == maintenanceId){
+                    continue;
+                }
+                if (carMaintenance.getReturnDate()==null){
+                    if(carMaintenance.getReturnDate().now().plusDays(14).isAfter(enteredDate)){
+                        throw new CarAlreadyInMaintenanceException(BusinessMessages.CarMaintenanceMessages.CAR_ALREADY_IN_MAINTENANCE);
+                    }
+                }else if(carMaintenance.getReturnDate().isAfter(enteredDate)){
+                    throw new CarAlreadyInMaintenanceException(BusinessMessages.CarMaintenanceMessages.CAR_ALREADY_IN_MAINTENANCE);
                 }
             }
         }
@@ -157,14 +189,14 @@ public class CarMaintenanceManager implements CarMaintenanceService {
 
     private void checkIsExistsByCarMaintenanceId(int carMaintenanceId) throws CarMaintenanceNotFoundException {
         if(!this.carMaintenanceDao.existsByMaintenanceId(carMaintenanceId)){
-            throw new CarMaintenanceNotFoundException("Car Maintenance id not exists");
+            throw new CarMaintenanceNotFoundException(BusinessMessages.CarMaintenanceMessages.CAR_MAINTENANCE_ID_NOT_FOUND + carMaintenanceId);
         }
     }
 
     @Override
     public void checkIsExistsByCar_CarId(int carId) throws CarExistsInCarMaintenanceException {
         if(this.carMaintenanceDao.existsByCar_CarId(carId)){
-            throw new CarExistsInCarMaintenanceException("Car id not found in car maintenance");
+            throw new CarExistsInCarMaintenanceException(BusinessMessages.CarMaintenanceMessages.CAR_ID_ALREADY_EXISTS_IN_THE_CAR_MAINTENANCE_TABLE + carId);
         }
     }
 

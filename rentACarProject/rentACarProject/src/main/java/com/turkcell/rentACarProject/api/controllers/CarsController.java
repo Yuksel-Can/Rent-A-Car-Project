@@ -83,7 +83,7 @@ public class CarsController {
 	}
 	
 	@GetMapping("getAllPagedCar")
-	public DataResult<List<CarPagedDto>> getAllPagedCar(@RequestParam int pageNo, int pageSize){
+	public DataResult<List<CarPagedDto>> getAllPagedCar(@RequestParam int pageNo, int pageSize) throws CarNotFoundException {
 		return this.carService.getAllPagedCar(pageNo, pageSize);
 	}
 	

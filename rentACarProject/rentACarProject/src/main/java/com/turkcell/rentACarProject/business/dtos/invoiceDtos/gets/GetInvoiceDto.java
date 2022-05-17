@@ -27,5 +27,4 @@ public class GetInvoiceDto {
     private String email;
     private int paymentId;
 
-
 }

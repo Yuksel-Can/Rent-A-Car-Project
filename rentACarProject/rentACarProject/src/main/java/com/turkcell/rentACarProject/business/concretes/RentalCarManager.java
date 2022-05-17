@@ -1,6 +1,7 @@
 package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.*;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarDto;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.lists.*;
 import com.turkcell.rentACarProject.business.dtos.rentalCarDtos.gets.GetRentalCarStatusDto;
@@ -71,7 +72,7 @@ public class RentalCarManager implements RentalCarService {
         List<RentalCarListDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Rentall Cars listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class RentalCarManager implements RentalCarService {
 
         this.rentalCarDao.save(rentalCar);
 
-        return new SuccessResult("Rental Car Updated, id: " + updateRentalCarRequest.getRentalCarId());
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateRentalCarRequest.getRentalCarId());
     }
 
 
@@ -122,7 +123,7 @@ public class RentalCarManager implements RentalCarService {
 
         this.rentalCarDao.save(rentalCar);
 
-        return new SuccessResult("Rental Car Updated, id: " + updateRentalCarRequest.getRentalCarId());
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateRentalCarRequest.getRentalCarId());
     }
 
     @Override
@@ -135,24 +136,24 @@ public class RentalCarManager implements RentalCarService {
 
         this.rentalCarDao.deleteById(deleteRentalCarRequest.getRentalCarId());
 
-        return new SuccessResult("Rental Car Deleted, id: " + deleteRentalCarRequest.getRentalCarId());
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + deleteRentalCarRequest.getRentalCarId());
 
     }
 
     @Override
     public DataResult<GetRentalCarStatusDto> deliverTheCar(DeliverTheCarRequest deliverTheCarRequest) throws RentedKilometerAlreadyExistsException, StartDateBeforeTodayException, RentalCarNotFoundException {
 
-     //   checkIfExistsRentalCarIdAndCarId(deliverTheCarRequest.getRentalCarId(), deliverTheCarRequest.getCarId());
+        checkIfExistsRentalCarIdAndCarId(deliverTheCarRequest.getRentalCarId(), deliverTheCarRequest.getCarId());
         RentalCar rentalCar = this.rentalCarDao.getById(deliverTheCarRequest.getRentalCarId());
-    //    checkIfStartDateAfterToday(rentalCar.getStartDate());
-     ///   checkIfRentedKilometerIsNull(rentalCar.getRentedKilometer());
+        checkIfStartDateAfterToday(rentalCar.getStartDate());
+        checkIfRentedKilometerIsNull(rentalCar.getRentedKilometer());
 
         rentalCar.setRentedKilometer(rentalCar.getCar().getKilometer());
         this.rentalCarDao.save(rentalCar);
 
         GetRentalCarStatusDto result = this.modelMapperService.forDto().map(rentalCar, GetRentalCarStatusDto.class);
 
-        return new SuccessDataResult<>(result,"The car was delivered");
+        return new SuccessDataResult<>(result,BusinessMessages.RentalCarMessages.CAR_DELIVERED + deliverTheCarRequest.getRentalCarId());
     }
 
     @Override
@@ -169,7 +170,7 @@ public class RentalCarManager implements RentalCarService {
 
         GetRentalCarStatusDto result = this.modelMapperService.forDto().map(rentalCar, GetRentalCarStatusDto.class);
 
-        return new SuccessDataResult<>(result, "The car received");
+        return new SuccessDataResult<>(result, BusinessMessages.RentalCarMessages.CAR_RECEIVED + receiveTheCarRequest.getRentalCarId());
     }
 
     @Override
@@ -181,7 +182,7 @@ public class RentalCarManager implements RentalCarService {
 
         GetRentalCarDto getRentalCarDto = this.modelMapperService.forDto().map(rentalCar, GetRentalCarDto.class);
 
-        return new SuccessDataResult<>(getRentalCarDto, "Rental Car listed by rentalCarId: " + rentalCarId);
+        return new SuccessDataResult<>(getRentalCarDto,BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + rentalCarId);
     }
 
     @Override
@@ -194,7 +195,7 @@ public class RentalCarManager implements RentalCarService {
         List<RentalCarListByCarIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByCarIdDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Rentals of the car listed by carId: " + carId);
+        return new SuccessDataResult<>(result, BusinessMessages.RentalCarMessages.RENTAL_CAR_LISTED_BY_CAR_ID + carId);
     }
 
     @Override
@@ -206,7 +207,7 @@ public class RentalCarManager implements RentalCarService {
         List<RentalCarListByRentedCityIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByRentedCityIdDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Rentals of the car listed by rentedCityId: " + rentedCity);
+        return new SuccessDataResult<>(result, BusinessMessages.RentalCarMessages.RENTAL_CAR_LISTED_BY_RENTED_CITY_ID + rentedCity);
     }
 
     @Override
@@ -218,7 +219,7 @@ public class RentalCarManager implements RentalCarService {
         List<RentalCarListByDeliveredCityIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByDeliveredCityIdDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Rentals of the car listed by deliveredCity: " + deliveredCity);
+        return new SuccessDataResult<>(result, BusinessMessages.RentalCarMessages.RENTAL_CAR_LISTED_BY_DELIVERED_CITY_ID + deliveredCity);
     }
 
     @Override
@@ -230,7 +231,7 @@ public class RentalCarManager implements RentalCarService {
         List<RentalCarListByCustomerIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByCustomerIdDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Rental of the car listed by customerId, customerId: " + customerId);
+        return new SuccessDataResult<>(result, BusinessMessages.RentalCarMessages.RENTAL_CAR_LISTED_BY_CUSTOMER_ID + customerId);
     }
 
     @Override
@@ -242,7 +243,7 @@ public class RentalCarManager implements RentalCarService {
         List<RentalCarListByIndividualCustomerIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByIndividualCustomerIdDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Rental of the car listed by individualCustomerId, individualCustomerId: " + individualCustomerId);
+        return new SuccessDataResult<>(result, BusinessMessages.RentalCarMessages.RENTAL_CAR_LISTED_BY_INDIVIDUAL_CUSTOMER_ID + individualCustomerId);
     }
 
     @Override
@@ -254,7 +255,7 @@ public class RentalCarManager implements RentalCarService {
         List<RentalCarListByCorporateCustomerIdDto> result = rentalCars.stream().map(rentalCar -> this.modelMapperService.forDto().map(rentalCar, RentalCarListByCorporateCustomerIdDto.class))
                 .collect(Collectors.toList());
 
-        return new SuccessDataResult<>(result, "Rental of the car listed by corporateCustomerId, corporateCustomerId: " + corporateCustomerId);
+        return new SuccessDataResult<>(result, BusinessMessages.RentalCarMessages.RENTAL_CAR_LISTED_BY_CORPORATE_CUSTOMER_ID + corporateCustomerId);
     }
 
 
@@ -344,19 +345,19 @@ public class RentalCarManager implements RentalCarService {
 
     private void checkIfStartDateAfterToday(LocalDate startDate) throws StartDateBeforeTodayException {
         if(startDate.isBefore(LocalDate.now())){
-        throw new StartDateBeforeTodayException("Start date cannot be earlier than today");
+        throw new StartDateBeforeTodayException(BusinessMessages.RentalCarMessages.START_DATE_CANNOT_BEFORE_TODAY + startDate);
         }
     }
 
     private void checkIfStartDateBeforeFinishDate(LocalDate startDate, LocalDate finishDate) throws StartDateBeforeFinishDateException {
         if(finishDate.isBefore(startDate)){
-            throw new StartDateBeforeFinishDateException("finish date cannot be earlier than start date");
+            throw new StartDateBeforeFinishDateException(BusinessMessages.RentalCarMessages.FINISH_DATE_CANNOT_BEFORE_START_DATE);
         }
     }
-    //todo:alttaki üsttekinin kopyası oldu
+
     public void checkIfFirstDateBeforeSecondDate(LocalDate firstDate, LocalDate secondDate) throws StartDateBeforeFinishDateException {
         if(secondDate.isBefore(firstDate) || secondDate.equals(firstDate)){
-            throw new StartDateBeforeFinishDateException("second date cannot be before first date or cannot equal");
+            throw new StartDateBeforeFinishDateException(BusinessMessages.RentalCarMessages.SECOND_DATE_CANNOT_BEFORE_FIRST_DATE);
         }
     }
 
@@ -371,7 +372,7 @@ public class RentalCarManager implements RentalCarService {
             }
         }
     }
-        //todo:bunlar teke nasıl düşer
+
     private void checkIfCarAlreadyRentedForUpdate(int rentalCarId, int carId, LocalDate startDate, LocalDate finishDate) throws CarAlreadyRentedEnteredDateException {
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
         if(rentalCars != null) {
@@ -385,28 +386,30 @@ public class RentalCarManager implements RentalCarService {
     }
 
     @Override
-    public void checkIfCarAlreadyRentedForDeliveryDateUpdate(int carId, LocalDate enteredDate) throws CarAlreadyRentedEnteredDateException {
+    public void checkIfCarAlreadyRentedForDeliveryDateUpdate(int carId, LocalDate enteredDate, int rentalCarId) throws CarAlreadyRentedEnteredDateException {
         List<RentalCar> rentalCars = this.rentalCarDao.getAllByCar_CarId(carId);
         if(rentalCars != null){
             for(RentalCar rentalCar : rentalCars){
+                if(rentalCar.getRentalCarId() == rentalCarId){
+                    continue;
+                }
                 checkIfCarAlreadyRentedOnTheEnteredDate(rentalCar, enteredDate);
             }
         }
     }
 
-    //todo:buraya parametre yanlış
     private void checkIfCarAlreadyRentedOnTheEnteredDate(RentalCar rentalCar, LocalDate enteredDate) throws CarAlreadyRentedEnteredDateException {
         if(rentalCar.getStartDate().isBefore(enteredDate) && (rentalCar.getFinishDate().isAfter(enteredDate))){
-            throw new CarAlreadyRentedEnteredDateException("The car rented between entered dates");
+            throw new CarAlreadyRentedEnteredDateException(BusinessMessages.RentalCarMessages.CAR_ALREADY_RENTED_ENTERED_DATES);
         }
     }
-    //todo:buda(parametre)
+
     private void checkIfCarAlreadyRentedBetweenStartAndFinishDates(RentalCar rentalCar,  LocalDate startDate, LocalDate finishDate) throws CarAlreadyRentedEnteredDateException {
 
         if((rentalCar.getStartDate().isAfter(startDate) && (rentalCar.getFinishDate().isBefore(finishDate))) ||
                 (rentalCar.getStartDate().equals(startDate) || (rentalCar.getFinishDate().equals(finishDate))))
         {
-            throw new CarAlreadyRentedEnteredDateException("The car is already rented between start and finish date");
+            throw new CarAlreadyRentedEnteredDateException(BusinessMessages.RentalCarMessages.CAR_ALREADY_RENTED_ENTERED_DATES);
         }
     }
 
@@ -418,7 +421,7 @@ public class RentalCarManager implements RentalCarService {
         if(rentalCars != null && finishDate != null){
             for(RentalCar rentalCar : rentalCars){
                 if(rentalCar.getStartDate().isAfter(startDate) && rentalCar.getFinishDate().isBefore(finishDate)){
-                    throw new CarAlreadyRentedEnteredDateException("The car is rented between start and finish date, cannot be maintenance or rented");
+                    throw new CarAlreadyRentedEnteredDateException(BusinessMessages.RentalCarMessages.CAR_IN_MAINTENANCE_ENTERED_DATES);
                 }
             }
         }
@@ -431,7 +434,7 @@ public class RentalCarManager implements RentalCarService {
         if(rentalCars != null && enteredDate != null){
             for(RentalCar rentalCar : rentalCars){
                 if(rentalCar.getStartDate().isBefore(enteredDate) && rentalCar.getFinishDate().isAfter(enteredDate)){
-                    throw new CarAlreadyRentedEnteredDateException("The car is rented between these dates, cannot be maintenance or rented");
+                    throw new CarAlreadyRentedEnteredDateException(BusinessMessages.RentalCarMessages.CAR_IN_MAINTENANCE_ENTERED_DATES);
 
                 }
             }
@@ -440,21 +443,21 @@ public class RentalCarManager implements RentalCarService {
 
     private void checkIfRentedKilometerIsNull(Integer rentedKilometer) throws RentedKilometerAlreadyExistsException {
         if(rentedKilometer != null){
-            throw new RentedKilometerAlreadyExistsException("The rented kilometer is already exists, the car has already been rented");
+            throw new RentedKilometerAlreadyExistsException(BusinessMessages.RentalCarMessages.RENTED_KILOMETER_ALREADY_EXISTS);
         }
     }
 
     @Override
     public void checkIfRentedKilometerIsNotNull(Integer rentedKilometer) throws RentedKilometerNullException {
         if(rentedKilometer == null){
-            throw new RentedKilometerNullException("The car has not yet been delivered to the customer, the rented kilometer cannot be null");
+            throw new RentedKilometerNullException(BusinessMessages.RentalCarMessages.RENTED_KILOMETER_NULL);
         }
     }
 
     @Override
     public void checkIfDeliveredKilometerIsNull(Integer deliveredKilometer) throws DeliveredKilometerAlreadyExistsException {
         if(deliveredKilometer != null){
-            throw new DeliveredKilometerAlreadyExistsException("The delivered kilometer is already exists, the car has already been delivered, deliveredKilometer: " + deliveredKilometer);
+            throw new DeliveredKilometerAlreadyExistsException(BusinessMessages.RentalCarMessages.DELIVERED_KILOMETER_ALREADY_EXISTS);
         }
     }
 
@@ -462,27 +465,27 @@ public class RentalCarManager implements RentalCarService {
     public void checkIsExistsByRentalCarId(int rentalCarId) throws RentalCarNotFoundException {
 
         if(!this.rentalCarDao.existsByRentalCarId(rentalCarId)){
-        throw new RentalCarNotFoundException("Rental Car id not exists, rentalCarId: " + rentalCarId);
+        throw new RentalCarNotFoundException(BusinessMessages.RentalCarMessages.RENTAL_CAR_ID_NOT_FOUND + rentalCarId);
         }
     }
 
     @Override
     public void checkIsNotExistsByRentalCar_CarId(int carId) throws CarAlreadyExistsInRentalCarException {
         if(this.rentalCarDao.existsByCar_CarId(carId)){
-        throw new CarAlreadyExistsInRentalCarException("Car id not found in rental car list, carId: " + carId);
+        throw new CarAlreadyExistsInRentalCarException(BusinessMessages.RentalCarMessages.CAR_ID_ALREADY_EXISTS_IN_THE_RENTAL_CAR_TABLE + carId);
         }
     }
 
     @Override
     public void checkIfRentalCar_CustomerIdNotExists(int customerId) throws CustomerAlreadyExistsInRentalCarException {
         if (this.rentalCarDao.existsByCustomer_CustomerId(customerId)) {
-            throw new CustomerAlreadyExistsInRentalCarException("Customer id exists in rental car list, customerId: " + customerId);
+            throw new CustomerAlreadyExistsInRentalCarException(BusinessMessages.RentalCarMessages.CUSTOMER_ID_ALREADY_EXISTS_IN_THE_RENTAL_CAR_TABLE + customerId);
         }
     }
 
     private void checkIfExistsRentalCarIdAndCarId(int rentalCarId, int carId) throws RentalCarNotFoundException {
         if(!this.rentalCarDao.existsByRentalCarIdAndCar_CarId(rentalCarId,carId)){
-            throw new RentalCarNotFoundException("Rental car id and car id not found rental car table, rentalCarId: " + rentalCarId + ", carId: " + carId);
+            throw new RentalCarNotFoundException(BusinessMessages.RentalCarMessages.RENTAL_CAR_ID_OR_CAR_ID_NOT_FOUND);
         }
     }
 }

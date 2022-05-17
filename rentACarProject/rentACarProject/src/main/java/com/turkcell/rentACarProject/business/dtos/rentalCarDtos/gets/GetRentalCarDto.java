@@ -25,4 +25,5 @@ public class GetRentalCarDto {
     private int deliveredCityId;
     private String deliveredCityName;
     private String email;
+
 }

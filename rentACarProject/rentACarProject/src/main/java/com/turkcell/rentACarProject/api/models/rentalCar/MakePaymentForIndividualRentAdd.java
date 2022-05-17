@@ -18,10 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 public class MakePaymentForIndividualRentAdd {
 
-    @Valid
-    @JsonIgnore
-    CreatePaymentRequest createPaymentRequest;
-
     @NotNull
     @Valid
     CreateCreditCardRequest createCreditCardRequest;

@@ -1,7 +1,6 @@
 package com.turkcell.rentACarProject.core.utilities.exceptions;
 
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.BusinessException;
-import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.additionalExceptions.AdditionalNotFoundException;
 import com.turkcell.rentACarProject.core.utilities.result.ErrorDataResult;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -37,7 +36,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     public ErrorDataResult<Object> handleBusinessException(BusinessException businessException){
 
-        ErrorDataResult<Object> error = new ErrorDataResult<Object>(businessException.getMessage(), businessException.getClass().getSimpleName()+".Error");
+        ErrorDataResult<Object> error = new ErrorDataResult<>(businessException.getMessage(), businessException.getClass().getSimpleName()+".Error");
 
         return error;
     }
@@ -55,7 +54,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDataResult<Object> handleIllegalArgumentException(IllegalArgumentException illegalArgumentException){
 
-        ErrorDataResult<Object> error = new ErrorDataResult<Object>(illegalArgumentException.getMessage(),"IllegalArgument.Error");
+        ErrorDataResult<Object> error = new ErrorDataResult<>(illegalArgumentException.getMessage(),"IllegalArgument.Error");
 
         return error;
     }
@@ -64,9 +63,17 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDataResult<Object> handleDataIntegrityViolationException(DataIntegrityViolationException dataIntegrityViolationException){
 
-        ErrorDataResult<Object> error = new ErrorDataResult<Object>(dataIntegrityViolationException.getMessage(),"DataIntegrityViolation.Error");
+        ErrorDataResult<Object> error = new ErrorDataResult<>(dataIntegrityViolationException.getMessage(),"DataIntegrityViolation.Error");
 
         return error;
     }
+/*
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDataResult<Object> handleDataIntegrityViolationException(Exception exception){
 
+        ErrorDataResult<Object> error = new ErrorDataResult<>(exception.getMessage(),"Exception.Error");
+
+        return error;
+    }*/
 }

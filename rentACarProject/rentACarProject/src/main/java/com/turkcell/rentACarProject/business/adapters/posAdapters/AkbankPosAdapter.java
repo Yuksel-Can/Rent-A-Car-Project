@@ -1,7 +1,6 @@
 package com.turkcell.rentACarProject.business.adapters.posAdapters;
 
 import com.turkcell.rentACarProject.business.outServices.AkbankPosService;
-import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.BusinessException;
 import com.turkcell.rentACarProject.core.utilities.exceptions.businessExceptions.PosServiceExceptions.MakePaymentFailedException;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +13,7 @@ public class AkbankPosAdapter implements PosService {
         AkbankPosService akbankPosService = new AkbankPosService();
 
         if(!akbankPosService.makePayment(cardOwner, cardNumber, cardCvv, cardExpirationDate, totalPrice)){
-            throw new MakePaymentFailedException("payment failed, akbank");
+            throw new MakePaymentFailedException("payment failed, Akbank");
         }
         return true;
     }

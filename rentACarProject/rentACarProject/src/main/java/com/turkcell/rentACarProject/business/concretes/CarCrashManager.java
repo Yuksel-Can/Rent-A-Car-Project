@@ -2,6 +2,7 @@ package com.turkcell.rentACarProject.business.concretes;
 
 import com.turkcell.rentACarProject.business.abstracts.CarCrashService;
 import com.turkcell.rentACarProject.business.abstracts.CarService;
+import com.turkcell.rentACarProject.business.constants.messaaages.BusinessMessages;
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.gets.GetCarCrashDto;
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListByCarIdDto;
 import com.turkcell.rentACarProject.business.dtos.carCrashDtos.lists.CarCrashListDto;
@@ -52,7 +53,7 @@ public class CarCrashManager implements CarCrashService {
             result.get(i).setCarId(carCrashes.get(i).getCar().getCarId());
         }
 
-        return new SuccessDataResult<>(result, "Car Crash listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_LISTED_SUCCESSFULLY);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class CarCrashManager implements CarCrashService {
 
         this.carCrashDao.save(carCrash);
 
-        return new SuccessResult("Car Crash added");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_ADDED_SUCCESSFULLY);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class CarCrashManager implements CarCrashService {
 
         this.carCrashDao.save(carCrash);
 
-        return new SuccessResult("Car Crash updated");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_UPDATED_SUCCESSFULLY + updateCarCrashRequest.getCarCrashId());
     }
 
     @Override
@@ -89,7 +90,7 @@ public class CarCrashManager implements CarCrashService {
 
         this.carCrashDao.deleteById(deleteCarCrashRequest.getCarCrashId());
 
-        return new SuccessResult("Car Crash deleted");
+        return new SuccessResult(BusinessMessages.GlobalMessages.DATA_DELETED_SUCCESSFULLY + deleteCarCrashRequest.getCarCrashId());
     }
 
     @Override
@@ -102,7 +103,7 @@ public class CarCrashManager implements CarCrashService {
         GetCarCrashDto result = this.modelMapperService.forDto().map(carCrash, GetCarCrashDto.class);
         result.setCarId(carCrash.getCar().getCarId());
 
-        return new SuccessDataResult<>(result, "Car Crash listed");
+        return new SuccessDataResult<>(result, BusinessMessages.GlobalMessages.DATA_BROUGHT_SUCCESSFULLY + carCrashId);
     }
 
     @Override
@@ -118,25 +119,25 @@ public class CarCrashManager implements CarCrashService {
             result.get(i).setCarId(carCrashes.get(i).getCar().getCarId());
         }
 
-        return new SuccessDataResult<>(result, "Car Crash listed by car id, carId: " + carId);
+        return new SuccessDataResult<>(result, BusinessMessages.CarCrashMessages.CAR_CRASH_LISTED_BY_CAR_ID + carId);
     }
 
     private void checkIfExistsByCarCrashId(int carCrashId) throws CarCrashNotFoundException {
         if(!this.carCrashDao.existsByCarCrashId(carCrashId)){
-            throw new CarCrashNotFoundException("Car crash id not found, carCrashId: " + carCrashId);
+            throw new CarCrashNotFoundException(BusinessMessages.CarCrashMessages.CAR_CRASH_ID_NOT_FOUND + carCrashId);
         }
     }
 
     private void checkIfCrashDateBeforeToday(LocalDate crashDate) throws CrashDateAfterTodayException {
         if(crashDate.isAfter(LocalDate.now())){
-            throw new CrashDateAfterTodayException("Crash date cannot be after today, crashDate: " + crashDate);
+            throw new CrashDateAfterTodayException(BusinessMessages.CarCrashMessages.CRASH_DATE_CANNOT_AFTER_TODAY + crashDate);
         }
     }
 
     @Override
     public void checkIfNotExistsCarCrashByCar_CarId(int carId) throws CarExistsInCarCrashException {
         if(this.carCrashDao.existsByCar_CarId(carId)){
-            throw new CarExistsInCarCrashException("Car id already exists in the Car Crash table, carId: " + carId);
+            throw new CarExistsInCarCrashException(BusinessMessages.CarCrashMessages.CAR_ID_ALREADY_EXISTS_IN_THE_CAR_CRASH_TABLE + carId);
         }
     }
 }
